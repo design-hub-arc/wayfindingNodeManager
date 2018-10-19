@@ -1,11 +1,6 @@
 package nodemanager.node;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Collection;
-import java.awt.Graphics;
-import nodemanager.gui.Scale;
+import java.util.*;
 import static java.lang.System.out;
 
 public class Node {
@@ -53,14 +48,13 @@ public class Node {
             n.adjacentNodes.clear();
             for(Integer i : n.adjacentIds){
                 n.adjacentNodes.add(allNodes.get(i));
+                /*
+                if(Arrays.asList(allNodes.get(i).adjacentIds).indexOf(n.id) == -1){
+                    allNodes.get(i).addAdjId(n.id);
+                }*/
             }
         }
     }
-    /*
-    public void draw(Graphics g, Scale s){
-        g.setColor(Color.red);
-        g.fillRect(s.x(rawX), s.y(rawY), s.percWidth(5), s.percHeight(5));
-    }*/
     
     public String getDesc(){
         String ret = 

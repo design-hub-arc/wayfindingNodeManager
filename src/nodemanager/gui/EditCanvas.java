@@ -1,29 +1,44 @@
 package nodemanager.gui;
 
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import java.awt.Color;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
-import nodemanager.node.Node;
-
-
-import nodemanager.node.NodeParser;
+import nodemanager.node.*;
 
 public class EditCanvas extends JPanel{
+    private final MenuBar menu;
+    private final Pane body;
     private final JButton chooseCsvButton;
     private final JButton chooseMapButton;
     private MapImage map;
     
     public EditCanvas(){
         super();
-        map = new MapImage();
-        add(map);
+        GridBagLayout lo = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        setLayout(lo);
         
-        setBackground(Color.blue);
+        menu = new MenuBar();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.BOTH;
+        add(menu, c);
+        
+        body = new Pane();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.weightx = 1;
+        c.weighty = 9;
+        c.fill = GridBagConstraints.BOTH;
+        add(body, c);
+        
+        map = new MapImage();
+        body.add(map);
         
         chooseCsvButton = createSelector(
                 "node file", 
@@ -35,7 +50,7 @@ public class EditCanvas extends JPanel{
                     }
                 }
         );
-        add(chooseCsvButton);
+        menu.add(chooseCsvButton);
         
         chooseMapButton = createSelector(
                 "map Image", 
@@ -48,10 +63,13 @@ public class EditCanvas extends JPanel{
                     }
                 }
         );
-        add(chooseMapButton);
+        menu.add(chooseMapButton);
         
         map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
         loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
+        
+        System.out.println(body.getY());
+        setBackground(Color.blue);
     }
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
         JButton ret = new JButton("Select " + type);
