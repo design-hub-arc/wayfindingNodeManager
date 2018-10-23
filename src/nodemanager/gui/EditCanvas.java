@@ -7,7 +7,7 @@ import java.awt.event.*;
 import java.io.File;
 import nodemanager.node.*;
 
-public class EditCanvas extends JPanel{
+public class EditCanvas extends JPanel implements MouseListener{
     private final MenuBar menu;
     private final Pane body;
     private final Sidebar sideBar;
@@ -16,8 +16,13 @@ public class EditCanvas extends JPanel{
     private final NodeDataPane selectedNode;
     private MapImage map;
     
+    private Mode mode; //TODO add some way to change modes
+    
     public EditCanvas(){
         super();
+        
+        mode = Mode.NONE;
+        
         GridBagLayout lo = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(lo);
@@ -49,6 +54,24 @@ public class EditCanvas extends JPanel{
         add(sideBar, c);
         
         selectedNode = new NodeDataPane();
+        selectedNode.changeCoords.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                map.addMouseListener(new MouseListener(){
+                    @Override
+                    public void mouseClicked(MouseEvent me) {}
+
+                    @Override
+                    public void mousePressed(MouseEvent me) {}
+                    @Override
+                    public void mouseReleased(MouseEvent me) {}
+                    @Override
+                    public void mouseEntered(MouseEvent me) {}
+                    @Override
+                    public void mouseExited(MouseEvent me) {}
+                });
+            }
+        });
         sideBar.add(selectedNode);
         
         map = new MapImage();
@@ -132,4 +155,36 @@ public class EditCanvas extends JPanel{
         revalidate();
         repaint();
     }
+
+    //TODO: implement these
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        switch(mode){
+            case NONE:
+                break;
+            case ADD:
+                break;
+            case MOVE:
+                break;
+            case REMOVE_CONNECTION:
+                break;
+            case ADD_CONNECTION:
+                break;
+            default:
+                //do error stuff
+                break;
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {}
+
+    @Override
+    public void mouseReleased(MouseEvent me) {}
+
+    @Override
+    public void mouseEntered(MouseEvent me) {}
+
+    @Override
+    public void mouseExited(MouseEvent me) {}
 }

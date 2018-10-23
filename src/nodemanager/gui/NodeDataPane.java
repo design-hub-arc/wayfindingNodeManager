@@ -9,11 +9,13 @@ public class NodeDataPane extends JComponent{
     private Node selectedNode;
     private boolean hasNodeSelected;
     private final JTextArea nodeInfo;
-    private final JButton changeCoords;
+    public final JButton changeCoords;
     
     public NodeDataPane(){
         setLayout(new GridLayout(2, 1));
+        selectedNode = null;
         hasNodeSelected = false;
+        
         nodeInfo = new JTextArea("No node selected");
         nodeInfo.setBackground(Color.red);
         nodeInfo.setEditable(false);
@@ -38,9 +40,17 @@ public class NodeDataPane extends JComponent{
         selectNode(n);
     }
     
+    public void addChangeCoord(AbstractAction a){
+        changeCoords.addActionListener(a);
+    }
+    
     public void selectNode(Node n){
         hasNodeSelected = true;
         selectedNode = n;
         nodeInfo.setText(n.getDesc());
+    }
+    
+    public Node getSelected(){
+        return selectedNode;
     }
 }
