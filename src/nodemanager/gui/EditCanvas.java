@@ -3,15 +3,17 @@ package nodemanager.gui;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.io.File;
 import nodemanager.node.*;
 
 public class EditCanvas extends JPanel{
     private final MenuBar menu;
     private final Pane body;
+    private final Sidebar sideBar;
     private final JButton chooseCsvButton;
     private final JButton chooseMapButton;
+    private final NodeDataPane selectedNode;
     private MapImage map;
     
     public EditCanvas(){
@@ -29,13 +31,25 @@ public class EditCanvas extends JPanel{
         add(menu, c);
         
         body = new Pane();
-        c.gridx = 0;
+        c.gridx = 1;
         c.gridy = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        c.weightx = 1;
+        c.weightx = 9;
         c.weighty = 9;
         c.fill = GridBagConstraints.BOTH;
         add(body, c);
+        
+        sideBar = new Sidebar();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.weightx = 1;
+        c.weighty = 9;
+        c.fill = GridBagConstraints.BOTH;
+        add(sideBar, c);
+        
+        selectedNode = new NodeDataPane();
+        sideBar.add(selectedNode);
         
         map = new MapImage();
         body.add(map);
@@ -68,7 +82,6 @@ public class EditCanvas extends JPanel{
         map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
         loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
         
-        System.out.println(body.getY());
         setBackground(Color.blue);
     }
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
@@ -95,12 +108,26 @@ public class EditCanvas extends JPanel{
         NodeParser.readCsv(f);
         map.scaleTo(Node.get(-1).rawX, Node.get(-1).rawY, Node.get(-2).rawX, Node.get(-2).rawY);
         
-        Scale s = map.getScale();
-        NodeIcon ni;
         for(Node n : Node.getAll()){
-            ni = new NodeIcon(n);
-            ni.scaleTo(s);
-            map.add(ni);
+            map.addNode(n);
+            map.getIconFor(n).addMouseListener(new MouseListener(){
+                @Override
+                public void mouseClicked(MouseEvent me) {
+                    selectedNode.selectNode(n);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent me) {}
+
+                @Override
+                public void mouseReleased(MouseEvent me) {}
+
+                @Override
+                public void mouseEntered(MouseEvent me) {}
+
+                @Override
+                public void mouseExited(MouseEvent me) {}
+            });
         }
         revalidate();
         repaint();

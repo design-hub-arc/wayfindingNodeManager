@@ -1,11 +1,12 @@
 package nodemanager.gui;
 
-import java.io.File;
-import java.io.IOException;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import java.io.*;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.awt.event.*;
+import java.util.HashMap;
+import nodemanager.node.Node;
 
 /*
 MapImage is used to render an image,
@@ -15,15 +16,31 @@ Upon creating a MapImage, you need to call setImage on a file,
 then scaleTo a set of coordinates
 */
 
-public class MapImage extends JLabel{
+public class MapImage extends JLabel implements MouseListener{
     private BufferedImage buff;
     private final Scale scaler;
+    private final HashMap<Integer, NodeIcon> nodeIcons;
     
     public MapImage(){
         super();
         setVisible(true);
         scaler = new Scale();
+        nodeIcons = new HashMap<>();
+        addMouseListener(this);
     }
+    
+    public void addNode(Node n){
+        NodeIcon ni = new NodeIcon(n);
+        ni.scaleTo(scaler);
+        nodeIcons.put(n.id, ni);
+        add(ni);
+        revalidate();
+        repaint();
+    }
+    public NodeIcon getIconFor(Node n){
+        return nodeIcons.get(n.id);
+    }
+    
     public void setImage(File f){
         try{
             buff = ImageIO.read(f);
@@ -41,4 +58,23 @@ public class MapImage extends JLabel{
     public Scale getScale(){
         return scaler;
     }
+    
+    
+
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        System.out.println(scaler.inverseX(me.getX()) + ", " + scaler.inverseY(me.getY()));
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {}
+
+    @Override
+    public void mouseReleased(MouseEvent me) {}
+
+    @Override
+    public void mouseEntered(MouseEvent me) {}
+
+    @Override
+    public void mouseExited(MouseEvent me) {}
 }

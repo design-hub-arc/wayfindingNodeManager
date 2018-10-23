@@ -41,6 +41,13 @@ public class Scale {
         return (int)(percDown * sourceHeight);
     }
     
+    public double inverseX(int x){
+        return minX + (width * x) / sourceWidth;
+    }
+    public double inverseY(int y){
+        return minY + (height * y) / sourceHeight;
+    }
+    
     public int percWidth(int perc){
         /*
         @param perc : the percentage of the width you want
