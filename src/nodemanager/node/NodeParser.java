@@ -22,12 +22,10 @@ public class NodeParser {
         try{
             br = new BufferedReader(new FileReader(f));
             br.lines().forEach(l -> parseLine(l));
-            Node.init();
-            Node.logAll();
+            Node.initAll();
+            //Node.logAll();
         } catch(FileNotFoundException e){
             e.printStackTrace();
-        } catch(IOException ioe){
-            ioe.printStackTrace();
         }
     }
     

@@ -25,6 +25,10 @@ public class NodeIcon extends JLabel implements MouseListener{
         this.setLocation(s.x(node.rawX), s.y(node.rawY));
     }
     
+    public void drawAllLinks(){
+        node.getAdj().stream().forEach(n -> drawLink(n));
+    }
+    
     private void drawLink(Node n){
         Graphics2D g = (Graphics2D)getParent().getGraphics();
         g.setColor(Color.red);
@@ -35,7 +39,6 @@ public class NodeIcon extends JLabel implements MouseListener{
     @Override
     public void mouseClicked(MouseEvent me) {
         node.displayData();
-        // select this node
     }
 
     @Override
@@ -47,7 +50,7 @@ public class NodeIcon extends JLabel implements MouseListener{
     @Override
     public void mouseEntered(MouseEvent me) {
         node.getAdj().stream().forEach(n -> drawLink(n));
-        this.setToolTipText(node.getDesc());
+        setToolTipText(node.getDesc());
     }
     
     //flickering
