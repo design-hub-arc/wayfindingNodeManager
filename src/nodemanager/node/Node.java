@@ -53,7 +53,7 @@ public class Node {
         return allNodes.values();
     }
     
-    
+   
     public void addAdjId(int i){
         adjacentIds.add(i);
     }
@@ -66,25 +66,38 @@ public class Node {
         //need to run this to populate adjacent nodes
         //TODO add checking and make two way
         for(Node n : allNodes.values()){
-            n.init(true);
+            n.checkOneWay();
+        }
+        for(Node n : allNodes.values()){
+            n.init();
         }
     }
-    public void init(boolean cascade){
+    public void init(){
         adjacentNodes.clear();
         Node adj;
+        
+        ArrayList<Integer> newAdj = new ArrayList<>();
+        adjacentIds.stream().filter(aid -> allNodes.containsKey(aid)).forEach(adid -> newAdj.add(adid));
+        adjacentIds = newAdj;
+        
         for(Integer i : adjacentIds){
             adj = allNodes.get(i);
-            adjacentNodes.add(adj);
-            /*
-            Make connection table which works both ways:
-            1, 2 adds 2 to 1's adjIds, and 1 to 2's
-            
-            if(Arrays.asList(adj.adjacentIds).indexOf(id) == -1){
-                adj.addAdjId(id);
-                if(cascade){
-                    adj.init(false);
+            if(adj != null){
+                adjacentNodes.add(adj);
+            } else {
+                out.println("Node not found with id of " + i);
+            }
+        }
+    }
+    private void checkOneWay(){
+        Node adj;
+        for(Integer i : adjacentIds){
+            adj = Node.get(i);
+            if(adj != null){
+                if(Arrays.asList(adj.adjacentIds).indexOf(id) == -1){
+                    adj.addAdjId(id);
                 }
-            }*/
+            }
         }
     }
     

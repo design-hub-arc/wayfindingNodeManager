@@ -90,12 +90,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseClicked(MouseEvent me) {
         if(Session.mode == Mode.ADD){
             Node n = new Node(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
-            n.init(false);
+            n.init();
             addNode(n);
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.MOVE){
             Session.mode = Mode.NONE;
-            JOptionPane.showMessageDialog(null, "done moving"); //not working
         }
     }
 

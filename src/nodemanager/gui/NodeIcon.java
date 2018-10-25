@@ -4,6 +4,8 @@ import javax.swing.JLabel;
 import javax.swing.JToolTip;
 import java.awt.*;
 import java.awt.event.*;
+import nodemanager.Mode;
+import nodemanager.Session;
 import nodemanager.node.Node;
 
 public class NodeIcon extends JLabel implements MouseListener{
@@ -22,7 +24,11 @@ public class NodeIcon extends JLabel implements MouseListener{
     
     public void scaleTo(Scale s){
         scale = s;
-        this.setLocation(s.x(node.rawX), s.y(node.rawY));
+        initPos();
+    }
+    
+    public void initPos(){
+        setLocation(scale.x(node.rawX), scale.y(node.rawY));
     }
     
     public void drawAllLinks(){
@@ -38,7 +44,17 @@ public class NodeIcon extends JLabel implements MouseListener{
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        node.displayData();
+        if(Session.mode == Mode.NONE){
+            node.displayData();
+        } else if(Session.mode == Mode.ADD_CONNECTION){
+            Session.selectedNode.addAdjId(node.id);
+            node.addAdjId(Session.selectedNode.id);
+            
+            Session.selectedNode.init();
+            node.init();
+            
+            Session.mode = Mode.NONE;
+        }
     }
 
     @Override

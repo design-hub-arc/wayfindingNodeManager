@@ -13,9 +13,11 @@ public class NodeDataPane extends JComponent{
     private final JTextArea nodeInfo;
     public final JButton delete;
     public final JButton move;
+    public final JButton resetPos;
+    public final JButton addConn;
     
     public NodeDataPane(){
-        setLayout(new GridLayout(3, 1));
+        setLayout(new GridLayout(5, 1));
         selectedNode = null;
         hasNodeSelected = false;
         
@@ -59,6 +61,29 @@ public class NodeDataPane extends JComponent{
             }
         });
         add(move);
+        
+        resetPos = new JButton("Reset position");
+        resetPos.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                if(hasNodeSelected){
+                    selectedNode.getIcon().initPos();
+                }
+            }
+        });
+        add(resetPos);
+        
+        addConn = new JButton("Add a connection");
+        addConn.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                if(hasNodeSelected){
+                    JOptionPane.showMessageDialog(null, "Click on a node to connect it to node " + selectedNode.id);
+                    Session.mode = Mode.ADD_CONNECTION;
+                }
+            }
+        });
+        add(addConn);
         
         setVisible(true);
     }
