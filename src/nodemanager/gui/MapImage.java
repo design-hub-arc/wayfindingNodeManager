@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.event.*;
 import java.util.HashMap;
 import nodemanager.node.Node;
+import nodemanager.*;
 
 /*
 MapImage is used to render an image,
@@ -16,7 +17,7 @@ Upon creating a MapImage, you need to call setImage on a file,
 then scaleTo a set of coordinates
 */
 
-public class MapImage extends JLabel implements MouseListener{
+public class MapImage extends JLabel implements MouseListener, MouseMotionListener{
     private BufferedImage buff;
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons;
@@ -27,13 +28,37 @@ public class MapImage extends JLabel implements MouseListener{
         scaler = new Scale();
         nodeIcons = new HashMap<>();
         addMouseListener(this);
+        this.addMouseMotionListener(this);
     }
     
     public void addNode(Node n){
-        NodeIcon ni = new NodeIcon(n);
+        MapImage map = this;
+        NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
         nodeIcons.put(n.id, ni);
         add(ni);
+        
+        ni.addMouseListener(new MouseListener(){
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                Session.selectNode(n);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {}
+
+            @Override
+            public void mouseReleased(MouseEvent me) {}
+
+            @Override
+            public void mouseEntered(MouseEvent me) {}
+
+            @Override
+            public void mouseExited(MouseEvent me) {}
+        });
+        
+        
+        
         revalidate();
         repaint();
     }
@@ -63,7 +88,15 @@ public class MapImage extends JLabel implements MouseListener{
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        System.out.println(scaler.inverseX(me.getX()) + ", " + scaler.inverseY(me.getY()));
+        if(Session.mode == Mode.ADD){
+            Node n = new Node(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
+            n.init(false);
+            addNode(n);
+            Session.mode = Mode.NONE;
+        } else if(Session.mode == Mode.MOVE){
+            Session.mode = Mode.NONE;
+            JOptionPane.showMessageDialog(null, "done moving"); //not working
+        }
     }
 
     @Override
@@ -73,8 +106,27 @@ public class MapImage extends JLabel implements MouseListener{
     public void mouseReleased(MouseEvent me) {}
 
     @Override
-    public void mouseEntered(MouseEvent me) {}
+    public void mouseEntered(MouseEvent me) {
+        if(Session.mode == Mode.ADD){
+            //TODO: add node icon that follows mouse?
+        }
+    }
 
     @Override
     public void mouseExited(MouseEvent me) {}
+
+    @Override
+    public void mouseDragged(MouseEvent me) {
+        //click and drag
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        if(Session.mode == Mode.MOVE){
+            Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
+            Session.selectedNode.getIcon().drawAllLinks();
+            revalidate();
+            repaint();
+        }
+    }
 }

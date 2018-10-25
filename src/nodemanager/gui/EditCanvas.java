@@ -1,5 +1,6 @@
 package nodemanager.gui;
 
+import nodemanager.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -7,21 +8,22 @@ import java.awt.event.*;
 import java.io.File;
 import nodemanager.node.*;
 
-public class EditCanvas extends JPanel implements MouseListener{
+/*
+EditCanvas is the main JPanel used by the program
+*/
+
+public class EditCanvas extends JPanel{
     private final MenuBar menu;
     private final Pane body;
     private final Sidebar sideBar;
     private final JButton chooseCsvButton;
     private final JButton chooseMapButton;
+    private final JButton addNodeButton;
     private final NodeDataPane selectedNode;
     private MapImage map;
     
-    private Mode mode; //TODO add some way to change modes
-    
     public EditCanvas(){
         super();
-        
-        mode = Mode.NONE;
         
         GridBagLayout lo = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
@@ -54,25 +56,8 @@ public class EditCanvas extends JPanel implements MouseListener{
         add(sideBar, c);
         
         selectedNode = new NodeDataPane();
-        selectedNode.changeCoords.addActionListener(new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e){
-                map.addMouseListener(new MouseListener(){
-                    @Override
-                    public void mouseClicked(MouseEvent me) {}
-
-                    @Override
-                    public void mousePressed(MouseEvent me) {}
-                    @Override
-                    public void mouseReleased(MouseEvent me) {}
-                    @Override
-                    public void mouseEntered(MouseEvent me) {}
-                    @Override
-                    public void mouseExited(MouseEvent me) {}
-                });
-            }
-        });
         sideBar.add(selectedNode);
+        Session.dataPane = selectedNode;
         
         map = new MapImage();
         body.add(map);
@@ -102,10 +87,23 @@ public class EditCanvas extends JPanel implements MouseListener{
         );
         menu.add(chooseMapButton);
         
-        map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
-        loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
+        addNodeButton = new JButton("Add a new Node");
+        addNodeButton.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                Session.mode = Mode.ADD;
+                JOptionPane.showMessageDialog(null, "Click on any location on the map to add a new node");
+            }
+        });
+        menu.add(addNodeButton);
         
         setBackground(Color.blue);
+        
+        
+        
+        //placeholders
+        map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
+        loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
     }
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
         JButton ret = new JButton("Select " + type);
@@ -133,58 +131,12 @@ public class EditCanvas extends JPanel implements MouseListener{
         
         for(Node n : Node.getAll()){
             map.addNode(n);
-            map.getIconFor(n).addMouseListener(new MouseListener(){
-                @Override
-                public void mouseClicked(MouseEvent me) {
-                    selectedNode.selectNode(n);
-                }
-
-                @Override
-                public void mousePressed(MouseEvent me) {}
-
-                @Override
-                public void mouseReleased(MouseEvent me) {}
-
-                @Override
-                public void mouseEntered(MouseEvent me) {}
-
-                @Override
-                public void mouseExited(MouseEvent me) {}
-            });
         }
         revalidate();
         repaint();
     }
-
-    //TODO: implement these
-    @Override
-    public void mouseClicked(MouseEvent me) {
-        switch(mode){
-            case NONE:
-                break;
-            case ADD:
-                break;
-            case MOVE:
-                break;
-            case REMOVE_CONNECTION:
-                break;
-            case ADD_CONNECTION:
-                break;
-            default:
-                //do error stuff
-                break;
-        }
+    
+    private abstract class FileSelectedListener{
+        public abstract void run(File f);
     }
-
-    @Override
-    public void mousePressed(MouseEvent me) {}
-
-    @Override
-    public void mouseReleased(MouseEvent me) {}
-
-    @Override
-    public void mouseEntered(MouseEvent me) {}
-
-    @Override
-    public void mouseExited(MouseEvent me) {}
 }
