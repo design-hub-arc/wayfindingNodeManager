@@ -17,47 +17,36 @@ Upon creating a MapImage, you need to call setImage on a file,
 then scaleTo a set of coordinates
 */
 
-public class MapImage extends JLabel implements MouseListener, MouseMotionListener{
+public class MapImage extends JLabel implements MouseListener, MouseMotionListener, MouseWheelListener{
     private BufferedImage buff;
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons;
+    
+    //https://stackoverflow.com/questions/874360/swing-creating-a-draggable-component
+    private int screenX;
+    private int screenY;
+    private int prevX;
+    private int prevY;
     
     public MapImage(){
         super();
         setVisible(true);
         scaler = new Scale();
         nodeIcons = new HashMap<>();
+        screenX = 0;
+        screenY = 0;
+        prevX = getX();
+        prevY = getY();
         addMouseListener(this);
-        this.addMouseMotionListener(this);
+        addMouseMotionListener(this);
+        addMouseWheelListener(this);
     }
     
     public void addNode(Node n){
-        MapImage map = this;
         NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
         nodeIcons.put(n.id, ni);
         add(ni);
-        
-        ni.addMouseListener(new MouseListener(){
-            @Override
-            public void mouseClicked(MouseEvent me) {
-                Session.selectNode(n);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent me) {}
-
-            @Override
-            public void mouseReleased(MouseEvent me) {}
-
-            @Override
-            public void mouseEntered(MouseEvent me) {}
-
-            @Override
-            public void mouseExited(MouseEvent me) {}
-        });
-        
-        
         
         revalidate();
         repaint();
@@ -96,6 +85,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         } else if(Session.mode == Mode.MOVE){
             Session.mode = Mode.NONE;
         }
+        
+        screenX = me.getX();
+        screenY = me.getY();
+        prevX = getX();
+        prevY = getY();
     }
 
     @Override
@@ -116,7 +110,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseDragged(MouseEvent me) {
-        //click and drag
+        //click and drag. Flickering
+        setLocation(prevX + (me.getX() - screenX), prevY + (me.getY() - screenY));
     }
 
     @Override
@@ -127,5 +122,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             revalidate();
             repaint();
         }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent mwe) {
+        System.out.println(mwe.getPreciseWheelRotation());
+        //still need to implement zooming
     }
 }

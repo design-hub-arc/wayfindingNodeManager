@@ -5,8 +5,8 @@ Implemented thus far:
 NONE                                        - done
 ADD               - in MapImage             - done
 MOVE              - in MapImage             - done, but not super good. 
-ADD_CONNECTION    - in NodeIcon             - not done
-REMOVE_CONNECTION - in NodeIcon             - not done
+ADD_CONNECTION    - in NodeIcon             - done
+REMOVE_CONNECTION - in NodeIcon             - done
 */
 public enum Mode {
     NONE,

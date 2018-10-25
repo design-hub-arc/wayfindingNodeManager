@@ -15,9 +15,10 @@ public class NodeDataPane extends JComponent{
     public final JButton move;
     public final JButton resetPos;
     public final JButton addConn;
+    public final JButton remConn;
     
     public NodeDataPane(){
-        setLayout(new GridLayout(5, 1));
+        setLayout(new GridLayout(6, 1));
         selectedNode = null;
         hasNodeSelected = false;
         
@@ -84,6 +85,18 @@ public class NodeDataPane extends JComponent{
             }
         });
         add(addConn);
+        
+        remConn = new JButton("Remove a connection");
+        remConn.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                if(hasNodeSelected){
+                    JOptionPane.showMessageDialog(null, "Click on a node to disconnect it from node " + selectedNode.id);
+                    Session.mode = Mode.REMOVE_CONNECTION;
+                }
+            }
+        });
+        add(remConn);
         
         setVisible(true);
     }

@@ -32,7 +32,7 @@ public class NodeIcon extends JLabel implements MouseListener{
     }
     
     public void drawAllLinks(){
-        node.getAdj().stream().forEach(n -> drawLink(n));
+        node.getAdjIds().stream().map(id -> Node.get(id)).forEach(n -> drawLink(n));
     }
     
     private void drawLink(Node n){
@@ -45,6 +45,7 @@ public class NodeIcon extends JLabel implements MouseListener{
     @Override
     public void mouseClicked(MouseEvent me) {
         if(Session.mode == Mode.NONE){
+            Session.selectNode(node);
             node.displayData();
         } else if(Session.mode == Mode.ADD_CONNECTION){
             Session.selectedNode.addAdjId(node.id);
@@ -54,6 +55,10 @@ public class NodeIcon extends JLabel implements MouseListener{
             node.init();
             
             Session.mode = Mode.NONE;
+        } else if(Session.mode == Mode.REMOVE_CONNECTION){
+            Session.selectedNode.removeAdj(node.id);
+            node.removeAdj(Session.selectedNode.id);
+            Session.mode = Mode.REMOVE_CONNECTION;
         }
     }
 
@@ -65,7 +70,7 @@ public class NodeIcon extends JLabel implements MouseListener{
 
     @Override
     public void mouseEntered(MouseEvent me) {
-        node.getAdj().stream().forEach(n -> drawLink(n));
+        drawAllLinks();
         setToolTipText(node.getDesc());
     }
     

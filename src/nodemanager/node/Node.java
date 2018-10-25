@@ -8,20 +8,17 @@ public class Node {
     public final int id;
     public final double rawX;
     public final double rawY;
-    private ArrayList<Integer> adjacentIds;
-    private ArrayList<Node> adjacentNodes;
+    private HashSet<Integer> adjacentIds;
     private NodeIcon icon;
     
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
-    
     private static int nextId = 0;
     
     public Node(int id, double x, double y){
             this.id = id;
             rawX = x;
             rawY = y;
-            adjacentIds = new ArrayList<>();
-            adjacentNodes = new ArrayList<>();
+            adjacentIds = new HashSet<>();
             icon = new NodeIcon(this);
         if(!allNodes.containsKey(id)){    
             allNodes.put(id, this);
@@ -36,11 +33,11 @@ public class Node {
     }
     
     public static void removeNode(int id){
+        allNodes.remove(id);
+        
         Node n = get(id);
         if(n != null){
-            allNodes.remove(id);
             n.adjacentIds.stream().forEach(i -> get(i).adjacentIds.remove(Integer.valueOf(id)));
-            n.adjacentNodes.stream().forEach(nn -> nn.adjacentNodes.remove(n));
         }
     }
     
@@ -48,47 +45,31 @@ public class Node {
     public static Node get(int nodeId){
         return allNodes.get(nodeId);
     }
-    
     public static Collection<Node> getAll(){
         return allNodes.values();
     }
     
-   
+    
+    
     public void addAdjId(int i){
         adjacentIds.add(i);
     }
-    
-    public ArrayList<Node> getAdj(){
-        return adjacentNodes;
-    }
-    
-    public static void initAll(){
-        //need to run this to populate adjacent nodes
-        //TODO add checking and make two way
-        for(Node n : allNodes.values()){
-            n.checkOneWay();
-        }
-        for(Node n : allNodes.values()){
-            n.init();
-        }
-    }
-    public void init(){
-        adjacentNodes.clear();
-        Node adj;
-        
-        ArrayList<Integer> newAdj = new ArrayList<>();
-        adjacentIds.stream().filter(aid -> allNodes.containsKey(aid)).forEach(adid -> newAdj.add(adid));
-        adjacentIds = newAdj;
-        
-        for(Integer i : adjacentIds){
-            adj = allNodes.get(i);
-            if(adj != null){
-                adjacentNodes.add(adj);
-            } else {
-                out.println("Node not found with id of " + i);
+    public void removeAdj(int i){
+        Integer remId = Integer.valueOf(i);
+        if(adjacentIds.contains(remId)){
+            Node connected = Node.get(i);
+            adjacentIds.remove(remId);
+            if(connected.adjacentIds.contains(remId)){
+                connected.removeAdj(id);
             }
         }
     }
+    public HashSet<Integer> getAdjIds(){
+        return adjacentIds;
+    }
+    
+    
+    
     private void checkOneWay(){
         Node adj;
         for(Integer i : adjacentIds){
@@ -99,6 +80,11 @@ public class Node {
                 }
             }
         }
+    }
+    public void init(){
+        HashSet<Integer> newAdj = new HashSet<>();
+        adjacentIds.stream().filter(aid -> allNodes.containsKey(aid)).forEach(adid -> newAdj.add(adid));
+        adjacentIds = newAdj;
     }
     
     public NodeIcon getIcon(){
@@ -116,9 +102,19 @@ public class Node {
         }
         return ret;
     }
-    
     public void displayData(){
         out.println(getDesc());
+    }
+    
+    public static void initAll(){
+        //need to run this to populate adjacent nodes
+        //TODO add checking and make two way
+        for(Node n : allNodes.values()){
+            n.checkOneWay();
+        }
+        for(Node n : allNodes.values()){
+            n.init();
+        }
     }
     public static void logAll(){
         out.println("*ALL NODES*");
@@ -127,5 +123,4 @@ public class Node {
             n.displayData();
         }
     }
-    
 }
