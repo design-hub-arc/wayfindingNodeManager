@@ -20,10 +20,14 @@ public class Node {
         rawX = x;
         rawY = y;
         adjacentIds = new HashSet<>();
-        icon = new NodeIcon(this);    
-        allNodes.put(id, this);
-        if(id >= nextId){
-            nextId = id + 1;
+        icon = new NodeIcon(this);
+        
+        //need this for now, but can remove once we get to one line per node in node file
+        if(!allNodes.containsKey(id)){
+            allNodes.put(id, this);
+            if(id >= nextId){
+                nextId = id + 1;
+            }
         }
     }
     

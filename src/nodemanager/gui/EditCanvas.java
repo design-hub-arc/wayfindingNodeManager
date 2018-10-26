@@ -101,20 +101,7 @@ public class EditCanvas extends JPanel{
         });
         menu.add(addNodeButton);
         
-        exportNodeData = new JButton("Export data");
-        exportNodeData.addActionListener(new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                JFileChooser destination = new JFileChooser();
-                destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int response = destination.showOpenDialog(destination);
-                if(response == JFileChooser.APPROVE_OPTION){
-                    File f = destination.getSelectedFile();
-                    Node.generateDataAt(f.getAbsolutePath());
-                }
-            }
-        });
-        menu.add(exportNodeData);
+        exportNodeData = createExportButton();
         
         setBackground(Color.blue);
         
@@ -142,6 +129,25 @@ public class EditCanvas extends JPanel{
         });
         
         return ret;
+    }
+    
+    private JButton createExportButton(){
+        JButton j = new JButton("Export data");
+        j.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JFileChooser destination = new JFileChooser();
+                destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int response = destination.showOpenDialog(destination);
+                if(response == JFileChooser.APPROVE_OPTION){
+                    File f = destination.getSelectedFile();
+                    Node.generateDataAt(f.getAbsolutePath());
+                }
+            }
+        });
+        menu.add(j);
+        
+        return j;
     }
     
     private void loadNodesFromFile(File f){

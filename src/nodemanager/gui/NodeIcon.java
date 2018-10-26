@@ -40,7 +40,7 @@ public class NodeIcon extends JLabel implements MouseListener{
         Graphics2D g = (Graphics2D)getParent().getGraphics();
         g.setColor(Color.red);
         g.setStroke(new BasicStroke(10));
-        g.drawLine(getX(), getY(), scale.x(n.rawX), scale.y(n.rawY));
+        g.drawLine(getX(), getY(), n.getIcon().getX(), n.getIcon().getY());
     }
 
     @Override
