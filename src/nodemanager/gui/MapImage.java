@@ -1,5 +1,6 @@
 package nodemanager.gui;
 
+import java.awt.Graphics2D;
 import java.io.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -22,17 +23,22 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons;
     
+    private double zoom;
+    
     //https://stackoverflow.com/questions/874360/swing-creating-a-draggable-component
-    private int screenX;
-    private int screenY;
-    private int prevX;
-    private int prevY;
+    private volatile int screenX;
+    private volatile int screenY;
+    private volatile int prevX;
+    private volatile int prevY;
     
     public MapImage(){
         super();
         setVisible(true);
         scaler = new Scale();
         nodeIcons = new HashMap<>();
+        
+        zoom = 1.0;
+        
         screenX = 0;
         screenY = 0;
         prevX = getX();
@@ -46,8 +52,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
         nodeIcons.put(n.id, ni);
-        add(ni);
         
+        add(ni);
         revalidate();
         repaint();
     }
@@ -85,15 +91,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         } else if(Session.mode == Mode.MOVE){
             Session.mode = Mode.NONE;
         }
-        
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {
         screenX = me.getX();
         screenY = me.getY();
         prevX = getX();
         prevY = getY();
     }
-
-    @Override
-    public void mousePressed(MouseEvent me) {}
 
     @Override
     public void mouseReleased(MouseEvent me) {}
@@ -128,5 +134,13 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseWheelMoved(MouseWheelEvent mwe) {
         System.out.println(mwe.getPreciseWheelRotation());
         //still need to implement zooming
+        zoom += mwe.getPreciseWheelRotation() / 100;
+        int newWidth = (int)(buff.getWidth() * zoom);
+        int newHeight = (int)(buff.getHeight() * zoom);
+        BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.OPAQUE);
+        Graphics2D g = resized.createGraphics();
+        g.drawImage(buff, 0, 0, newWidth, newHeight, null);
+        g.dispose();
+        setIcon(new ImageIcon(resized));
     }
 }
