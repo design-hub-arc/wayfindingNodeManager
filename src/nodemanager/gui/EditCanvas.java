@@ -126,6 +126,9 @@ public class EditCanvas extends JPanel{
     }
     
     private void loadNodesFromFile(File f){
+        map.removeAllNodes();
+        Node.removeAll();
+        
         NodeParser.readCsv(f);
         map.scaleTo(Node.get(-1).rawX, Node.get(-1).rawY, Node.get(-2).rawX, Node.get(-2).rawY);
         

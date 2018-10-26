@@ -1,11 +1,13 @@
 package nodemanager.gui;
 
+import java.awt.Component;
 import java.awt.Graphics2D;
 import java.io.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import nodemanager.node.Node;
 import nodemanager.*;
@@ -57,6 +59,19 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         revalidate();
         repaint();
     }
+    public void removeAllNodes(){
+        ArrayList<Component> newComp = new ArrayList<>();
+        for(Component c : getComponents()){
+            if(!(c instanceof NodeIcon)){
+                newComp.add(c);
+            }
+        }
+        removeAll();
+        for(Component c : newComp){
+            add(c);
+        }
+    }
+    
     public NodeIcon getIconFor(Node n){
         return nodeIcons.get(n.id);
     }

@@ -33,12 +33,15 @@ public class Node {
     }
     
     public static void removeNode(int id){
-        allNodes.remove(id);
         
         Node n = get(id);
         if(n != null){
             n.adjacentIds.stream().forEach(i -> get(i).adjacentIds.remove(Integer.valueOf(id)));
         }
+        allNodes.remove(id);
+    }
+    public static void removeAll(){
+        allNodes.clear();
     }
     
     //how deal with not found?
