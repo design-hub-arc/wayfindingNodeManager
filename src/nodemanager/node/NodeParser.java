@@ -17,6 +17,7 @@ public class NodeParser {
     }
     private static HashMap<ColumnType, Integer> columns = new HashMap<>();
     
+    //TODO: make this work using seperate node and connection files
     public static void readCsv(File f){
         BufferedReader br;
         try{

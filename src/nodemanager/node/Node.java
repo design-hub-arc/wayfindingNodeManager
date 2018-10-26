@@ -1,5 +1,6 @@
 package nodemanager.node;
 
+import java.io.*;
 import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
@@ -15,16 +16,14 @@ public class Node {
     private static int nextId = 0;
     
     public Node(int id, double x, double y){
-            this.id = id;
-            rawX = x;
-            rawY = y;
-            adjacentIds = new HashSet<>();
-            icon = new NodeIcon(this);
-        if(!allNodes.containsKey(id)){    
-            allNodes.put(id, this);
-            if(id >= nextId){
-                nextId = id + 1;
-            }
+        this.id = id;
+        rawX = x;
+        rawY = y;
+        adjacentIds = new HashSet<>();
+        icon = new NodeIcon(this);    
+        allNodes.put(id, this);
+        if(id >= nextId){
+            nextId = id + 1;
         }
     }
     
@@ -124,6 +123,35 @@ public class Node {
         for(Node n : allNodes.values()){
             out.println("");
             n.displayData();
+        }
+    }
+    
+    public static void generateDataAt(String path){
+        BufferedWriter out = null;
+        String nl = System.getProperty("line.separator");
+        try {
+            File nodeFile = new File(path + File.separator + "nodeData.csv");
+            File connectFile = new File(path + File.separator + "nodeConnections.csv");
+            
+            out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
+            out.write("id, x, y" + nl);
+            for(Node n : allNodes.values()){
+                out.write(n.id + ", " + n.getIcon().getX() + ", " + n.getIcon().getY() + nl);
+            }
+            out.close();
+            
+            out = new BufferedWriter(new FileWriter(connectFile.getAbsoluteFile()));
+            for(Node n : allNodes.values()){
+                for(int id : n.adjacentIds){
+                    //TODO: no duplicates
+                    out.write(n.id + ", " + id + nl);
+                }
+            }
+            out.close();
+        } catch (FileNotFoundException ex) {
+            
+        } catch (IOException ex) {
+            
         }
     }
 }
