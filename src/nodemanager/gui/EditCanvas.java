@@ -5,6 +5,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import static java.awt.event.KeyEvent.VK_ESCAPE;
 import java.io.File;
 import nodemanager.node.*;
 
@@ -12,13 +13,14 @@ import nodemanager.node.*;
 EditCanvas is the main JPanel used by the program
 */
 
-public class EditCanvas extends JPanel{
+public class EditCanvas extends JPanel implements KeyListener{
     private final MenuBar menu;
     private final Pane body;
     private final Sidebar sideBar;
     private final JButton chooseCsvButton;
     private final JButton chooseMapButton;
     private final JButton addNodeButton;
+    
     private final NodeDataPane selectedNode;
     private MapImage map;
     
@@ -81,6 +83,8 @@ public class EditCanvas extends JPanel{
                     @Override
                     public void run(File f){
                         map.setImage(f);
+                        JOptionPane.showMessageDialog(null, "Click on a point on the new map to resize");
+                        Session.mode = Mode.RESCALING;
                         repaint();
                     }
                 }
@@ -104,6 +108,14 @@ public class EditCanvas extends JPanel{
         //placeholders
         map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
         loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
+        
+        getInputMap().put(KeyStroke.getKeyStroke("SPACE"), new AbstractAction(){
+            //not running
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                Session.mode = Mode.NONE;
+            }
+        });
     }
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
         JButton ret = new JButton("Select " + type);
@@ -138,6 +150,20 @@ public class EditCanvas extends JPanel{
         revalidate();
         repaint();
     }
+
+    @Override
+    public void keyTyped(KeyEvent ke) {}
+
+    @Override
+    public void keyPressed(KeyEvent ke) {
+        System.out.println(ke.getKeyCode());
+        if(ke.getKeyCode() == VK_ESCAPE){
+            Session.mode = Mode.NONE;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent ke) {}
     
     private abstract class FileSelectedListener{
         public abstract void run(File f);

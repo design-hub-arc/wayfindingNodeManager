@@ -9,7 +9,6 @@ public class Scale {
     private double width;
     private double height;
     
-    private JLabel source;
     private double sourceWidth;
     private double sourceHeight;
     
@@ -31,11 +30,15 @@ public class Scale {
     public void setSource(JLabel j){
         sourceWidth = j.getWidth();
         sourceHeight = j.getHeight();
-        source = j;
     }
+    public void setSize(double w, double h){
+        sourceWidth = w;
+        sourceHeight = h;
+    }
+    
     public int x(double x){
         double percLeft = (x - minX) / width;
-        return (int)(percLeft * source.getWidth());
+        return (int)(percLeft * sourceWidth);
     }
     public double percX(double x){
         return (x - minX) / width;
@@ -43,7 +46,7 @@ public class Scale {
     
     public int y(double y){
         double percDown = (y - minY) / height;
-        return (int)(percDown * source.getHeight());
+        return (int)(percDown * sourceHeight);
     }
     public double percY(double y){
         return (y - minY) / height;

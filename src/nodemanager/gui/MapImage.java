@@ -105,6 +105,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.MOVE){
             Session.mode = Mode.NONE;
+        } else if(Session.mode == Mode.RESCALING){
+            Session.mode = Mode.NONE;
         }
     }
 
@@ -142,6 +144,9 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.selectedNode.getIcon().drawAllLinks();
             revalidate();
             repaint();
+        } else if(Session.mode == Mode.RESCALING){
+            scaler.setSize(me.getX() + 5, me.getY());
+            nodeIcons.values().stream().forEach(ni -> ni.initPos());
         }
     }
 
