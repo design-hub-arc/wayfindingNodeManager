@@ -7,7 +7,7 @@ ADD               - in MapImage             - done
 MOVE              - in MapImage             - done, but not super good. 
 ADD_CONNECTION    - in NodeIcon             - done
 REMOVE_CONNECTION - in NodeIcon             - done
-RESCALING         - in NodeIcon, MapImage   - Not done
+RESCALING         - in MapImage             - done
 */
 public enum Mode {
     NONE,

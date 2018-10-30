@@ -16,7 +16,8 @@ public class EditCanvas extends JPanel{
     private final MenuBar menu;
     private final Pane body;
     private final Sidebar sideBar;
-    private final JButton chooseCsvButton;
+    private final JButton chooseNodeSourceButton;
+    private final JButton chooseNodeConnButton;
     private final JButton chooseMapButton;
     private final JButton addNodeButton;
     private final JButton exportNodeData;
@@ -61,10 +62,11 @@ public class EditCanvas extends JPanel{
         sideBar.add(selectedNode);
         Session.dataPane = selectedNode;
         
+        //don't set a layout for the body, causes issues
         map = new MapImage();
         body.add(map);
         
-        chooseCsvButton = createSelector(
+        chooseNodeSourceButton = createSelector(
                 "node file", 
                 new String[]{"Comma Separated Values", "csv"},
                 new FileSelectedListener(){
@@ -74,7 +76,19 @@ public class EditCanvas extends JPanel{
                     }
                 }
         );
-        menu.add(chooseCsvButton);
+        menu.add(chooseNodeSourceButton);
+        
+        chooseNodeConnButton = createSelector(
+                "connection file",
+                new String[]{"Comma Separated Values", "csv"},
+                new FileSelectedListener(){
+                    @Override
+                    public void run(File f){
+                        loadConn(f);
+                    }
+                }
+        );
+        menu.add(chooseNodeConnButton);
         
         chooseMapButton = createSelector(
                 "map Image", 
@@ -110,6 +124,7 @@ public class EditCanvas extends JPanel{
         //placeholders
         map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
         loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
+        loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));
     }
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
         JButton ret = new JButton("Select " + type);
@@ -154,7 +169,8 @@ public class EditCanvas extends JPanel{
         map.removeAllNodes();
         Node.removeAll();
         
-        NodeParser.readCsv(f);
+        //NodeParser.readCsv(f);
+        NodeParser.parseNodeFile(f);
         map.scaleTo(Node.get(-1).rawX, Node.get(-1).rawY, Node.get(-2).rawX, Node.get(-2).rawY);
         
         for(Node n : Node.getAll()){
@@ -162,6 +178,11 @@ public class EditCanvas extends JPanel{
         }
         revalidate();
         repaint();
+    }
+    
+    private void loadConn(File f){
+        NodeParser.parseConnFile(f);
+        Node.initAll();
     }
     
     private abstract class FileSelectedListener{

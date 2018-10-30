@@ -71,10 +71,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             add(c);
         }
     }
-    
-    public NodeIcon getIconFor(Node n){
-        return nodeIcons.get(n.id);
+    private void resizeNodeIcons(){
+        nodeIcons.values().forEach(n -> n.scaleTo(scaler));
     }
+    
     
     public void setImage(File f){
         try{
@@ -152,15 +152,16 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent mwe) {
-        System.out.println(mwe.getPreciseWheelRotation());
-        //still need to implement zooming
-        zoom += mwe.getPreciseWheelRotation() / 100;
+        zoom -= mwe.getPreciseWheelRotation() / 100;
         int newWidth = (int)(buff.getWidth() * zoom);
         int newHeight = (int)(buff.getHeight() * zoom);
+        
         BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.OPAQUE);
         Graphics2D g = resized.createGraphics();
         g.drawImage(buff, 0, 0, newWidth, newHeight, null);
         g.dispose();
         setIcon(new ImageIcon(resized));
+        scaler.setSource(this);
+        resizeNodeIcons();
     }
 }
