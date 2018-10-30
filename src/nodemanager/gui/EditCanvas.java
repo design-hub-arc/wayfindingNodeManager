@@ -97,8 +97,8 @@ public class EditCanvas extends JPanel{
                     @Override
                     public void run(File f){
                         map.setImage(f);
-                        JOptionPane.showMessageDialog(null, "Click on a point on the new map to resize");
-                        Session.mode = Mode.RESCALING;
+                        JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
+                        Session.mode = Mode.RESCALE_UL;
                         repaint();
                     }
                 }

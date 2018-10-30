@@ -105,13 +105,13 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.MOVE){
             Session.mode = Mode.NONE;
-        } else if(Session.mode == Mode.RESCALING){
+        } else if(Session.mode == Mode.RESCALE_UL){
+            Session.mode = Mode.RESCALE_LR;
+            Node.get(-1).getIcon().setLocation((int)scaler.inverseX(me.getX()), (int)scaler.inverseY(me.getY()));
+            JOptionPane.showMessageDialog(null, "Click on a point on the map to set new lower-right corner");
+        } else if(Session.mode == Mode.RESCALE_LR){
             Session.mode = Mode.NONE;
-            try{
-                Node.get(-1).getIcon().setLocation((int)scaler.inverseX(getWidth()), (int)scaler.inverseY(getHeight()));
-            } catch(NullPointerException e){
-                
-            }
+            Node.get(-2).getIcon().setLocation((int)scaler.inverseX(me.getX()), (int)scaler.inverseY(me.getY()));
         }
     }
 
@@ -149,8 +149,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.selectedNode.getIcon().drawAllLinks();
             revalidate();
             repaint();
-        } else if(Session.mode == Mode.RESCALING){
-            scaler.setSize(me.getX() + 5, me.getY());
+        } else if(Session.mode == Mode.RESCALE_UL){
+            // wait a second... maybe I shouldn't reposition nodes, but instead resize the map image based on where the user clicks
+            Node.get(-1).getIcon().setLocation(me.getX(), me.getY() + 5);
+            scaler.rescale(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()), Node.get(-2).rawX, Node.get(-2).rawY);
+            nodeIcons.values().stream().forEach(ni -> ni.initPos());
+            revalidate();
+            repaint();
+        } else if(Session.mode == Mode.RESCALE_LR){
+            scaler.setSize(me.getX(), me.getY());
             nodeIcons.values().stream().forEach(ni -> ni.initPos());
         }
     }
