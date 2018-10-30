@@ -9,7 +9,7 @@ import nodemanager.Session;
 import nodemanager.node.Node;
 
 public class NodeIcon extends JLabel implements MouseListener{
-    private final Node node;
+    public final Node node;
     private Scale scale;
     
     public NodeIcon(Node n){

@@ -107,11 +107,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.RESCALE_UL){
             Session.mode = Mode.RESCALE_LR;
-            Node.get(-1).getIcon().setLocation((int)scaler.inverseX(me.getX()), (int)scaler.inverseY(me.getY()));
+            Session.newMapX = Node.get(-1).getIcon().getX();
+            Session.newMapY = Node.get(-1).getIcon().getY();
             JOptionPane.showMessageDialog(null, "Click on a point on the map to set new lower-right corner");
         } else if(Session.mode == Mode.RESCALE_LR){
             Session.mode = Mode.NONE;
-            Node.get(-2).getIcon().setLocation((int)scaler.inverseX(me.getX()), (int)scaler.inverseY(me.getY()));
+            Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
+            Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
+            //setImage(buff.getSubimage(Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight));
+            // create a new map image file buff.getSubimage(Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight);
         }
     }
 
@@ -150,15 +154,23 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             revalidate();
             repaint();
         } else if(Session.mode == Mode.RESCALE_UL){
-            // wait a second... maybe I shouldn't reposition nodes, but instead resize the map image based on where the user clicks
-            Node.get(-1).getIcon().setLocation(me.getX(), me.getY() + 5);
-            scaler.rescale(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()), Node.get(-2).rawX, Node.get(-2).rawY);
-            nodeIcons.values().stream().forEach(ni -> ni.initPos());
+            double shiftX = me.getX();
+            double shiftY = me.getY();
+            double baseX;
+            double baseY;
+            for(NodeIcon ni : nodeIcons.values()){
+                baseX = scaler.x(ni.node.rawX);
+                baseY = scaler.y(ni.node.rawY);
+                ni.setLocation((int)(baseX + shiftX - ni.getWidth() - 5), (int)(baseY + shiftY - ni.getHeight() - 5));
+            }
             revalidate();
             repaint();
         } else if(Session.mode == Mode.RESCALE_LR){
-            scaler.setSize(me.getX(), me.getY());
-            nodeIcons.values().stream().forEach(ni -> ni.initPos());
+            scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
+            for(NodeIcon ni : nodeIcons.values()){
+                ni.initPos();
+                ni.setLocation(ni.getX() + Session.newMapX + 5, ni.getY() + Session.newMapY + 5);
+            }
         }
     }
 
