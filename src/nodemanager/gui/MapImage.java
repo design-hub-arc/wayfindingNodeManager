@@ -107,6 +107,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.RESCALING){
             Session.mode = Mode.NONE;
+            try{
+                Node.get(-1).getIcon().setLocation((int)scaler.inverseX(getWidth()), (int)scaler.inverseY(getHeight()));
+            } catch(NullPointerException e){
+                
+            }
         }
     }
 
