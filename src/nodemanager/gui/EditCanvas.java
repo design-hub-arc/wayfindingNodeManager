@@ -6,6 +6,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import nodemanager.node.*;
 
 /*
@@ -21,6 +25,7 @@ public class EditCanvas extends JPanel{
     private final JButton chooseMapButton;
     private final JButton addNodeButton;
     private final JButton exportNodeData;
+    private final JButton saveMap;
     
     private final NodeDataPane selectedNode;
     private MapImage map;
@@ -96,10 +101,14 @@ public class EditCanvas extends JPanel{
                 new FileSelectedListener(){
                     @Override
                     public void run(File f){
-                        map.setImage(f);
-                        JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
-                        Session.mode = Mode.RESCALE_UL;
-                        repaint();
+                        try {
+                            map.setImage(ImageIO.read(f));
+                            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
+                            Session.mode = Mode.RESCALE_UL;
+                            repaint();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
         );
@@ -117,13 +126,23 @@ public class EditCanvas extends JPanel{
         
         exportNodeData = createExportButton();
         
+        saveMap = new JButton("Export map");
+        saveMap.addActionListener(new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                map.saveImage();
+            }
+        });
+        menu.add(saveMap);
+        
         setBackground(Color.blue);
         
         
         
         //placeholders
         try{
-            map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
+            System.out.println(getClass().getResource("/map.png"));
+            map.setImage(ImageIO.read(new File(new File("").getAbsolutePath() + "/data/map.png")));
             loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
             loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));
         } catch(Exception e){

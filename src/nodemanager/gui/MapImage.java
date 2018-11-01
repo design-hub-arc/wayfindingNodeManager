@@ -58,6 +58,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         repaint();
     }
     public void removeAllNodes(){
+        nodeIcons.clear();
         ArrayList<Component> newComp = new ArrayList<>();
         for(Component c : getComponents()){
             if(!(c instanceof NodeIcon)){
@@ -65,77 +66,79 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             }
         }
         removeAll();
-        for(Component c : newComp){
-            add(c);
-        }
+        newComp.stream().forEach(c -> add(c));
     }
     private void resizeNodeIcons(){
         nodeIcons.values().forEach(n -> n.scaleTo(scaler));
     }
     
-    
-    public void setImage(File f){
-        try{
-            buff = ImageIO.read(f);
-            setIcon(new ImageIcon(buff));
-            setSize(buff.getWidth(), buff.getHeight());
-            scaler.setSource(this); //need to reinvoke b/c size passed by ref
-            revalidate();
-            repaint();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
+    public void setImage(BufferedImage bi){
+        buff = bi;
+        setIcon(new ImageIcon(buff));
+        setSize(buff.getWidth(), buff.getHeight());
+        scaler.setSource(this); //need to reinvoke b/c size passed by ref
+        revalidate();
+        repaint();
     }
+    
     public void scaleTo(double x1, double y1, double x2, double y2){
         scaler.rescale(x1, y1, x2, y2);
     }
-    
-    public Scale getScale(){
-        return scaler;
-    }
-    
-    
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        if(Session.mode == Mode.ADD){
-            Node n = new Node(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
-            n.init();
-            addNode(n);
-            Session.mode = Mode.NONE;
-        } else if(Session.mode == Mode.MOVE){
-            Session.selectedNode.repos(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
-            Session.mode = Mode.NONE;
-        } else if(Session.mode == Mode.RESCALE_UL){
-            Session.mode = Mode.RESCALE_LR;
-            Session.newMapX = Node.get(-1).getIcon().getX();
-            Session.newMapY = Node.get(-1).getIcon().getY();
-            JOptionPane.showMessageDialog(null, "Click on a point on the map to set new lower-right corner");
-        } else if(Session.mode == Mode.RESCALE_LR){
-            Session.mode = Mode.NONE;
-            Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
-            Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
-            
-            //make sure not to go outside the image
-            int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
-            if(clip[0] < 0){
-                clip[0] = 0;
+        switch(Session.mode){
+            case ADD:
+                Node n = new Node(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
+                n.init();
+                addNode(n);
+                Session.mode = Mode.NONE;
+                break;
+            case MOVE:
+                Session.selectedNode.repos(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
+                Session.mode = Mode.NONE;
+                break;
+            case RESCALE_UL:
+                Session.mode = Mode.RESCALE_LR;
+                Session.newMapX = Node.get(-1).getIcon().getX();
+                Session.newMapY = Node.get(-1).getIcon().getY();
+                JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
+                break;
+            case RESCALE_LR:
+                Session.mode = Mode.NONE;
+                Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
+                Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
+                
+                int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
+                if(clip[0] < 0){
+                    clip[0] = 0;
+                }
+                if(clip[1] < 0){
+                    clip[1] = 0;
+                }
+                if(clip[2] > buff.getWidth() - clip[0]){
+                    clip[2] = buff.getWidth() - clip[0];
+                }
+                if(clip[3] > buff.getHeight() - clip[1]){
+                    clip[3] = buff.getHeight() - clip[1];
+                }
+                setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
+                scaler.setSource(this);
+                resizeNodeIcons();
+                break;
+        }
+    }
+    
+    public void saveImage(){
+        JFileChooser cd = new JFileChooser();
+        cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        try {
+            if(cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION){
+                File f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + System.currentTimeMillis() + ".png");
+                ImageIO.write(buff, "png", f);
             }
-            if(clip[1] < 0){
-                clip[1] = 0;
-            }
-            if(clip[2] > buff.getWidth() - clip[0]){
-                clip[2] = buff.getWidth() - clip[0];
-            }
-            if(clip[3] > buff.getHeight() - clip[1]){
-                clip[3] = buff.getHeight() - clip[1];
-            }
-            
-            File nm = createNewImageFile(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
-            setImage(nm);
-            
-            scaler.setSource(this);
-            resizeNodeIcons();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 

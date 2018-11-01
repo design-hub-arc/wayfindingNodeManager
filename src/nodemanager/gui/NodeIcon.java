@@ -84,10 +84,11 @@ public class NodeIcon extends JLabel implements MouseListener{
     public void mouseExited(MouseEvent me) {
         getParent().repaint();
     }
-    /*
+    
+    @Override
     public JToolTip createToolTip(){
         JToolTip ret = new JToolTip();
         
         return ret;
-    }*/
+    }
 }
