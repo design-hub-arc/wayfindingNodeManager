@@ -7,8 +7,12 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nodemanager.node.Node;
 import nodemanager.*;
 
@@ -82,6 +86,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             setIcon(new ImageIcon(buff));
             setSize(buff.getWidth(), buff.getHeight());
             scaler.setSource(this); //need to reinvoke b/c size passed by ref
+            revalidate();
+            repaint();
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -114,8 +120,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.mode = Mode.NONE;
             Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
             Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
-            //setImage(buff.getSubimage(Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight));
-            // create a new map image file buff.getSubimage(Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight);
+            File nm = createNewImageFile(buff.getSubimage(Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight));
+            setImage(nm);
+            
+            scaler.setSource(this);
+            resizeNodeIcons();
         }
     }
 
@@ -187,5 +196,21 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         setIcon(new ImageIcon(resized));
         scaler.setSource(this);
         resizeNodeIcons();
+    }
+    
+    public static File createNewImageFile(BufferedImage image){
+        File f = new File("mapImage" + System.currentTimeMillis() + ".png");
+        JFileChooser cd = new JFileChooser();
+        cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        try {
+            ImageIO.write(image, "png", f);
+            if(cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION){
+                Files.move(Paths.get(f.getPath()), Paths.get(cd.getSelectedFile().getPath() + File.separator + f.getName()));
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        return f;
     }
 }

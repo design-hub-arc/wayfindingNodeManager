@@ -16,7 +16,7 @@ public class NodeIcon extends JLabel implements MouseListener{
         super(Integer.toString(n.id));
         node = n;
         setSize(30, 30);
-        setBackground(Color.red);
+        setBackground((n.id < 0) ? Color.green : Color.red);
         setOpaque(true);
         setVisible(true);
         addMouseListener(this);
