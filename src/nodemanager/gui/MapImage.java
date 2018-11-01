@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
-import java.nio.file.*;
 import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
@@ -116,7 +115,23 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             Session.mode = Mode.NONE;
             Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
             Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
-            File nm = createNewImageFile(buff.getSubimage(Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight));
+            
+            //make sure not to go outside the image
+            int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
+            if(clip[0] < 0){
+                clip[0] = 0;
+            }
+            if(clip[1] < 0){
+                clip[1] = 0;
+            }
+            if(clip[2] > buff.getWidth() - clip[0]){
+                clip[2] = buff.getWidth() - clip[0];
+            }
+            if(clip[3] > buff.getHeight() - clip[1]){
+                clip[3] = buff.getHeight() - clip[1];
+            }
+            
+            File nm = createNewImageFile(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
             setImage(nm);
             
             scaler.setSource(this);
