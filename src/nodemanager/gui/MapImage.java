@@ -110,6 +110,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             addNode(n);
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.MOVE){
+            Session.selectedNode.repos(scaler.inverseX(me.getX()), scaler.inverseY(me.getY()));
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.RESCALE_UL){
             Session.mode = Mode.RESCALE_LR;
@@ -177,7 +178,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         } else if(Session.mode == Mode.RESCALE_LR){
             scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
             for(NodeIcon ni : nodeIcons.values()){
-                ni.initPos();
+                ni.repos();
                 ni.setLocation(ni.getX() + Session.newMapX + 5, ni.getY() + Session.newMapY + 5);
             }
         }

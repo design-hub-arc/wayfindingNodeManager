@@ -68,7 +68,7 @@ public class NodeDataPane extends JComponent{
             @Override
             public void actionPerformed(ActionEvent e){
                 if(hasNodeSelected){
-                    selectedNode.getIcon().initPos();
+                    selectedNode.getIcon().resetPos();
                 }
             }
         });

@@ -9,6 +9,9 @@ public class Node {
     public final int id;
     public final double rawX;
     public final double rawY;
+    private double x;
+    private double y;
+    
     private HashSet<Integer> adjacentIds;
     private NodeIcon icon;
     
@@ -19,6 +22,9 @@ public class Node {
         this.id = id;
         rawX = x;
         rawY = y;
+        this.x = x;
+        this.y = y;
+        
         adjacentIds = new HashSet<>();
         icon = new NodeIcon(this);
         
@@ -55,7 +61,20 @@ public class Node {
         return allNodes.values();
     }
     
-    
+    public void repos(double x, double y){
+        this.x = x;
+        this.y = y;
+    }
+    public void resetPos(){
+        x = rawX;
+        y = rawY;
+    }
+    public double getX(){
+        return x;
+    }
+    public double getY(){
+        return y;
+    }
     
     public void addAdjId(int i){
         adjacentIds.add(i);

@@ -24,12 +24,16 @@ public class NodeIcon extends JLabel implements MouseListener{
     
     public void scaleTo(Scale s){
         scale = s;
-        initPos();
+        repos();
     }
     
-    public void initPos(){
-        //setLocation(0, 0);
+    public void resetPos(){
         setLocation(scale.x(node.rawX), scale.y(node.rawY));
+        node.resetPos();
+    }
+    
+    public void repos(){
+        setLocation(scale.x(node.getX()), scale.y(node.getY()));
     }
     
     public void drawAllLinks(){
