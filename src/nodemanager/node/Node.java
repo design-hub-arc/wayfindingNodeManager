@@ -153,8 +153,8 @@ public class Node {
         BufferedWriter out = null;
         String nl = System.getProperty("line.separator");
         try {
-            File nodeFile = new File(path + File.separator + "nodeData.csv");
-            File connectFile = new File(path + File.separator + "nodeConnections.csv");
+            File nodeFile = new File(path + File.separator + "nodeData" + System.currentTimeMillis() + ".csv");
+            File connectFile = new File(path + File.separator + "nodeConnections" + System.currentTimeMillis() + ".csv");
             
             out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
             out.write("id, x, y" + nl);

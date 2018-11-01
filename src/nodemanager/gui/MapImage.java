@@ -1,18 +1,13 @@
 package nodemanager.gui;
 
-import java.awt.Component;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.file.*;
+import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
 
@@ -200,13 +195,13 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     }
     
     public static File createNewImageFile(BufferedImage image){
-        File f = new File("mapImage" + System.currentTimeMillis() + ".png");
+        File f = null;
         JFileChooser cd = new JFileChooser();
         cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         try {
-            ImageIO.write(image, "png", f);
             if(cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION){
-                Files.move(Paths.get(f.getPath()), Paths.get(cd.getSelectedFile().getPath() + File.separator + f.getName()));
+                f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + System.currentTimeMillis() + ".png");
+                ImageIO.write(image, "png", f);
             }
         } catch (IOException ex) {
             ex.printStackTrace();

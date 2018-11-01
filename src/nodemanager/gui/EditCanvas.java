@@ -6,6 +6,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import nodemanager.node.*;
 
 /*
@@ -122,9 +123,13 @@ public class EditCanvas extends JPanel{
         
         
         //placeholders
-        map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
-        loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
-        loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));
+        try{
+            map.setImage(new File(new File("").getAbsolutePath() + "/data/map.png"));
+            loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
+            loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
         JButton ret = new JButton("Select " + type);
