@@ -54,6 +54,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipW = 0;
         clipH = 0;
         
+        setBackground(Color.BLACK);
+        
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
@@ -79,14 +81,40 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         removeAll();
         newComp.stream().forEach(c -> add(c));
     }
+    
     private void resizeNodeIcons(){
         nodeIcons.values().forEach(n -> n.scaleTo(scaler));
     }
     
+    private void pan(int x, int y){
+        
+        //make this not move components if image couldn't pan
+        // or just recalc position completely
+        Arrays.asList(this.getComponents()).stream().forEach(c -> c.setLocation(c.getX() + x, c.getY() + y));
+        
+        
+        clipX -= x;
+        clipY -= y;
+        
+        if(clipX < 0){
+            clipX = 0;
+        } else if(clipX > buff.getWidth()){
+            clipX = buff.getWidth();
+        }
+        
+        if(clipY < 0){
+            clipY = 0;
+        } else if(clipY > buff.getHeight()){
+            clipY = buff.getHeight();
+        }
+    }
+    
     public void setImage(BufferedImage bi){
         buff = bi;
-        setIcon(new ImageIcon(buff));
+        setIcon(new ImageIcon(buff)); //for some reason it doesn't draw unless I do this
         setSize(buff.getWidth(), buff.getHeight());
+        //setSize(500, (int)(500.0 * buff.getHeight()/buff.getWidth()));
+        System.out.println(this.getSize());
         clipW = (int)(buff.getWidth() * zoom);
         clipH = (int)(buff.getHeight() * zoom);
         scaler.setSource(this); //need to reinvoke b/c size passed by ref
@@ -212,8 +240,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 }
                 break;
         }//end switch
-        clipX = me.getX();
-        clipY = me.getY();
+        
+        if(me.getY() < getHeight() * 0.33){
+            pan(0, -1);
+        } else if(me.getY() > getHeight() * 0.5){
+            pan(0, 1);
+        }
         repaint();
     }
 
@@ -259,6 +291,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         /*
         Drawing a clip of the image means we don't need to move the map, but how to deal with the node icons?
         */
-        //g.drawImage(buff.getSubimage(clipX, clipY, clipW - clipX, clipH - clipY), 0, 0, getWidth() - clipX, getHeight() - clipY, this);
+        //System.out.println(clipX + ", " + clipY + ", " + clipW + ", " + clipH);
+        g.drawImage(buff.getSubimage(clipX, clipY, clipW - clipX, clipH - clipY), 0, 0, getWidth() - clipX, getHeight() - clipY, this);
+        
     }
 }

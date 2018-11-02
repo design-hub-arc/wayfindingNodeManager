@@ -1,5 +1,5 @@
 package nodemanager.gui;
-import javax.swing.JLabel;
+import javax.swing.JComponent;
 
 /**
  * Scale is used to scale a collection of points to any other scale.
@@ -50,7 +50,7 @@ public class Scale {
     /**
      * @param j : The JLabel you want to scale points to 
      */
-    public void setSource(JLabel j){
+    public void setSource(JComponent j){
         setSize(j.getWidth(), j.getHeight());
     }
     
@@ -58,7 +58,7 @@ public class Scale {
      * @param w : the sourceWidth to scale points to
      * @param h : the sourceHeight to scale points to
      */
-    public void setSize(double w, double h){
+    public void setSize(int w, int h){
         destinationWidth = w;
         destinationHeight = h;
     }

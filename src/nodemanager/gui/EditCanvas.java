@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.System.out;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
 
