@@ -7,8 +7,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
 
@@ -141,7 +139,7 @@ public class EditCanvas extends JPanel{
         
         //placeholders
         try{
-            System.out.println(getClass().getResource("/map.png"));
+            //System.out.println("Location: " + getClass().getResource("/data"));
             map.setImage(ImageIO.read(new File(new File("").getAbsolutePath() + "/data/map.png")));
             loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
             loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));

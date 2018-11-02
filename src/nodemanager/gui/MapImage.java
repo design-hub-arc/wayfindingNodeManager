@@ -31,6 +31,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private volatile int prevX;
     private volatile int prevY;
     
+    private int clipX;
+    private int clipY;
+    private int clipW;
+    private int clipH;
+    
     public MapImage(){
         super();
         setVisible(true);
@@ -43,6 +48,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         screenY = 0;
         prevX = getX();
         prevY = getY();
+        
+        clipX = 0;
+        clipY = 0;
+        clipW = 0;
+        clipH = 0;
+        
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
@@ -76,6 +87,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         buff = bi;
         setIcon(new ImageIcon(buff));
         setSize(buff.getWidth(), buff.getHeight());
+        clipW = (int)(buff.getWidth() * zoom);
+        clipH = (int)(buff.getHeight() * zoom);
         scaler.setSource(this); //need to reinvoke b/c size passed by ref
         revalidate();
         repaint();
@@ -84,7 +97,20 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void scaleTo(double x1, double y1, double x2, double y2){
         scaler.rescale(x1, y1, x2, y2);
     }
-
+    
+    public void saveImage(){
+        JFileChooser cd = new JFileChooser();
+        cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        try {
+            if(cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION){
+                File f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + System.currentTimeMillis() + ".png");
+                ImageIO.write(buff, "png", f);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     @Override
     public void mouseClicked(MouseEvent me) {
         switch(Session.mode){
@@ -129,19 +155,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
     }
     
-    public void saveImage(){
-        JFileChooser cd = new JFileChooser();
-        cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        try {
-            if(cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION){
-                File f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + System.currentTimeMillis() + ".png");
-                ImageIO.write(buff, "png", f);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     @Override
     public void mousePressed(MouseEvent me) {
         screenX = me.getX();
@@ -171,35 +184,46 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseMoved(MouseEvent me) {
-        if(Session.mode == Mode.MOVE){
-            Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
-            Session.selectedNode.getIcon().drawAllLinks();
-            revalidate();
-            repaint();
-        } else if(Session.mode == Mode.RESCALE_UL){
-            double shiftX = me.getX();
-            double shiftY = me.getY();
-            double baseX;
-            double baseY;
-            for(NodeIcon ni : nodeIcons.values()){
-                baseX = scaler.x(ni.node.rawX);
-                baseY = scaler.y(ni.node.rawY);
-                ni.setLocation((int)(baseX + shiftX - ni.getWidth() - 5), (int)(baseY + shiftY - ni.getHeight() - 5));
-            }
-            revalidate();
-            repaint();
-        } else if(Session.mode == Mode.RESCALE_LR){
-            scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
-            for(NodeIcon ni : nodeIcons.values()){
-                ni.repos();
-                ni.setLocation(ni.getX() + Session.newMapX + 5, ni.getY() + Session.newMapY + 5);
-            }
-        }
+        switch(Session.mode){
+            case MOVE:
+                Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
+                Session.selectedNode.getIcon().drawAllLinks();
+                revalidate();
+                repaint();
+                break;
+            case RESCALE_UL:
+                double shiftX = me.getX();
+                double shiftY = me.getY();
+                double baseX;
+                double baseY;
+                for(NodeIcon ni : nodeIcons.values()){
+                    baseX = scaler.x(ni.node.rawX);
+                    baseY = scaler.y(ni.node.rawY);
+                    ni.setLocation((int)(baseX + shiftX - ni.getWidth() - 5), (int)(baseY + shiftY - ni.getHeight() - 5));
+                }
+                revalidate();
+                repaint();
+                break;
+            case RESCALE_LR:
+                scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
+                for(NodeIcon ni : nodeIcons.values()){
+                    ni.repos();
+                    ni.setLocation(ni.getX() + Session.newMapX + 5, ni.getY() + Session.newMapY + 5);
+                }
+                break;
+        }//end switch
+        clipX = me.getX();
+        clipY = me.getY();
+        repaint();
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent mwe) {
         zoom -= mwe.getPreciseWheelRotation() / 100;
+        
+        clipW = (int)(buff.getWidth() * zoom);
+        clipH = (int)(buff.getHeight() * zoom);
+        
         int newWidth = (int)(buff.getWidth() * zoom);
         int newHeight = (int)(buff.getHeight() * zoom);
         
@@ -210,6 +234,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         setIcon(new ImageIcon(resized));
         scaler.setSource(this);
         resizeNodeIcons();
+        
     }
     
     public static File createNewImageFile(BufferedImage image){
@@ -226,5 +251,14 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
         
         return f;
+    }
+    
+    @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        /*
+        Drawing a clip of the image means we don't need to move the map, but how to deal with the node icons?
+        */
+        //g.drawImage(buff.getSubimage(clipX, clipY, clipW - clipX, clipH - clipY), 0, 0, getWidth() - clipX, getHeight() - clipY, this);
     }
 }
