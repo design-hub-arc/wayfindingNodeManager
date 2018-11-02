@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
+import static java.lang.System.out;
 import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
@@ -87,14 +88,25 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     }
     
     private void pan(int x, int y){
+        boolean panX = true;
+        boolean panY = true;
         
-        //make this not move components if image couldn't pan
-        // or just recalc position completely
-        Arrays.asList(this.getComponents()).stream().forEach(c -> c.setLocation(c.getX() + x, c.getY() + y));
+        if(clipX <= 0 || clipX >= buff.getWidth()){
+            panX = false;
+        }
+        if(clipY <= 0 || clipY >= buff.getHeight()){
+            panY = false;
+        }
         
+        if(panX){
+            Arrays.asList(this.getComponents()).stream().forEach(c -> c.setLocation(c.getX() - x, c.getY()));
+        }
+        if(panY){
+            Arrays.asList(this.getComponents()).stream().forEach(c -> c.setLocation(c.getX(), c.getY() - y));
+        }
         
-        clipX -= x;
-        clipY -= y;
+        clipX += x;
+        clipY += y;
         
         if(clipX < 0){
             clipX = 0;
@@ -242,9 +254,9 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }//end switch
         
         if(me.getY() < getHeight() * 0.33){
-            pan(0, -1);
+            pan(0, -5);
         } else if(me.getY() > getHeight() * 0.5){
-            pan(0, 1);
+            pan(0, 5);
         }
         repaint();
     }
