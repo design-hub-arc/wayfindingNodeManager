@@ -67,6 +67,7 @@ public class EditCanvas extends JPanel{
         Session.dataPane = selectedNode;
         
         //don't set a layout for the body, causes issues
+        body.setLayout(new GridLayout(1, 1));
         map = new MapImage();
         body.add(map);
         

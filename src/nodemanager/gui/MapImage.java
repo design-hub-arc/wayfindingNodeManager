@@ -26,16 +26,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     
     private double zoom;
     
-    //https://stackoverflow.com/questions/874360/swing-creating-a-draggable-component
-    private volatile int screenX;
-    private volatile int screenY;
-    private volatile int prevX;
-    private volatile int prevY;
-    
     private int clipX;
     private int clipY;
     private int clipW;
     private int clipH;
+    
+    private double aspectRatio;
     
     public MapImage(){
         super();
@@ -44,11 +40,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         nodeIcons = new HashMap<>();
         
         zoom = 1.0;
-        
-        screenX = 0;
-        screenY = 0;
-        prevX = getX();
-        prevY = getY();
         
         clipX = 0;
         clipY = 0;
@@ -60,6 +51,21 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
+        this.addComponentListener(new ComponentListener(){
+            @Override
+            public void componentResized(ComponentEvent ce) {
+                clipW = (getWidth() < buff.getWidth()) ? getWidth() : buff.getWidth();
+                clipH = (getHeight() < buff.getHeight()) ? getHeight() : buff.getHeight();
+                scaler.setSize(buff.getWidth(), buff.getHeight());
+                resizeNodeIcons();
+            }
+            @Override
+            public void componentMoved(ComponentEvent ce) {}
+            @Override
+            public void componentShown(ComponentEvent ce) {}
+            @Override
+            public void componentHidden(ComponentEvent ce) {}
+        });
     }
     
     public void addNode(Node n){
@@ -91,10 +97,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         boolean panX = true;
         boolean panY = true;
         
-        if(clipX <= 0 || clipX >= buff.getWidth()){
+        if(clipX <= 0 || clipX + clipW >= buff.getWidth()){
             panX = false;
         }
-        if(clipY <= 0 || clipY >= buff.getHeight()){
+        if(clipY <= 0 || clipY + clipH >= buff.getHeight()){
             panY = false;
         }
         
@@ -110,26 +116,27 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         
         if(clipX < 0){
             clipX = 0;
-        } else if(clipX > buff.getWidth()){
-            clipX = buff.getWidth();
+        } else if(clipX + clipW > buff.getWidth()){
+            clipX = buff.getWidth() - clipW;
         }
         
         if(clipY < 0){
             clipY = 0;
-        } else if(clipY > buff.getHeight()){
-            clipY = buff.getHeight();
+        } else if(clipY + clipH > buff.getHeight()){
+            clipY = buff.getHeight() - clipH;
         }
     }
     
     public void setImage(BufferedImage bi){
         buff = bi;
-        setIcon(new ImageIcon(buff)); //for some reason it doesn't draw unless I do this
-        setSize(buff.getWidth(), buff.getHeight());
+        aspectRatio = 1.0 * buff.getWidth() / buff.getHeight();
+        //setIcon(new ImageIcon(buff)); //for some reason it doesn't draw unless I do this
+        //setSize(buff.getWidth(), buff.getHeight());
         //setSize(500, (int)(500.0 * buff.getHeight()/buff.getWidth()));
-        System.out.println(this.getSize());
-        clipW = (int)(buff.getWidth() * zoom);
-        clipH = (int)(buff.getHeight() * zoom);
-        scaler.setSource(this); //need to reinvoke b/c size passed by ref
+        //System.out.println(this.getSize());
+        //clipW = (int)(buff.getWidth() * zoom);
+        //clipH = (int)(buff.getHeight() * zoom);
+        //scaler.setSource(this); //need to reinvoke b/c size passed by ref
         revalidate();
         repaint();
     }
@@ -196,12 +203,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     }
     
     @Override
-    public void mousePressed(MouseEvent me) {
-        screenX = me.getX();
-        screenY = me.getY();
-        prevX = getX();
-        prevY = getY();
-    }
+    public void mousePressed(MouseEvent me) {}
 
     @Override
     public void mouseReleased(MouseEvent me) {}
@@ -217,10 +219,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseExited(MouseEvent me) {}
 
     @Override
-    public void mouseDragged(MouseEvent me) {
-        //click and drag. Flickering
-        setLocation(prevX + (me.getX() - screenX), prevY + (me.getY() - screenY));
-    }
+    public void mouseDragged(MouseEvent me) {}
 
     @Override
     public void mouseMoved(MouseEvent me) {
@@ -253,9 +252,9 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 break;
         }//end switch
         
-        if(me.getY() < getHeight() * 0.33){
+        if(me.getY() < getHeight() * 0.1){
             pan(0, -5);
-        } else if(me.getY() > getHeight() * 0.5){
+        } else if(me.getY() > getHeight() * 0.9){
             pan(0, 5);
         }
         repaint();
@@ -304,7 +303,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         Drawing a clip of the image means we don't need to move the map, but how to deal with the node icons?
         */
         //System.out.println(clipX + ", " + clipY + ", " + clipW + ", " + clipH);
-        g.drawImage(buff.getSubimage(clipX, clipY, clipW - clipX, clipH - clipY), 0, 0, getWidth() - clipX, getHeight() - clipY, this);
+        g.drawImage(buff.getSubimage(clipX, clipY, clipW, clipH), 0, 0, (int)(getWidth() * aspectRatio), getHeight(), this);
         
     }
 }
