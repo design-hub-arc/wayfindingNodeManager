@@ -51,13 +51,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
-        this.addComponentListener(new ComponentListener(){
+        addComponentListener(new ComponentListener(){
             @Override
             public void componentResized(ComponentEvent ce) {
-                clipW = (getWidth() < buff.getWidth()) ? getWidth() : buff.getWidth();
-                clipH = (getHeight() < buff.getHeight()) ? getHeight() : buff.getHeight();
-                scaler.setSize(buff.getWidth(), buff.getHeight());
-                resizeNodeIcons();
+                resize();
             }
             @Override
             public void componentMoved(ComponentEvent ce) {}
@@ -127,16 +124,19 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
     }
     
+    private void resize(){
+        clipW = (getWidth() < buff.getWidth()) ? getWidth() : buff.getWidth();
+        clipH = (getHeight() < buff.getHeight()) ? getHeight() : buff.getHeight();
+        scaler.setSize(buff.getWidth(), buff.getHeight());
+        resizeNodeIcons();
+    }
+    
     public void setImage(BufferedImage bi){
         buff = bi;
         aspectRatio = 1.0 * buff.getWidth() / buff.getHeight();
-        //setIcon(new ImageIcon(buff)); //for some reason it doesn't draw unless I do this
-        //setSize(buff.getWidth(), buff.getHeight());
-        //setSize(500, (int)(500.0 * buff.getHeight()/buff.getWidth()));
-        //System.out.println(this.getSize());
-        //clipW = (int)(buff.getWidth() * zoom);
-        //clipH = (int)(buff.getHeight() * zoom);
-        //scaler.setSource(this); //need to reinvoke b/c size passed by ref
+        clipX = 0;
+        clipY = 0;
+        resize();
         revalidate();
         repaint();
     }
@@ -183,6 +183,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
                 
                 int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
+                
+                out.print("Clip: ");
+                for(int i : clip){
+                    out.print(i + " ");
+                }
+                
                 if(clip[0] < 0){
                     clip[0] = 0;
                 }
@@ -195,9 +201,13 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 if(clip[3] > buff.getHeight() - clip[1]){
                     clip[3] = buff.getHeight() - clip[1];
                 }
+                
+                out.println();
+                for(int i : clip){
+                    out.print(i + " ");
+                }
+                
                 setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
-                scaler.setSource(this);
-                resizeNodeIcons();
                 break;
         }
     }
@@ -274,7 +284,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         Graphics2D g = resized.createGraphics();
         g.drawImage(buff, 0, 0, newWidth, newHeight, null);
         g.dispose();
-        setIcon(new ImageIcon(resized));
+        //setIcon(new ImageIcon(resized));
         scaler.setSource(this);
         resizeNodeIcons();
         
