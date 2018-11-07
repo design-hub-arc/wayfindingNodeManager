@@ -141,7 +141,7 @@ public class EditCanvas extends JPanel{
         
         //placeholders
         try{
-            //System.out.println("Location: " + getClass().getResource("/data"));
+            //System.out.println("Location: " + getClass().getResource("map.png"));
             map.setImage(ImageIO.read(new File(new File("").getAbsolutePath() + "/data/map.png")));
             loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
             loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));

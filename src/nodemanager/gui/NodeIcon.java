@@ -8,6 +8,7 @@ import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.node.Node;
 
+//get rid of this, causing problems b/c panning
 public class NodeIcon extends JLabel implements MouseListener{
     public final Node node;
     private Scale scale;
@@ -46,7 +47,7 @@ public class NodeIcon extends JLabel implements MouseListener{
         g.setStroke(new BasicStroke(10));
         g.drawLine(getX(), getY(), n.getIcon().getX(), n.getIcon().getY());
     }
-
+    
     @Override
     public void mouseClicked(MouseEvent me) {
         if(Session.mode == Mode.NONE){

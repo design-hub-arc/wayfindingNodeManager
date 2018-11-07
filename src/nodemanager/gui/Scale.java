@@ -48,13 +48,6 @@ public class Scale {
     }
     
     /**
-     * @param j : The JLabel you want to scale points to 
-     */
-    public void setSource(JComponent j){
-        setSize(j.getWidth(), j.getHeight());
-    }
-    
-    /**
      * @param w : the sourceWidth to scale points to
      * @param h : the sourceHeight to scale points to
      */

@@ -4,13 +4,16 @@ import java.io.*;
 import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
+import nodemanager.gui.Scale;
 
 public class Node {
     public final int id;
     public final double rawX;
     public final double rawY;
-    private double x;
-    private double y;
+    
+    //coordinates on canvas
+    private int x;
+    private int y;
     
     private HashSet<Integer> adjacentIds;
     private NodeIcon icon;
@@ -22,8 +25,8 @@ public class Node {
         this.id = id;
         rawX = x;
         rawY = y;
-        this.x = x;
-        this.y = y;
+        this.x = (int)x;
+        this.y = (int)y;
         
         adjacentIds = new HashSet<>();
         icon = new NodeIcon(this);
@@ -61,13 +64,18 @@ public class Node {
         return allNodes.values();
     }
     
+    public void scaleTo(Scale s){
+        x = s.x(rawX);
+        y = s.y(rawY);
+    }
+    
     public void repos(double x, double y){
-        this.x = x;
-        this.y = y;
+        this.x = (int)x;
+        this.y = (int)y;
     }
     public void resetPos(){
-        x = rawX;
-        y = rawY;
+        x = (int)rawX;
+        y = (int)rawY;
     }
     public double getX(){
         return x;
