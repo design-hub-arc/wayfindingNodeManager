@@ -130,8 +130,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipW = (int)(origClipW * zoom);
         clipH = (int)(origClipH * zoom);
         
-        out.println(zoom);
-        
         if(clipX + clipW >= buff.getWidth() || clipY + clipH >= buff.getHeight()){
             clipW = buff.getWidth() - clipX;
             clipH = buff.getHeight() - clipY;
