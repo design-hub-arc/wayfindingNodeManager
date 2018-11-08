@@ -34,6 +34,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private int clipY;
     private int clipW;
     private int clipH;
+    private int origClipW;
+    private int origClipH;
     
     private double aspectRatio;
     
@@ -49,6 +51,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipY = 0;
         clipW = 0;
         clipH = 0;
+        origClipW = 0;
+        origClipH = 0;
         
         setBackground(Color.BLACK);
         
@@ -103,16 +107,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     }
     
     private void pan(int x, int y){
-        boolean panX = true;
-        boolean panY = true;
-        
-        if(clipX <= 0 || clipX + clipW >= buff.getWidth()){
-            panX = false;
-        }
-        if(clipY <= 0 || clipY + clipH >= buff.getHeight()){
-            panY = false;
-        }
-        
         clipX += x;
         clipY += y;
         
@@ -131,24 +125,36 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         resizeNodeIcons();
     }
     private void zoom(double perc){
-        clipW /= zoom;
-        clipH /= zoom;
-        
         zoom += perc;
         
-        clipW *= zoom;
-        clipH *= zoom;
+        clipW = (int)(origClipW * zoom);
+        clipH = (int)(origClipH * zoom);
+        
+        out.println(zoom);
         
         if(clipX + clipW >= buff.getWidth() || clipY + clipH >= buff.getHeight()){
             clipW = buff.getWidth() - clipX;
             clipH = buff.getHeight() - clipY;
-        }//find some way to present zooming too far out
+        }
+        if(zoom > 1.0){
+            zoom = 1.0;
+            clipW = origClipW;
+            clipH = origClipH;
+        } else if(zoom < 0.1){
+            zoom = 0.1;
+            clipW = origClipW / 10;
+            clipH = origClipH / 10;
+        }
+        
         resizeNodeIcons();
     }
     
     private void resize(){
         clipW = (getWidth() < buff.getWidth()) ? getWidth() : buff.getWidth();
         clipH = (getHeight() < buff.getHeight()) ? getHeight() : buff.getHeight();
+        origClipW = clipW;
+        origClipH = clipH;
+        zoom = 1.0;
         scaler.setSize(buff.getWidth(), buff.getHeight());
         resizeNodeIcons();
     }
@@ -187,6 +193,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 Node n = new Node(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
                 n.init();
                 addNode(n);
+                revalidate();
+                repaint();
                 Session.mode = Mode.NONE;
                 break;
             case MOVE:
