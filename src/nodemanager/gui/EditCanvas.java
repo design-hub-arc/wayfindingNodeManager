@@ -5,8 +5,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import static java.lang.System.out;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
@@ -77,7 +76,11 @@ public class EditCanvas extends JPanel{
                 new FileSelectedListener(){
                     @Override
                     public void run(File f){
-                        loadNodesFromFile(f);
+                        try {
+                            loadNodesFromFile(new FileInputStream(f));
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
         );
@@ -89,7 +92,11 @@ public class EditCanvas extends JPanel{
                 new FileSelectedListener(){
                     @Override
                     public void run(File f){
-                        loadConn(f);
+                        try {
+                            loadConn(new FileInputStream(f));
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
         );
@@ -139,12 +146,21 @@ public class EditCanvas extends JPanel{
         
         
         
-        //placeholders
+        //set defaults
         try{
-            //System.out.println("Location: " + getClass().getResource("map.png"));
-            map.setImage(ImageIO.read(new File(new File("").getAbsolutePath() + "/data/map.png")));
-            loadNodesFromFile(new File(new File("").getAbsolutePath() + "/data/nodeData.csv"));
-            loadConn(new File(new File("").getAbsolutePath() + "/data/nodeConnections.csv"));
+            map.setImage(ImageIO.read(getClass().getResourceAsStream("/map.png")));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        
+        try{
+            loadNodesFromFile(getClass().getResourceAsStream("/nodeData.csv"));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        
+        try{
+           loadConn(getClass().getResourceAsStream("/nodeConnections.csv"));
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -188,12 +204,11 @@ public class EditCanvas extends JPanel{
         return j;
     }
     
-    private void loadNodesFromFile(File f){
+    private void loadNodesFromFile(InputStream i){
         map.removeAllNodes();
         Node.removeAll();
         
-        //NodeParser.readCsv(f);
-        NodeParser.parseNodeFile(f);
+        NodeParser.parseNodeFile(i);
         map.scaleTo(Node.get(-1).rawX, Node.get(-1).rawY, Node.get(-2).rawX, Node.get(-2).rawY);
         
         for(Node n : Node.getAll()){
@@ -203,8 +218,8 @@ public class EditCanvas extends JPanel{
         repaint();
     }
     
-    private void loadConn(File f){
-        NodeParser.parseConnFile(f);
+    private void loadConn(InputStream i){
+        NodeParser.parseConnFile(i);
         Node.initAll();
     }
     

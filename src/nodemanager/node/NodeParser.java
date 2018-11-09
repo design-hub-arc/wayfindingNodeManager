@@ -1,14 +1,19 @@
 package nodemanager.node;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.BufferedReader;
+import java.io.*;
 import static java.lang.System.out;
 import java.util.Arrays;
 
 public class NodeParser {
+    
     public static void parseNodeFile(File f){
+        try{
+            parseNodeFile(stream(f));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static void parseNodeFile(InputStream s){
         BufferedReader br;
         String[] line;
         int id;
@@ -16,7 +21,7 @@ public class NodeParser {
         double y;
         
         try{
-            br = new BufferedReader(new FileReader(f));
+            br = new BufferedReader(new InputStreamReader(s));
             while(br.ready()){
                 line = br.readLine().split(",");
                 try{
@@ -33,14 +38,22 @@ public class NodeParser {
             e.printStackTrace();
         }
     }
+    
     public static void parseConnFile(File f){
+        try{
+            parseConnFile(stream(f));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static void parseConnFile(InputStream s){
         BufferedReader br;
         String[] line;
         int id;
         int adj;
         
         try{
-            br = new BufferedReader(new FileReader(f));
+            br = new BufferedReader(new InputStreamReader(s));
             while(br.ready()){
                 line = br.readLine().split(",");
                 try{
@@ -58,5 +71,9 @@ public class NodeParser {
         } catch(IOException e){
             e.printStackTrace();
         }
+    }
+    
+    public static InputStream stream(File f) throws FileNotFoundException{
+        return new FileInputStream(f);
     }
 }

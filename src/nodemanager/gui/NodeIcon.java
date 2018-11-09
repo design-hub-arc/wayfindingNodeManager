@@ -59,12 +59,11 @@ public class NodeIcon extends JLabel implements MouseListener{
             
             Session.selectedNode.init();
             node.init();
-            
             Session.mode = Mode.NONE;
         } else if(Session.mode == Mode.REMOVE_CONNECTION){
             Session.selectedNode.removeAdj(node.id);
             node.removeAdj(Session.selectedNode.id);
-            Session.mode = Mode.REMOVE_CONNECTION;
+            Session.mode = Mode.NONE;
         }
     }
 

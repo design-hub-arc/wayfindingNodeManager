@@ -127,7 +127,7 @@ public class Node {
     public String getDesc(){
         String ret = 
                 "Node #" + id + System.lineSeparator() +
-                "Raw coordinates: (" + rawX + ", " + rawY + ")" + System.lineSeparator() +
+                "Raw coordinates: (" + (int)rawX + ", " + (int)rawY + ")" + System.lineSeparator() +
                 "Adjacent ids: " + System.lineSeparator();
         //streaming doesn't work here
         for(int i : adjacentIds){

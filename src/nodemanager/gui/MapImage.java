@@ -74,10 +74,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     }
     
     private int translateClickX(int x){
-        return x + clipX;
+        return (int) ((x + clipX) * zoom);
     }
     private int translateClickY(int y){
-        return y + clipY;
+        return (int) ((y + clipY) * zoom);
     }
     
     public void addNode(Node n){
