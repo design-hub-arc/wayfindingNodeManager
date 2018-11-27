@@ -7,6 +7,13 @@ import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.node.Node;
 
+/**
+ * @author Matt Crow (greengrappler12@gmail.com)
+ */
+
+ /** 
+ * NodeDataPane is used to display information on the currently selected Node 
+ */
 public class NodeDataPane extends JComponent{
     private Node selectedNode;
     private boolean hasNodeSelected;

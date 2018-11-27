@@ -11,14 +11,20 @@ import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
 
-/*
-MapImage is used to render an image,
-as well as proved a scale to resize points drawn onto it.
+/**
+ * @author Matt Crow (greengrappler12@gmail.com)
+ */
 
-Upon creating a MapImage, you need to call setImage on a file,
-then scaleTo a set of coordinates
+/**
+* MapImage is used to render an image,
+* as well as proved a scale to resize points drawn onto it.
+*
+* Upon creating a MapImage, you need to call setImage on a file,
+* then scaleTo a set of coordinates
+* 
+* Displays a portion of the image it is displaying by taking a subsection of that image, a 'clip',
+* then displaying that clip over this component using paintcomponent
 */
-
 public class MapImage extends JLabel implements MouseListener, MouseMotionListener, MouseWheelListener{
     private BufferedImage buff;
     private final Scale scaler;
@@ -39,6 +45,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     
     private double aspectRatio;
     
+    /**
+     * Initially, does not have any image or scale.
+     * WARNING! DO NOT GIVE THIS A LAYOUT! 
+     * The NodeIcons added to a MapImage need to be able to position themselves
+     */
     public MapImage(){
         super();
         setVisible(true);
@@ -73,13 +84,29 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         });
     }
     
+    /**
+     * Converts a click on the MapImage to where the user would be clicking on the actual image
+     * @param x mouse click x coordinate
+     * @return the x coordinate on the image where the user would have clicked
+     */
     private int translateClickX(int x){
         return (int) ((x + clipX) * zoom);
     }
+    
+    /**
+     * Converts a click on the MapImage to where the user would be clicking on the actual image
+     * @param y mouse click y coordinate
+     * @return the y coordinate on the image where the user would have clicked
+     */
     private int translateClickY(int y){
         return (int) ((y + clipY) * zoom);
     }
     
+    /**
+     * Adds a Node's NodeIcon to the MapImage,
+     * then positions it.
+     * @param n the Node to add to the MapImage
+     */
     public void addNode(Node n){
         NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
@@ -89,6 +116,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         revalidate();
         repaint();
     }
+    
+    /**
+     * Removes all NodeIcons from this element.
+     */
     public void removeAllNodes(){
         nodeIcons.clear();
         ArrayList<Component> newComp = new ArrayList<>();
@@ -101,11 +132,20 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         newComp.stream().forEach(c -> add(c));
     }
     
+    /**
+     * resets the position of each NodeIcon.
+     */
     private void resizeNodeIcons(){
         nodeIcons.values().forEach(n -> n.scaleTo(scaler));
         nodeIcons.values().forEach(n -> n.setLocation((int) ((n.getX() - clipX) / zoom), (int) ((n.getY() - clipY) / zoom)));
     }
     
+    /**
+     * Moves the clip of the image this element is displaying.
+     * Automatically prevents going out of the image's bounds
+     * @param x the amount the clip is moved to the right
+     * @param y the amount the clip is moved down
+     */
     private void pan(int x, int y){
         clipX += x;
         clipY += y;
@@ -124,6 +164,14 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         
         resizeNodeIcons();
     }
+    
+    /**
+     * Reduces the width and height of the clip area of the image. 
+     * Since the clip is still rendered at the same size,
+     * it has to fill the same area, but with a smaller image,
+     * giving the illusion of zooming in.
+     * @param perc the percentage to zoom in. Negative to zoom out.
+     */
     private void zoom(double perc){
         zoom += perc;
         
@@ -147,6 +195,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         resizeNodeIcons();
     }
     
+    /**
+     * Called whenever this component is resized.
+     * Repositions all the NodeIcons.
+     */
     private void resize(){
         clipW = (getWidth() < buff.getWidth()) ? getWidth() : buff.getWidth();
         clipH = (getHeight() < buff.getHeight()) ? getHeight() : buff.getHeight();
@@ -157,6 +209,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         resizeNodeIcons();
     }
     
+    /**
+     * Changes the image displayed by this component,
+     * resetting the clip info in the process
+     * @param bi the image to display
+     */
     public void setImage(BufferedImage bi){
         buff = bi;
         aspectRatio = 1.0 * buff.getWidth() / buff.getHeight();
@@ -167,10 +224,20 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         repaint();
     }
     
+    /**
+     * Scales the coordinate conversion to two points
+     * @param x1 the x coordinate of the upper left point
+     * @param y1 the y coordinate of the upper left point
+     * @param x2 the x coordinate of the lower right point
+     * @param y2 the y coordinate of the lower right point
+     */
     public void scaleTo(double x1, double y1, double x2, double y2){
         scaler.rescale(x1, y1, x2, y2);
     }
     
+    /**
+     * Currently doesn't work with resized image?
+     */
     public void saveImage(){
         JFileChooser cd = new JFileChooser();
         cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -188,6 +255,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseClicked(MouseEvent me) {
         switch(Session.mode){
             case ADD:
+                //adds a Node where the user clicks
                 Node n = new Node(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
                 n.init();
                 addNode(n);
@@ -196,16 +264,19 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 Session.mode = Mode.NONE;
                 break;
             case MOVE:
+                //repositions a Node to where the user clicks
                 Session.selectedNode.repos(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
                 Session.mode = Mode.NONE;
                 break;
             case RESCALE_UL:
+                // sets the upper-left corner of the new map image clip
                 Session.mode = Mode.RESCALE_LR;
                 Session.newMapX = Node.get(-1).getIcon().getX();
                 Session.newMapY = Node.get(-1).getIcon().getY();
                 JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
                 break;
             case RESCALE_LR:
+                // sets the lower-right corner of the new map image clip
                 Session.mode = Mode.NONE;
                 Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
                 Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
@@ -263,6 +334,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseMoved(MouseEvent me) {
         switch(Session.mode){
             case MOVE:
+                // shows where the selected node will be repositioned when the user clicks
                 Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
                 Session.selectedNode.getIcon().drawAllLinks();
                 revalidate();
@@ -292,6 +364,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 break;
         }//end switch
         
+        //pan if the user moves the mouse within 10% of the edge of the displayed clip
         if(me.getY() < getHeight() * 0.1){
             pan(0, -5);
         } else if(me.getY() > getHeight() * 0.9){
@@ -311,6 +384,11 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         zoom(mwe.getPreciseWheelRotation() / 100);
     }
     
+    /**
+     * Saves a BufferedImage to a file
+     * @param image the BufferedImage to save
+     * @return a File containing the new image
+     */
     public static File createNewImageFile(BufferedImage image){
         File f = null;
         JFileChooser cd = new JFileChooser();
@@ -327,7 +405,13 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         return f;
     }
     
+    
     @Override
+    /**
+     * Renders a clip of the image. 
+     * Note that this means the displayed image isn't the actual component
+     * @param g 
+     */
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         //System.out.println(clipX + ", " + clipY + ", " + clipW + ", " + clipH);
