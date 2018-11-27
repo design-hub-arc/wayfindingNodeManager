@@ -2,11 +2,12 @@ package nodemanager.gui;
 
 import javax.swing.*;
 import java.awt.*;
+/**
+*@author Matt Crow (greengrappler12@gmail.com)
+*/
 
 /**
- * @author Matt Crow (greengrappler12@gmail.com)
- * 
- * Used to position components in a horizontal row
+ * Used to position components in a horizontal row.
  */
 public class MenuBar extends JComponent{
     /**

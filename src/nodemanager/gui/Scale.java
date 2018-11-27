@@ -1,5 +1,4 @@
 package nodemanager.gui;
-import javax.swing.JComponent;
 
 /**
  * Scale is used to scale a collection of points to any other scale.
@@ -48,8 +47,8 @@ public class Scale {
     }
     
     /**
-     * @param w : the sourceWidth to scale points to
-     * @param h : the sourceHeight to scale points to
+     * @param w : the destination width to scale points to
+     * @param h : the destination height to scale points to
      */
     public void setSize(int w, int h){
         destinationWidth = w;

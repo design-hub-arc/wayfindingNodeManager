@@ -4,14 +4,30 @@ import java.io.*;
 import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
+import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
 import nodemanager.gui.Scale;
 
+/**
+ * The Node class is used to store data pertaining to points on campus.
+ * Each Node has a unique ID, 
+ * x and y coordinates on both a "source plane" and a target Container element, 
+ * and the IDs of Nodes connecting to it, known as "adjacent nodes"
+ * 
+ * @author Matt Crow (greengrappler12@gmail.com)
+ */
 public class Node {
     public final int id;
+    
+    /*
+    position on a "source plain", which basically means this point can be 
+    ANY set of horizontal and vertical components on
+    ANY two dimensional grid, so long as x grows right, and y grows down
+    */
     public final double rawX;
     public final double rawY;
     
-    //coordinates on canvas
+    //coordinates on destination plane
     private int x;
     private int y;
     
@@ -21,6 +37,12 @@ public class Node {
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
     private static int nextId = 0;
     
+    /**
+     * 
+     * @param id the id of this Node
+     * @param x the horizontal component of this Node's position on its source plane
+     * @param y the vertical component of this Node's position on its source plane
+     */
     public Node(int id, double x, double y){
         this.id = id;
         rawX = x;
@@ -40,10 +62,20 @@ public class Node {
         }
     }
     
+    /**
+     * Generates a new Node at the given coordinates, with a unique ID.
+     * @param x the horizontal component of this Node's position on its source plane
+     * @param y the vertical component of this Node's position on its source plane
+     */
     public Node(double x, double y){
         this(nextId, x, y);
     }
     
+    /**
+     * Removes a Node from the program, and severs any connections between this Node and those adjacent to it.
+     * Note that it doesn't modify the original spreadsheet
+     * @param id the ID of the Node to remove
+     */
     public static void removeNode(int id){
         
         Node n = get(id);
@@ -52,43 +84,103 @@ public class Node {
         }
         allNodes.remove(id);
     }
+    
+    /**
+     * Clears the program's Node list.
+     * Doesn't modify the spreadsheet
+     */
     public static void removeAll(){
         allNodes.clear();
     }
     
     //how deal with not found?
-    public static Node get(int nodeId){
+    /**
+     * Returns a Node with the given ID
+     * @param nodeId the ID to get a Node with
+     * @return the Node with the given ID, or null if one doesn't exist
+     * @throws NullPointerException 
+     */
+    public static Node get(int nodeId) throws NullPointerException{
         return allNodes.get(nodeId);
     }
+    
+    /**
+     * Get all Nodes
+     * @return a Collection of all Nodes
+     */
     public static Collection<Node> getAll(){
         return allNodes.values();
     }
     
+    /**
+     * Sets this Node's destination plane,
+     * setting its coordinates.
+     * @param s the Scale to position to.
+     */
     public void scaleTo(Scale s){
         x = s.x(rawX);
         y = s.y(rawY);
     }
     
+    /**
+     * Repositions this Node on its destination plane,
+     * such as the MapImage
+     * @param x the x coordinate to set to
+     * @param y the y coordinate to set to
+     */
     public void repos(double x, double y){
         this.x = (int)x;
         this.y = (int)y;
     }
+    
+    /**
+     * Resets this Node's position on the destination plane 
+     * to where it when it was initially imported
+     */
     public void resetPos(){
         x = (int)rawX;
         y = (int)rawY;
     }
+    
+    /**
+     * the x coordinate of this Node on the destination plane
+     * @return the x coordinate of this Node on the destination plane
+     */
     public double getX(){
         return x;
     }
+    
+    /**
+     * the y coordinate of this Node on the destination plane
+     * @return the y coordinate of this Node on the destination plane
+     */
     public double getY(){
         return y;
     }
     
+    /**
+     * Creates a connection between this Node and another
+     * @param i the ID of the Node to connect to
+     */
     public void addAdjId(int i){
-        adjacentIds.add(i);
+        if(Node.get(i) == null){
+            out.println(String.format("Node with ID %d does not exist.", i));
+        } else {
+            if(!isAdjTo(i)){
+               adjacentIds.add(i);
+            }
+            if(!Node.get(i).isAdjTo(id)){
+                Node.get(i).addAdjId(id);
+            }
+        }
     }
+    
+    /**
+     * Severs a connection between this Node and another. Does nothing if no connection exists
+     * @param i the ID of the Node to disconnect from
+     */
     public void removeAdj(int i){
-        Integer remId = Integer.valueOf(i);
+        Integer remId = i;
         if(adjacentIds.contains(remId)){
             Node connected = Node.get(i);
             adjacentIds.remove(remId);
@@ -97,33 +189,36 @@ public class Node {
             }
         }
     }
+    
+    /**
+     * Checks to see if this Node connects to one with a given ID
+     * @param i the ID of the Node to check for a connection with
+     * @return whether or not the two Nodes connect
+     */
+    public boolean isAdjTo(int i){
+        return adjacentIds.contains(i);
+    }
+    
+    /**
+     * gives all adjacent Node ids
+     * @return a HashSet of all adjacent Node ids
+     */
     public HashSet<Integer> getAdjIds(){
         return adjacentIds;
     }
     
-    
-    
-    private void checkOneWay(){
-        Node adj;
-        for(Integer i : adjacentIds){
-            adj = Node.get(i);
-            if(adj != null){
-                if(Arrays.asList(adj.adjacentIds).indexOf(id) == -1){
-                    adj.addAdjId(id);
-                }
-            }
-        }
-    }
-    public void init(){
-        HashSet<Integer> newAdj = new HashSet<>();
-        adjacentIds.stream().filter(aid -> allNodes.containsKey(aid)).forEach(adid -> newAdj.add(adid));
-        adjacentIds = newAdj;
-    }
-    
+    /**
+     * Returns the visual representation of this Node.
+     * @return the NodeIcon generated by this node
+     */
     public NodeIcon getIcon(){
         return icon;
     }
     
+    /**
+     * Get the textual description of this Node
+     * @return a description of this Node
+     */
     public String getDesc(){
         String ret = 
                 "Node #" + id + System.lineSeparator() +
@@ -135,20 +230,17 @@ public class Node {
         }
         return ret;
     }
+    
+    /**
+     * Prints this Node's data to the console
+     */
     public void displayData(){
         out.println(getDesc());
     }
     
-    public static void initAll(){
-        //need to run this to populate adjacent nodes
-        //TODO add checking and make two way
-        for(Node n : allNodes.values()){
-            n.checkOneWay();
-        }
-        for(Node n : allNodes.values()){
-            n.init();
-        }
-    }
+    /**
+     * Prints the data of all Nodes to the console
+     */
     public static void logAll(){
         out.println("*ALL NODES*");
         for(Node n : allNodes.values()){
@@ -157,13 +249,19 @@ public class Node {
         }
     }
     
+    /**
+     * Exports the Node data in the form of two csv files
+     * @param path the path to the directory where the new files will be created
+     */
     public static void generateDataAt(String path){
         BufferedWriter out = null;
         String nl = System.getProperty("line.separator");
         
+        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
+        
         try {
-            File nodeFile = new File(path + File.separator + "nodeData" + System.currentTimeMillis() + ".csv");
-            File connectFile = new File(path + File.separator + "nodeConnections" + System.currentTimeMillis() + ".csv");
+            File nodeFile = new File(path + File.separator + "nodeData" + time + ".csv");
+            File connectFile = new File(path + File.separator + "nodeConnections" + time + ".csv");
             
             out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
             out.write("id, x, y" + nl);

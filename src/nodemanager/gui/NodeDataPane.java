@@ -40,6 +40,7 @@ public class NodeDataPane extends JComponent{
             public void actionPerformed(ActionEvent e){
                 if(hasNodeSelected){
                     if(selectedNode.id < 0){
+                        //prevent user from deleting corner nodes
                         JOptionPane.showMessageDialog(null, "Cannot delete node with id of " + selectedNode.id);
                     } else if(JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this node? This will not alter the original spreadsheet.") == JOptionPane.YES_OPTION){
                         NodeIcon n = selectedNode.getIcon();
@@ -71,6 +72,8 @@ public class NodeDataPane extends JComponent{
         add(move);
         
         resetPos = new JButton("Reset position");
+        
+        //resets the NodeIcon to its position when it was initially imported
         resetPos.addActionListener(new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -108,17 +111,29 @@ public class NodeDataPane extends JComponent{
         setVisible(true);
     }
     
+    /**
+     * Creates a NodeDataPane with a specific node selected
+     * @param n the Node to select
+     */
     public NodeDataPane(Node n){
         this();
         selectNode(n);
     }
     
+    /**
+     * Changes the information displayed to that of a given node
+     * @param n the Node this should display the data for
+     */
     public void selectNode(Node n){
         hasNodeSelected = true;
         selectedNode = n;
         nodeInfo.setText(n.getDesc());
     }
     
+    /**
+     * returns the Node this is displaying the data for
+     * @return the selected Node
+     */
     public Node getSelected(){
         return selectedNode;
     }

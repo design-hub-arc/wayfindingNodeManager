@@ -19,7 +19,7 @@ public class EditCanvas extends JPanel{
     EditCanvas is the main JPanel used by the program
     */
     private final MenuBar menu;
-    private final Pane body;
+    private final JComponent body;
     private final Sidebar sideBar;
     private final JButton chooseNodeSourceButton;
     private final JButton chooseNodeConnButton;
@@ -51,7 +51,8 @@ public class EditCanvas extends JPanel{
         c.fill = GridBagConstraints.BOTH;
         add(menu, c);
         
-        body = new Pane();
+        body = new JComponent(){};
+        body.setLayout(new FlowLayout());
         c.gridx = 1;
         c.gridy = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -251,7 +252,6 @@ public class EditCanvas extends JPanel{
      */
     private void loadConn(InputStream i){
         NodeParser.parseConnFile(i);
-        Node.initAll();
     }
     
     /**

@@ -257,7 +257,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             case ADD:
                 //adds a Node where the user clicks
                 Node n = new Node(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
-                n.init();
                 addNode(n);
                 revalidate();
                 repaint();

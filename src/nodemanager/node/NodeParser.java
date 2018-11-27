@@ -60,7 +60,6 @@ public class NodeParser {
                     id = Integer.parseInt(line[0].trim());
                     adj = Integer.parseInt(line[1].trim());
                     Node.get(id).addAdjId(adj);
-                    Node.get(adj).addAdjId(id);
                 } catch(NumberFormatException e){
                     out.println("Line fail: " + Arrays.toString(line));
                 } catch(NullPointerException n){
