@@ -160,6 +160,7 @@ public class Node {
     public static void generateDataAt(String path){
         BufferedWriter out = null;
         String nl = System.getProperty("line.separator");
+        
         try {
             File nodeFile = new File(path + File.separator + "nodeData" + System.currentTimeMillis() + ".csv");
             File connectFile = new File(path + File.separator + "nodeConnections" + System.currentTimeMillis() + ".csv");

@@ -10,11 +10,14 @@ import static java.lang.System.out;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
 
-/*
-EditCanvas is the main JPanel used by the program
-*/
+/**
+ * @author Matt Crow (greengrappler12@gmail.com)
+ */
 
 public class EditCanvas extends JPanel{
+    /**
+    EditCanvas is the main JPanel used by the program
+    */
     private final MenuBar menu;
     private final Pane body;
     private final Sidebar sideBar;
@@ -28,7 +31,12 @@ public class EditCanvas extends JPanel{
     private final NodeDataPane selectedNode;
     private MapImage map;
     
+    /**
+    * Creates many different components, then adds them to the JPanel.
+    * Is a bit of a mess because of all the stuff it needs to add, may clean up next semester.
+    */
     public EditCanvas(){
+        
         super();
         
         GridBagLayout lo = new GridBagLayout();
@@ -119,7 +127,7 @@ public class EditCanvas extends JPanel{
                     }
                 }
         );
-        menu.add(chooseMapButton);
+        //menu.add(chooseMapButton); //The map choosing feature doesn't work
         
         addNodeButton = new JButton("Add a new Node");
         addNodeButton.addActionListener(new AbstractAction(){
@@ -149,7 +157,7 @@ public class EditCanvas extends JPanel{
         //set defaults
         try{
             map.setImage(ImageIO.read(getClass().getResourceAsStream("/map.png")));
-        } catch(Exception e){
+        } catch(IOException e){
             e.printStackTrace();
         }
         
@@ -165,6 +173,16 @@ public class EditCanvas extends JPanel{
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Creates a button that allows the user to select a file with a given extention, 
+     * then invokes the given file listener's run method, passing in the file selected as a parameter
+     * 
+     * @param type the caption on the button this will create
+     * @param types the file types the selector allows the user to select
+     * @param l the FileSelectedListener (see the bottom of this file) that will run after the user chooses a file
+     * @return the JButton constructed
+     */
     private JButton createSelector(String type, String[] types, FileSelectedListener l){
         JButton ret = new JButton("Select " + type);
         
@@ -185,6 +203,12 @@ public class EditCanvas extends JPanel{
         return ret;
     }
     
+    /**
+     * Used to move some of the cluttered code out of the constructor.
+     * Creates a button which, when clicked, allows the user to choose
+     * a directory to export the data created by the program to.
+     * @return  the JButton constructed
+     */
     private JButton createExportButton(){
         JButton j = new JButton("Export data");
         j.addActionListener(new AbstractAction(){
@@ -204,6 +228,11 @@ public class EditCanvas extends JPanel{
         return j;
     }
     
+    /**
+     * Imports node position data from a csv file,
+     * then adds their icons to the map
+     * @param i the InputStream given by a FileInputStream generated from a csv file
+     */
     private void loadNodesFromFile(InputStream i){
         map.removeAllNodes();
         Node.removeAll();
@@ -211,18 +240,23 @@ public class EditCanvas extends JPanel{
         NodeParser.parseNodeFile(i);
         map.scaleTo(Node.get(-1).rawX, Node.get(-1).rawY, Node.get(-2).rawX, Node.get(-2).rawY);
         
-        for(Node n : Node.getAll()){
-            map.addNode(n);
-        }
+        Node.getAll().forEach((n) -> map.addNode(n));
         revalidate();
         repaint();
     }
     
+    /**
+     * Imports node connection data from a csv file
+     * @param i the InputStream given by a FileInputStream generated from a csv file
+     */
     private void loadConn(InputStream i){
         NodeParser.parseConnFile(i);
         Node.initAll();
     }
     
+    /**
+     * Used by createSelector to react to choosing a file through a JFileChooser
+     */
     private abstract class FileSelectedListener{
         public abstract void run(File f);
     }

@@ -5,8 +5,14 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import nodemanager.gui.Window;
 
-public class NodeManager {
+/**
+ * @author Matt Crow (greengrappler12@gmail.com)
+ */
 
+public class NodeManager {
+    /**
+     * NodeManager is the main class for the program
+     */
     public static void main(String[] args) {
         new Window();
         

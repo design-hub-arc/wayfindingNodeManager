@@ -1,4 +1,7 @@
 package nodemanager;
+/**
+ * @author Matt Crow (greengrappler12@gmail.com)
+ */
 
 /*
 Modes are used to tell the program how to act
@@ -14,6 +17,9 @@ ADD_CONNECTION    - in NodeIcon             - done
 REMOVE_CONNECTION - in NodeIcon             - done
 RESCALE_UL        - in MapImage             - done
 RESCALE_LR        - in MapImage             - done
+
+some classes have event listeners that check the current mode to decide how to act
+see MapImage and NodeIcon
 */
 public enum Mode {
     NONE,
