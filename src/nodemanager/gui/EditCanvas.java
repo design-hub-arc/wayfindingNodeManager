@@ -149,7 +149,7 @@ public class EditCanvas extends JPanel{
                 map.saveImage();
             }
         });
-        menu.add(saveMap);
+        //menu.add(saveMap); // doesn't work yet
         
         setBackground(Color.blue);
         
