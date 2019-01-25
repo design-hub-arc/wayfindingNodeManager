@@ -29,6 +29,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private BufferedImage buff;
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons;
+    private final ArrayList<Node> nodes;
     
     private double zoom;
     
@@ -45,6 +46,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     
     private double aspectRatio;
     
+    private Node hoveringOver;
+    
     /**
      * Initially, does not have any image or scale.
      * WARNING! DO NOT GIVE THIS A LAYOUT! 
@@ -55,6 +58,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         setVisible(true);
         scaler = new Scale();
         nodeIcons = new HashMap<>();
+        nodes = new ArrayList<>();
         
         zoom = 1.0;
         
@@ -64,6 +68,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipH = 0;
         origClipW = 0;
         origClipH = 0;
+        
+        hoveringOver = null;
         
         setBackground(Color.BLACK);
         
@@ -110,10 +116,17 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void addNode(Node n){
         NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
-        nodeIcons.put(n.id, ni);
+        //nodeIcons.put(n.id, ni);
+        n.scaleTo(scaler);
+        nodes.add(n);
         
-        add(ni);
+        //add(ni);
         revalidate();
+        repaint();
+    }
+    
+    public void removeNode(Node n){
+        nodes.remove(n);
         repaint();
     }
     
@@ -122,6 +135,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      */
     public void removeAllNodes(){
         nodeIcons.clear();
+        nodes.clear();
+        
         ArrayList<Component> newComp = new ArrayList<>();
         for(Component c : getComponents()){
             if(!(c instanceof NodeIcon)){
@@ -251,8 +266,32 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
     }
     
+    
+    /**
+     * @throws NullPointerException if the mouse isn't over a node.
+     * @return the Node the mouse is over
+     */
+    private Node hoveredNode(int mouseX, int mouseY) throws NullPointerException{
+        int nodeSize = Node.getSize();
+        int x = translateClickX(mouseX);
+        int y = translateClickY(mouseY);
+        return Node.getAll().stream().filter(node -> {
+            return node.getX() <= x 
+                && node.getX() + nodeSize >= x
+                && node.getY() <= y
+                && node.getY() + nodeSize >= y;
+        }).findFirst().orElse(null);
+    }
+
+    
     @Override
     public void mouseClicked(MouseEvent me) {
+        try{
+            hoveringOver.mouseClicked(me);
+        }catch(NullPointerException e){
+            //no node selected
+        }
+        
         switch(Session.mode){
             case ADD:
                 //adds a Node where the user clicks
@@ -331,6 +370,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseMoved(MouseEvent me) {
+        hoveringOver = hoveredNode(me.getX(), me.getY());
+        
         switch(Session.mode){
             case MOVE:
                 // shows where the selected node will be repositioned when the user clicks
@@ -413,8 +454,18 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      */
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        //System.out.println(clipX + ", " + clipY + ", " + clipW + ", " + clipH);
-        g.drawImage(buff.getSubimage(clipX, clipY, clipW, clipH), 0, 0, (int)(getWidth() * aspectRatio), getHeight(), this);
         
+        g.translate(-clipX, -clipY);
+        Graphics2D g2d = (Graphics2D)g.create();
+        g2d.scale(zoom, zoom);
+        
+        g2d.drawImage(buff, 0, 0, this);
+        Node.getAll().stream().forEach(node -> node.draw(g2d));
+        
+        try{
+            hoveringOver.drawLinks(g2d);
+        } catch(NullPointerException e){
+            //no nodes hovered
+        }
     }
 }

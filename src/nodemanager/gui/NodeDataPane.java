@@ -43,12 +43,17 @@ public class NodeDataPane extends JComponent{
                         //prevent user from deleting corner nodes
                         JOptionPane.showMessageDialog(null, "Cannot delete node with id of " + selectedNode.id);
                     } else if(JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this node? This will not alter the original spreadsheet.") == JOptionPane.YES_OPTION){
+                        /*
                         NodeIcon n = selectedNode.getIcon();
                         Container c = n.getParent();
                         Node.removeNode(selectedNode.id);
                         c.remove(n);
+                        
                         c.revalidate();
                         c.repaint();
+                        */
+                        Node.removeNode(selectedNode.id);
+                        
                         Session.selectNode(Node.get(-1));
                     }
                 }

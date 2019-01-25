@@ -1,12 +1,22 @@
 package nodemanager.node;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
+import nodemanager.Mode;
+import nodemanager.Session;
 import nodemanager.gui.Scale;
+
+//seperate this into Node and NodeListener or something like that
 
 /**
  * The Node class is used to store data pertaining to points on campus.
@@ -16,7 +26,7 @@ import nodemanager.gui.Scale;
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
-public class Node {
+public class Node implements MouseListener{
     public final int id;
     
     /*
@@ -37,6 +47,9 @@ public class Node {
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
     private static int nextId = 0;
     
+    private Color color;
+    private static int size = 30; //add ability to resize
+    
     /**
      * 
      * @param id the id of this Node
@@ -49,6 +62,8 @@ public class Node {
         rawY = y;
         this.x = (int)x;
         this.y = (int)y;
+        
+        color = (id > 0) ? Color.blue : Color.red;
         
         adjacentIds = new HashSet<>();
         icon = new NodeIcon(this);
@@ -113,6 +128,14 @@ public class Node {
     }
     
     /**
+     * 
+     * @return the size of nodes, in pixels
+     */
+    public static int getSize(){
+        return size;
+    }
+    
+    /**
      * Sets this Node's destination plane,
      * setting its coordinates.
      * @param s the Scale to position to.
@@ -146,7 +169,7 @@ public class Node {
      * the x coordinate of this Node on the destination plane
      * @return the x coordinate of this Node on the destination plane
      */
-    public double getX(){
+    public int getX(){
         return x;
     }
     
@@ -154,7 +177,7 @@ public class Node {
      * the y coordinate of this Node on the destination plane
      * @return the y coordinate of this Node on the destination plane
      */
-    public double getY(){
+    public int getY(){
         return y;
     }
     
@@ -248,6 +271,74 @@ public class Node {
             n.displayData();
         }
     }
+    
+    
+    /**
+     * Draws this node on a Graphics object
+     * @param g the graphics context to draw on
+     */
+    public void draw(Graphics g){
+        g.setColor(color);
+        g.fillRect(x, y, size, size);
+        g.setColor(Color.black);
+        g.drawString(Integer.toString(id), x, y);
+    }
+    
+    /**
+     * Draws a link between this node and another
+     * @param g the graphics context to draw on
+     * @param n the node to draw a link to
+     */
+    public void drawLink(Graphics2D g, Node n){
+        g.setColor(Color.blue);
+        g.setStroke(new BasicStroke(10));
+        g.drawLine(getX(), getY(), n.getX(), n.getY());
+    }
+    
+    /**
+     * Visualize the connections between 
+     * this node and those adjacent to it
+     * @param g the graphics context to draw on
+     */
+    public void drawLinks(Graphics2D g){
+        getAdjIds().stream().map(id -> Node.get(id)).forEach(n -> drawLink(g, n));
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        switch (Session.mode) {
+            case NONE:
+                Session.selectNode(this);
+                this.displayData();
+                break;
+            case ADD_CONNECTION:
+                Session.selectedNode.addAdjId(id);
+                Session.mode = Mode.NONE;
+                break;
+            case REMOVE_CONNECTION:
+                Session.selectedNode.removeAdj(id);
+                removeAdj(Session.selectedNode.id);
+                Session.mode = Mode.NONE;
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {}
+
+    @Override
+    public void mouseReleased(MouseEvent me) {}
+
+    @Override
+    public void mouseEntered(MouseEvent me) {
+        //drawLinks();
+    }
+    
+    //flickering
+    @Override
+    public void mouseExited(MouseEvent me) {}
     
     /**
      * Exports the Node data in the form of two csv files
