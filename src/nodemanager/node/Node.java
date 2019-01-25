@@ -357,7 +357,7 @@ public class Node implements MouseListener{
             out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
             out.write("id, x, y" + nl);
             for(Node n : allNodes.values()){
-                out.write(n.id + ", " + n.getIcon().getX() + ", " + n.getIcon().getY() + nl);
+                out.write(n.id + ", " + n.getX() + ", " + n.getY() + nl);
             }
             out.close();
             

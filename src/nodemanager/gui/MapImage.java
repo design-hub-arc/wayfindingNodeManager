@@ -303,7 +303,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 break;
             case MOVE:
                 //repositions a Node to where the user clicks
-                Session.selectedNode.repos(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
+                //Session.selectedNode.repos(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
+                
                 Session.mode = Mode.NONE;
                 break;
             case RESCALE_UL:
@@ -375,9 +376,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         switch(Session.mode){
             case MOVE:
                 // shows where the selected node will be repositioned when the user clicks
-                Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
-                Session.selectedNode.getIcon().drawAllLinks();
-                revalidate();
+                //Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
+                //Session.selectedNode.getIcon().drawAllLinks();
+                Session.selectedNode.repos(translateClickX(me.getX()), translateClickY(me.getY()));
+                //revalidate();
                 repaint();
                 break;
             case RESCALE_UL:
