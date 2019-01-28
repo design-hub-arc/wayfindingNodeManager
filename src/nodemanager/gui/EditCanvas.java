@@ -128,7 +128,7 @@ public class EditCanvas extends JPanel{
                     }
                 }
         );
-        //menu.add(chooseMapButton); //The map choosing feature doesn't work
+        menu.add(chooseMapButton); //The map choosing feature doesn't work
         
         addNodeButton = new JButton("Add a new Node");
         addNodeButton.addActionListener(new AbstractAction(){
@@ -149,7 +149,7 @@ public class EditCanvas extends JPanel{
                 map.saveImage();
             }
         });
-        //menu.add(saveMap); // doesn't work yet
+        menu.add(saveMap); // doesn't work yet
         
         setBackground(Color.blue);
         

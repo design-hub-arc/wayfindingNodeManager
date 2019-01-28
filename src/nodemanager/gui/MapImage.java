@@ -296,10 +296,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 }
                 break;
             case RESCALE_LR:
-                scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
-                for(NodeIcon ni : nodeIcons.values()){
-                    ni.setPos((int)ni.node.getX() + Session.newMapX + 5, (int)ni.node.getY() + Session.newMapY + 5);
-                }
+                scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
+                resizeNodeIcons();
                 break;
         }//end switch
         
