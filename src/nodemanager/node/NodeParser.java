@@ -32,8 +32,8 @@ public class NodeParser {
         BufferedReader br;
         String[] line;
         int id;
-        double x;
-        double y;
+        int x;
+        int y;
         
         try{
             br = new BufferedReader(new InputStreamReader(s));
@@ -41,8 +41,8 @@ public class NodeParser {
                 line = br.readLine().split(",");
                 try{
                     id = Integer.parseInt(line[0].trim());
-                    x = Double.parseDouble(line[1].trim());
-                    y = Double.parseDouble(line[2].trim());
+                    x = Integer.parseInt(line[1].trim());
+                    y = Integer.parseInt(line[2].trim());
                     new Node(id, x, y);
                 } catch(NumberFormatException e){
                     out.println("Line fail: " + Arrays.toString(line));

@@ -1,6 +1,5 @@
 package nodemanager.gui;
 
-import javax.swing.JLabel;
 import javax.swing.JToolTip;
 import java.awt.*;
 import java.awt.event.*;
@@ -15,28 +14,84 @@ import nodemanager.node.Node;
 
 
 /**
- * NodeIcons are used to visually display Nodes on a MapImage, as well as respond to mouse clicks.
- * We will likely replace NodeIcon in later versions, as panning the map image requires us to move ALL the NodeIcons on them map,
- * which is somewhat tedious. Also, Components are meant to be in a layout, which means they aren't meant to be constantly repositioned.
+ * NodeIcons are used to visually display Nodes on a MapImage, 
+ * as well as respond to mouse clicks.
  * 
- * In spite of all that, it's just easier this way. Will deprecate later.
+ * Note how this does not implement a mouselistener. 
+ * That is because this would have to be a component to do so,
+ * but since NodeIcons need to be constantly repositioned,
+ * java doesn't like that.
+ * Solving the problem: MapImage will pass click events to this' mouse event listeners.
  */
-public class NodeIcon extends JLabel implements MouseListener{
+public class NodeIcon{
     public final Node node;
+    private final int id; //the ID to display
+    private final Color color;
     private Scale scale;
+    private int x; //position on the map image
+    private int y;
+    private boolean drawLinks; //whether or not this should draw links
+    
+    private static int size = 30; //add ability to resize
     
     /**
      * Creates a visual representation of the given Node
      * @param n the Node to create a representation of
      */
     public NodeIcon(Node n){
-        super(Integer.toString(n.id));
+        id = n.id;
         node = n;
-        setSize(30, 30);
-        setBackground((n.id < 0) ? Color.green : Color.red);
-        setOpaque(true);
-        setVisible(true);
-        addMouseListener(this);
+        color = (n.id < 0) ? Color.green : Color.red;
+        
+        x = node.rawX;
+        y = node.rawY;
+        
+        drawLinks = false;
+    }
+    
+    /**
+     * Gets the width and height of NodeIcons, in pixels
+     * @return the size of NodeIcons
+     */
+    public static int getSize(){
+        return size;
+    }
+    
+    
+    /**
+     * Gets the Node this represents
+     * @return the Node this represents.
+     */
+    public Node getNode(){
+        return node;
+    }
+    
+    
+    /**
+     * 
+     * @return this' x-coordinate on the map image
+     */
+    public int getX(){
+        return x;
+    }
+    
+    /**
+     * 
+     * @return this' y-coordinate on the map image
+     */
+    public int getY(){
+        return y;
+    }
+    
+    /**
+     * Sets the position of this icon on the map image.
+     * Note that this does not edit this' node
+     * @param xc the x-coordinate on the map
+     * @param yc the y-coordinate on the map
+     */
+    public void setPos(int xc, int yc){
+        x = xc;
+        y = yc;
     }
     
     /**
@@ -46,36 +101,34 @@ public class NodeIcon extends JLabel implements MouseListener{
      */
     public void scaleTo(Scale s){
         scale = s;
-        setLocation(scale.x(node.getX()), scale.y(node.getY()));
+        x = scale.x(node.getX());
+        y = scale.y(node.getY());
     }
     
     /**
      * Moves this component back to where it was when the Node was initially imported
      */
     public void resetPos(){
-        setLocation(scale.x(node.rawX), scale.y(node.rawY));
-        node.resetPos();
+        x = scale.x(node.rawX);
+        y = scale.y(node.rawY);
     }
+    
     
     /**
-     * Graphically display all the connections between this icon's Nodes and its adjacent Nodes
+     * Checks to see if the given points 
+     * is contained within this NodeIcon
+     * @param xc the x-coordinate of the click, as a point on the map image
+     * @param yc the y-coordinate of the click, as a point on the map image
+     * @return whether or not this was clicked on
      */
-    public void drawAllLinks(){
-        node.getAdjIds().stream().map(id -> Node.get(id)).forEach(n -> drawLink(n));
+    public boolean isIn(int xc, int yc){
+        return x <= xc && 
+               x + size >= xc &&
+               y <= yc &&
+               y + size >= yc;
     }
     
-    /**
-     * Draw a link between this NodeIcon and another Node's icon
-     * @param n the Node to draw a connection to
-     */
-    private void drawLink(Node n){
-        Graphics2D g = (Graphics2D)getParent().getGraphics();
-        g.setColor(Color.red);
-        g.setStroke(new BasicStroke(10));
-        g.drawLine(getX(), getY(), n.getIcon().getX(), n.getIcon().getY());
-    }
     
-    @Override
     public void mouseClicked(MouseEvent me) {
         switch (Session.mode) {
             case NONE:
@@ -96,34 +149,54 @@ public class NodeIcon extends JLabel implements MouseListener{
         }
     }
 
-    @Override
-    public void mousePressed(MouseEvent me) {}
-
-    @Override
-    public void mouseReleased(MouseEvent me) {}
-
-    @Override
     public void mouseEntered(MouseEvent me) {
-        drawAllLinks();
-        setToolTipText(node.getDesc());
+        drawLinks = true;
+        //make this change to being displayed as node data
     }
     
-    //flickering
-    @Override
     public void mouseExited(MouseEvent me) {
-        getParent().repaint();
+        drawLinks = false;
+        //make revert to displayed as node icon
     }
+    
     
     /**
-     * In the future, I kinda want to display the node's data on the tooltip,
-     * but we'll need some way to do multiple lines of text.
-     * 
-     * @return the tooltip for this component
+     * Draws this on a Graphics object
+     * @param g the graphics context to draw on
      */
-    @Override
-    public JToolTip createToolTip(){
-        JToolTip ret = new JToolTip();
+    public void draw(Graphics g){
+        g.setColor(color);
+        g.fillRect(x, y, size, size);
         
-        return ret;
+        g.setColor(Color.black);
+        g.drawString(Integer.toString(id), x, y);
+        
+        if(drawLinks){
+            drawAllLinks(g);
+        }
+    }
+    
+    
+    /**
+     * Graphically display all the connections between this icon's Nodes and its adjacent Nodes
+     * @param g the Graphics context to draw on
+     */
+    private void drawAllLinks(Graphics g){
+        node.getAdjIds()
+                .stream()
+                .map(id -> Node.get(id))
+                .forEach(node -> drawLink(g, node));
+    }
+    
+    
+    /**
+     * Draw a link between this NodeIcon and another Node's icon
+     * @param n the Node to draw a connection to
+     */
+    private void drawLink(Graphics g, Node n){
+        Graphics2D g2d = (Graphics2D)g;
+        g2d.setColor(color);
+        g2d.setStroke(new BasicStroke(10));
+        g2d.drawLine(getX(), getY(), n.getIcon().getX(), n.getIcon().getY());
     }
 }

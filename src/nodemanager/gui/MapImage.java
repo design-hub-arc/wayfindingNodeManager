@@ -28,8 +28,7 @@ import nodemanager.*;
 public class MapImage extends JLabel implements MouseListener, MouseMotionListener, MouseWheelListener{
     private BufferedImage buff;
     private final Scale scaler;
-    private final HashMap<Integer, NodeIcon> nodeIcons;
-    private final ArrayList<Node> nodes;
+    private final HashMap<Integer, NodeIcon> nodeIcons; // the node icons this is displaying
     
     private double zoom;
     
@@ -46,19 +45,16 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     
     private double aspectRatio;
     
-    private Node hoveringOver;
+    private NodeIcon hoveringOver;
     
     /**
      * Initially, does not have any image or scale.
-     * WARNING! DO NOT GIVE THIS A LAYOUT! 
-     * The NodeIcons added to a MapImage need to be able to position themselves
      */
     public MapImage(){
         super();
         setVisible(true);
         scaler = new Scale();
         nodeIcons = new HashMap<>();
-        nodes = new ArrayList<>();
         
         zoom = 1.0;
         
@@ -96,7 +92,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * @return the x coordinate on the image where the user would have clicked
      */
     private int translateClickX(int x){
-        return (int) ((x + clipX) * zoom);
+        return (int) ((x + clipX) / zoom);
     }
     
     /**
@@ -105,7 +101,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * @return the y coordinate on the image where the user would have clicked
      */
     private int translateClickY(int y){
-        return (int) ((y + clipY) * zoom);
+        return (int) ((y + clipY) / zoom);
     }
     
     /**
@@ -116,17 +112,17 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void addNode(Node n){
         NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
-        //nodeIcons.put(n.id, ni);
-        n.scaleTo(scaler);
-        nodes.add(n);
-        
-        //add(ni);
-        revalidate();
+        nodeIcons.put(n.id, ni);
         repaint();
     }
     
+    /**
+     * Removes a node icon from the map.
+     * Does not delete the node
+     * @param n the Node whose icon we want to remove
+     */
     public void removeNode(Node n){
-        nodes.remove(n);
+        nodeIcons.remove(n.id);
         repaint();
     }
     
@@ -135,16 +131,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      */
     public void removeAllNodes(){
         nodeIcons.clear();
-        nodes.clear();
-        
-        ArrayList<Component> newComp = new ArrayList<>();
-        for(Component c : getComponents()){
-            if(!(c instanceof NodeIcon)){
-                newComp.add(c);
-            }
-        }
-        removeAll();
-        newComp.stream().forEach(c -> add(c));
+        repaint();
     }
     
     /**
@@ -152,7 +139,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      */
     private void resizeNodeIcons(){
         nodeIcons.values().forEach(n -> n.scaleTo(scaler));
-        nodeIcons.values().forEach(n -> n.setLocation((int) ((n.getX() - clipX) / zoom), (int) ((n.getY() - clipY) / zoom)));
+        repaint();
     }
     
     /**
@@ -176,8 +163,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         } else if(clipY + clipH > buff.getHeight()){
             clipY = buff.getHeight() - clipH;
         }
-        
-        resizeNodeIcons();
+        repaint();
     }
     
     /**
@@ -206,8 +192,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             clipW = origClipW / 10;
             clipH = origClipH / 10;
         }
-        
-        resizeNodeIcons();
+        repaint();
     }
     
     /**
@@ -235,8 +220,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipX = 0;
         clipY = 0;
         resize();
-        revalidate();
-        repaint();
     }
     
     /**
@@ -269,42 +252,92 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     
     /**
      * @throws NullPointerException if the mouse isn't over a node.
-     * @return the Node the mouse is over
+     * @return the NodeIcon the mouse is over
      */
-    private Node hoveredNode(int mouseX, int mouseY) throws NullPointerException{
-        int nodeSize = Node.getSize();
+    private NodeIcon hoveredNodeIcon(int mouseX, int mouseY) throws NullPointerException{
         int x = translateClickX(mouseX);
         int y = translateClickY(mouseY);
-        return Node.getAll().stream().filter(node -> {
-            return node.getX() <= x 
-                && node.getX() + nodeSize >= x
-                && node.getY() <= y
-                && node.getY() + nodeSize >= y;
+        return nodeIcons.values().stream().filter(icon -> {
+            return icon.isIn(x, y);
         }).findFirst().orElse(null);
     }
 
     
     @Override
+    public void mouseMoved(MouseEvent me) {
+        
+        NodeIcon oldOver = hoveringOver;
+        hoveringOver = hoveredNodeIcon(me.getX(), me.getY());
+        
+        if(oldOver != hoveringOver){
+            if(hoveringOver != null){
+                hoveringOver.mouseEntered(me);
+            }
+            if(oldOver != null){
+                oldOver.mouseExited(me);
+            }
+        }
+        
+        switch(Session.mode){
+            case MOVE:
+                // shows where the selected node will be repositioned when the user clicks
+                Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
+                break;
+            case RESCALE_UL:
+                double shiftX = translateClickX(me.getX());
+                double shiftY = translateClickY(me.getY());
+                double baseX;
+                double baseY;
+                for(NodeIcon ni : nodeIcons.values()){
+                    baseX = scaler.x(ni.node.rawX);
+                    baseY = scaler.y(ni.node.rawY);
+                    ni.setPos((int)(baseX + shiftX), (int)(baseY + shiftY));
+                }
+                break;
+            case RESCALE_LR:
+                scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
+                for(NodeIcon ni : nodeIcons.values()){
+                    ni.setPos((int)ni.node.getX() + Session.newMapX + 5, (int)ni.node.getY() + Session.newMapY + 5);
+                }
+                break;
+        }//end switch
+        
+        //pan if the user moves the mouse within 10% of the edge of the displayed clip
+        if(me.getY() < getHeight() * 0.1){
+            pan(0, -5);
+        } else if(me.getY() > getHeight() * 0.9){
+            pan(0, 5);
+        }
+        
+        if(me.getX() < getWidth() * aspectRatio * 0.1){
+            pan(-5, 0);
+        } else if(me.getX() > getWidth() * aspectRatio * 0.9){
+            pan(5, 0);
+        }
+        repaint();
+    }
+    
+    
+    @Override
     public void mouseClicked(MouseEvent me) {
-        try{
+        if(hoveringOver != null){
             hoveringOver.mouseClicked(me);
-        }catch(NullPointerException e){
-            //no node selected
         }
         
         switch(Session.mode){
             case ADD:
                 //adds a Node where the user clicks
-                Node n = new Node(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
+                Node n = new Node(
+                        (int)scaler.inverseX(translateClickX(me.getX())), 
+                        (int)scaler.inverseY(translateClickY(me.getY()))
+                );
                 addNode(n);
-                revalidate();
                 repaint();
                 Session.mode = Mode.NONE;
                 break;
             case MOVE:
                 //repositions a Node to where the user clicks
-                //Session.selectedNode.repos(scaler.inverseX(translateClickX(me.getX())), scaler.inverseY(translateClickY(me.getY())));
-                
+                Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
                 Session.mode = Mode.NONE;
                 break;
             case RESCALE_UL:
@@ -357,69 +390,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseReleased(MouseEvent me) {}
 
     @Override
-    public void mouseEntered(MouseEvent me) {
-        if(Session.mode == Mode.ADD){
-            //TODO: add node icon that follows mouse?
-        }
-    }
+    public void mouseEntered(MouseEvent me) {}
 
     @Override
     public void mouseExited(MouseEvent me) {}
+    
 
     @Override
     public void mouseDragged(MouseEvent me) {}
 
-    @Override
-    public void mouseMoved(MouseEvent me) {
-        hoveringOver = hoveredNode(me.getX(), me.getY());
-        
-        switch(Session.mode){
-            case MOVE:
-                // shows where the selected node will be repositioned when the user clicks
-                //Session.selectedNode.getIcon().setLocation(me.getX(), me.getY() + 5);
-                //Session.selectedNode.getIcon().drawAllLinks();
-                Session.selectedNode.repos(translateClickX(me.getX()), translateClickY(me.getY()));
-                //revalidate();
-                repaint();
-                break;
-            case RESCALE_UL:
-                double shiftX = me.getX();
-                double shiftY = me.getY();
-                double baseX;
-                double baseY;
-                for(NodeIcon ni : nodeIcons.values()){
-                    baseX = scaler.x(ni.node.rawX);
-                    baseY = scaler.y(ni.node.rawY);
-                    ni.setLocation((int)(baseX + shiftX - ni.getWidth() - 5), (int)(baseY + shiftY - ni.getHeight() - 5));
-                }
-                revalidate();
-                repaint();
-                break;
-            case RESCALE_LR:
-                scaler.setSize(me.getX() - Session.newMapX, me.getY() - Session.newMapY);
-                for(NodeIcon ni : nodeIcons.values()){
-                    //ni.repos();
-                    ni.setLocation((int)ni.node.getX() + Session.newMapX + 5, (int)ni.node.getY() + Session.newMapY + 5);
-                    revalidate();
-                    repaint();
-                }
-                break;
-        }//end switch
-        
-        //pan if the user moves the mouse within 10% of the edge of the displayed clip
-        if(me.getY() < getHeight() * 0.1){
-            pan(0, -5);
-        } else if(me.getY() > getHeight() * 0.9){
-            pan(0, 5);
-        }
-        
-        if(me.getX() < getWidth() * aspectRatio * 0.1){
-            pan(-5, 0);
-        } else if(me.getX() > getWidth() * aspectRatio * 0.9){
-            pan(5, 0);
-        }
-        repaint();
-    }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent mwe) {
@@ -462,12 +441,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         g2d.scale(zoom, zoom);
         
         g2d.drawImage(buff, 0, 0, this);
-        Node.getAll().stream().forEach(node -> node.draw(g2d));
-        
-        try{
-            hoveringOver.drawLinks(g2d);
-        } catch(NullPointerException e){
-            //no nodes hovered
-        }
+        nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
     }
 }
