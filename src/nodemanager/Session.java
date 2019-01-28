@@ -1,7 +1,7 @@
 package nodemanager;
 
 import nodemanager.node.Node;
-import nodemanager.gui.NodeDataPane;
+import nodemanager.gui.*;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)

@@ -1,6 +1,5 @@
 package nodemanager.gui;
 
-import javax.swing.JToolTip;
 import java.awt.*;
 import java.awt.event.*;
 import nodemanager.Mode;
@@ -31,6 +30,7 @@ public class NodeIcon{
     private int x; //position on the map image
     private int y;
     private boolean drawLinks; //whether or not this should draw links
+    private MapImage onImage; // the image this is being drawn on
     
     private static int size = 30; //add ability to resize
     
@@ -47,7 +47,9 @@ public class NodeIcon{
         y = node.rawY;
         
         drawLinks = false;
+        onImage = null;
     }
+    
     
     /**
      * Gets the width and height of NodeIcons, in pixels
@@ -57,6 +59,23 @@ public class NodeIcon{
         return size;
     }
     
+    
+    /**
+     * Sets the map image this is displayed on.
+     * Not that this doesn't effect anything apart from NodeDataPane's delete node option
+     * @param i the map image this is drawn on.
+     */
+    public void setHost(MapImage i){
+        onImage = i;
+    }
+    
+    /**
+     * gets the map image this is drawn on
+     * @return the map image
+     */
+    public MapImage getHost(){
+        return onImage;
+    }
     
     /**
      * Gets the Node this represents

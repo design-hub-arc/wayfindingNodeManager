@@ -112,6 +112,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void addNode(Node n){
         NodeIcon ni = n.getIcon();
         ni.scaleTo(scaler);
+        ni.setHost(this);
         nodeIcons.put(n.id, ni);
         repaint();
     }
@@ -337,7 +338,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 break;
             case MOVE:
                 //repositions a Node to where the user clicks
-                Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
+                //Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
                 Session.mode = Mode.NONE;
                 break;
             case RESCALE_UL:
