@@ -38,10 +38,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     */
     private int clipX;
     private int clipY;
-    private int clipW;
-    private int clipH;
-    private int origClipW;
-    private int origClipH;
     
     private double aspectRatio;
     
@@ -60,10 +56,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         
         clipX = 0;
         clipY = 0;
-        clipW = 0;
-        clipH = 0;
-        origClipW = 0;
-        origClipH = 0;
         
         hoveringOver = null;
         
@@ -152,18 +144,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private void pan(int x, int y){
         clipX += x;
         clipY += y;
-        
-        if(clipX < 0){
-            clipX = 0;
-        } else if(clipX + clipW > buff.getWidth()){
-            clipX = buff.getWidth() - clipW;
-        }
-        
-        if(clipY < 0){
-            clipY = 0;
-        } else if(clipY + clipH > buff.getHeight()){
-            clipY = buff.getHeight() - clipH;
-        }
         repaint();
     }
     
@@ -172,27 +152,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * Since the clip is still rendered at the same size,
      * it has to fill the same area, but with a smaller image,
      * giving the illusion of zooming in.
-     * @param perc the percentage to zoom in. Negative to zoom out.
+     * @param perc the percentage to zoom in. Negative to zoom in.
      */
     private void zoom(double perc){
-        zoom += perc;
-        
-        clipW = (int)(origClipW * zoom);
-        clipH = (int)(origClipH * zoom);
-        
-        if(clipX + clipW >= buff.getWidth() || clipY + clipH >= buff.getHeight()){
-            clipW = buff.getWidth() - clipX;
-            clipH = buff.getHeight() - clipY;
-        }
-        if(zoom > 1.0){
-            zoom = 1.0;
-            clipW = origClipW;
-            clipH = origClipH;
-        } else if(zoom < 0.1){
-            zoom = 0.1;
-            clipW = origClipW / 10;
-            clipH = origClipH / 10;
-        }
+        zoom -= perc;
         repaint();
     }
     
@@ -201,10 +164,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * Repositions all the NodeIcons.
      */
     private void resize(){
-        clipW = (getWidth() < buff.getWidth()) ? getWidth() : buff.getWidth();
-        clipH = (getHeight() < buff.getHeight()) ? getHeight() : buff.getHeight();
-        origClipW = clipW;
-        origClipH = clipH;
         zoom = 1.0;
         scaler.setSize(buff.getWidth(), buff.getHeight());
         resizeNodeIcons();
