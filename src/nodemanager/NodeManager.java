@@ -17,13 +17,14 @@ public class NodeManager {
         new Window();
         
         //pressing any key will cancel any operation in progress
+        /*
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher(){
             @Override
             public boolean dispatchKeyEvent(KeyEvent ke) {
                 Session.mode = Mode.NONE;
                 return false;
             }
-        });
+        });*/
     }
     
 }

@@ -42,6 +42,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private double aspectRatio;
     
     private NodeIcon hoveringOver;
+    private MapKeyAdapter key;
+    
+    private ActionListener updateKeys;
+    private javax.swing.Timer update;
     
     /**
      * Initially, does not have any image or scale.
@@ -76,6 +80,56 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             @Override
             public void componentHidden(ComponentEvent ce) {}
         });
+        
+        key = new MapKeyAdapter();
+        addKeyListener(key);
+        
+        updateKeys = new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                System.out.println(key.getKeyPressed());
+                switch(key.getKeyPressed()){
+                    case KeyEvent.VK_UP:
+                        pan(0, -5);
+                        break;
+                        
+                    case KeyEvent.VK_DOWN:
+                        pan(0, 5);
+                        break;
+                        
+                    case KeyEvent.VK_LEFT:
+                        pan(-5, 0);
+                        break;
+                        
+                    case KeyEvent.VK_RIGHT:
+                        pan(5, 0);
+                        break;
+                        
+                    default:
+                        //do nothing
+                }
+                repaint();
+            }
+        };
+        
+        JComponent head = this;
+        while(head.getParent() != null){
+            head = (JComponent)head.getParent();
+        }
+        
+        
+        head.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "panUp");
+        head.getActionMap().put("panUp", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                pan(-5, 0);
+                System.out.println("up");
+            }
+        });
+        
+        update = new javax.swing.Timer(500, updateKeys);
+        update.setRepeats(true);
+        update.start();
     }
     
     /**
@@ -400,5 +454,29 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         
         g2d.drawImage(buff, 0, 0, this);
         nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
+    }
+}
+
+class MapKeyAdapter extends KeyAdapter{
+    private int pressed;
+    
+    public MapKeyAdapter(){
+        super();
+        pressed = 0;
+    }
+    
+    @Override
+    public void keyPressed(KeyEvent e){
+        pressed = e.getKeyCode();
+        System.out.println("Pressed: " + pressed);
+    }
+    
+    @Override
+    public void keyReleased(KeyEvent e){
+        pressed = 0;
+    }
+    
+    public int getKeyPressed(){
+        return pressed;
     }
 }
