@@ -113,13 +113,14 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         };
         
         JComponent head = this;
+        /*
         while(head.getParent() != null){
             head = (JComponent)head.getParent();
-        }
+        }*/
         
         
-        head.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "panUp");
-        head.getActionMap().put("panUp", new AbstractAction(){
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "panUp");
+        getActionMap().put("panUp", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e){
                 pan(-5, 0);
@@ -127,9 +128,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             }
         });
         
+        System.out.println(Arrays.toString(getInputMap(WHEN_IN_FOCUSED_WINDOW).keys()));
+        getActionMap().get("panUp").actionPerformed(new ActionEvent(this, 0, "whatever"){});
+        
         update = new javax.swing.Timer(500, updateKeys);
         update.setRepeats(true);
-        update.start();
+        //update.start();
     }
     
     /**

@@ -6,7 +6,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import static java.lang.System.out;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
 
@@ -18,22 +17,15 @@ public class EditCanvas extends JPanel{
     /**
     EditCanvas is the main JPanel used by the program
     */
-    private final MenuBar menu;
+    private final JMenuBar menu;
     private final JComponent body;
     private final Sidebar sideBar;
-    private final JButton chooseNodeSourceButton;
-    private final JButton chooseNodeConnButton;
-    private final JButton chooseMapButton;
-    private final JButton addNodeButton;
-    private final JButton exportNodeData;
-    private final JButton saveMap;
     
     private final NodeDataPane selectedNode;
     private MapImage map;
     
     /**
     * Creates many different components, then adds them to the JPanel.
-    * Is a bit of a mess because of all the stuff it needs to add, may clean up next semester.
     */
     public EditCanvas(){
         
@@ -43,7 +35,7 @@ public class EditCanvas extends JPanel{
         GridBagConstraints c = new GridBagConstraints();
         setLayout(lo);
         
-        menu = new MenuBar();
+        menu = new JMenuBar();
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -70,86 +62,27 @@ public class EditCanvas extends JPanel{
         c.fill = GridBagConstraints.BOTH;
         add(sideBar, c);
         
+        
         selectedNode = new NodeDataPane();
         sideBar.add(selectedNode);
         Session.dataPane = selectedNode;
         
-        //don't set a layout for the body, causes issues
         body.setLayout(new GridLayout(1, 1));
         map = new MapImage();
         body.add(map);
         
-        chooseNodeSourceButton = createSelector(
-                "node file", 
-                new String[]{"Comma Separated Values", "csv"},
-                new FileSelectedListener(){
-                    @Override
-                    public void run(File f){
-                        try {
-                            loadNodesFromFile(new FileInputStream(f));
-                        } catch (FileNotFoundException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-        );
-        menu.add(chooseNodeSourceButton);
+        JMenu importMenu = createImportMenu();
+        menu.add(importMenu);
         
-        chooseNodeConnButton = createSelector(
-                "connection file",
-                new String[]{"Comma Separated Values", "csv"},
-                new FileSelectedListener(){
-                    @Override
-                    public void run(File f){
-                        try {
-                            loadConn(new FileInputStream(f));
-                        } catch (FileNotFoundException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-        );
-        menu.add(chooseNodeConnButton);
+        JMenu exportMenu = createExportMenu();
+        menu.add(exportMenu);
         
-        chooseMapButton = createSelector(
-                "map Image", 
-                new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
-                new FileSelectedListener(){
-                    @Override
-                    public void run(File f){
-                        try {
-                            map.setImage(ImageIO.read(f));
-                            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
-                            Session.mode = Mode.RESCALE_UL;
-                            repaint();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-        );
-        menu.add(chooseMapButton); //The map choosing feature doesn't work
-        
-        addNodeButton = new JButton("Add a new Node");
-        addNodeButton.addActionListener(new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e){
+        JMenuItem addNodeButton = new JMenuItem("Add a new Node");
+        addNodeButton.addActionListener((ActionEvent e) -> {
                 Session.mode = Mode.ADD;
                 JOptionPane.showMessageDialog(null, "Click on any location on the map to add a new node");
-            }
-        });
+            });
         menu.add(addNodeButton);
-        
-        exportNodeData = createExportButton();
-        
-        saveMap = new JButton("Export map");
-        saveMap.addActionListener(new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e){
-                map.saveImage();
-            }
-        });
-        menu.add(saveMap);
         
         setBackground(Color.blue);
         
@@ -176,6 +109,97 @@ public class EditCanvas extends JPanel{
     }
     
     /**
+     * Creates the menu used to load data into the program.
+     * Note that it doesn't add the menu automatically.
+     * 
+     * Move to another class in the future?
+     * @return the created menu.
+     */
+    private JMenu createImportMenu(){
+        JMenu menu = new JMenu("Import");
+        
+        menu.add(createSelector(
+                "node file", 
+                new String[]{"Comma Separated Values", "csv"},
+                new FileSelectedListener(){
+                    @Override
+                    public void run(File f){
+                        try {
+                            loadNodesFromFile(new FileInputStream(f));
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+        ));
+        
+        menu.add(createSelector(
+                "connection file",
+                new String[]{"Comma Separated Values", "csv"},
+                new FileSelectedListener(){
+                    @Override
+                    public void run(File f){
+                        try {
+                            loadConn(new FileInputStream(f));
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+        ));
+        
+        menu.add(createSelector(
+                "map Image", 
+                new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
+                new FileSelectedListener(){
+                    @Override
+                    public void run(File f){
+                        try {
+                            map.setImage(ImageIO.read(f));
+                            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
+                            Session.mode = Mode.RESCALE_UL;
+                            repaint();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+        ));
+        
+        return menu;
+    }
+    
+    
+    /**
+     * Creates the menu used to get data out of the program.
+     * Note that it doesn't add the menu automatically.
+     * 
+     * Move to another class in the future?
+     * @return the created menu.
+     */
+    private JMenu createExportMenu(){
+        JMenu menu = new JMenu("Export");
+        
+        JMenuItem exportNodeData = new JMenuItem("Export Node Data");
+        exportNodeData.addActionListener((ActionEvent ae) -> {
+                JFileChooser destination = new JFileChooser();
+                destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int response = destination.showOpenDialog(destination);
+                if(response == JFileChooser.APPROVE_OPTION){
+                    File f = destination.getSelectedFile();
+                    Node.generateDataAt(f.getAbsolutePath());
+                }
+            });
+        menu.add(exportNodeData);
+        
+        JMenuItem saveMap = new JMenuItem("Export map");
+        saveMap.addActionListener((ActionEvent e) -> map.saveImage());
+        menu.add(saveMap);
+        
+        return menu;
+    }
+    
+    /**
      * Creates a button that allows the user to select a file with a given extention, 
      * then invokes the given file listener's run method, passing in the file selected as a parameter
      * 
@@ -184,8 +208,8 @@ public class EditCanvas extends JPanel{
      * @param l the FileSelectedListener (see the bottom of this file) that will run after the user chooses a file
      * @return the JButton constructed
      */
-    private JButton createSelector(String type, String[] types, FileSelectedListener l){
-        JButton ret = new JButton("Select " + type);
+    private JMenuItem createSelector(String type, String[] types, FileSelectedListener l){
+        JMenuItem ret = new JMenuItem("Select " + type);
         
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -206,12 +230,12 @@ public class EditCanvas extends JPanel{
     
     /**
      * Used to move some of the cluttered code out of the constructor.
-     * Creates a button which, when clicked, allows the user to choose
+     * Creates a menu item which, when clicked, allows the user to choose
      * a directory to export the data created by the program to.
-     * @return  the JButton constructed
+     * @return  the menu item constructed
      */
-    private JButton createExportButton(){
-        JButton j = new JButton("Export data");
+    private JMenuItem createExportButton(){
+        JMenuItem j = new JMenuItem("Export node data");
         j.addActionListener(new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -224,7 +248,6 @@ public class EditCanvas extends JPanel{
                 }
             }
         });
-        menu.add(j);
         
         return j;
     }
