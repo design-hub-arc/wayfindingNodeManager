@@ -42,7 +42,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private double aspectRatio;
     
     private NodeIcon hoveringOver;
-    private MapKeyAdapter key;
     
     private ActionListener updateKeys;
     private javax.swing.Timer update;
@@ -81,54 +80,20 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             public void componentHidden(ComponentEvent ce) {}
         });
         
-        key = new MapKeyAdapter();
-        //addKeyListener(key);
+        InputMap im = Session.masterPanel.getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = Session.masterPanel.getActionMap();
         
-        updateKeys = new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e){
-                System.out.println(key.getKeyPressed());
-                switch(key.getKeyPressed()){
-                    case KeyEvent.VK_UP:
-                        pan(0, -5);
-                        break;
-                        
-                    case KeyEvent.VK_DOWN:
-                        pan(0, 5);
-                        break;
-                        
-                    case KeyEvent.VK_LEFT:
-                        pan(-5, 0);
-                        break;
-                        
-                    case KeyEvent.VK_RIGHT:
-                        pan(5, 0);
-                        break;
-                        
-                    default:
-                        //do nothing
-                }
-                repaint();
-            }
-        };
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "panUp");
+        am.put("panUp", new KeyAction(KeyEvent.VK_UP));
         
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "panDown");
+        am.put("panDown", new KeyAction(KeyEvent.VK_DOWN));
         
-        Session.masterPanel.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "panUp");
-        Session.masterPanel.getActionMap().put("panUp", new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e){
-                pan(0, -5);
-                System.out.println("up");
-            }
-        });
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "panLeft");
+        am.put("panLeft", new KeyAction(KeyEvent.VK_LEFT));
         
-        /*
-        System.out.println(Arrays.toString(getInputMap(WHEN_IN_FOCUSED_WINDOW).keys()));
-        getActionMap().get("panUp").actionPerformed(new ActionEvent(this, 0, "whatever"){});
-        */
-        //update = new javax.swing.Timer(500, updateKeys);
-        //update.setRepeats(true);
-        //update.start();
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "panRight");
+        am.put("panRight", new KeyAction(KeyEvent.VK_RIGHT));
     }
     
     /**
@@ -312,19 +277,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 resizeNodeIcons();
                 break;
         }//end switch
-        
-        //pan if the user moves the mouse within 10% of the edge of the displayed clip
-        if(me.getY() < getHeight() * 0.1){
-            pan(0, -5);
-        } else if(me.getY() > getHeight() * 0.9){
-            pan(0, 5);
-        }
-        
-        if(me.getX() < getWidth() * aspectRatio * 0.1){
-            pan(-5, 0);
-        } else if(me.getX() > getWidth() * aspectRatio * 0.9){
-            pan(5, 0);
-        }
         repaint();
     }
     
@@ -454,28 +406,37 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         g2d.drawImage(buff, 0, 0, this);
         nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
     }
-}
 
-class MapKeyAdapter extends KeyAdapter{
-    private int pressed;
-    
-    public MapKeyAdapter(){
-        super();
-        pressed = 0;
-    }
-    
-    @Override
-    public void keyPressed(KeyEvent e){
-        pressed = e.getKeyCode();
-        System.out.println("Pressed: " + pressed);
-    }
-    
-    @Override
-    public void keyReleased(KeyEvent e){
-        pressed = 0;
-    }
-    
-    public int getKeyPressed(){
-        return pressed;
+    class KeyAction extends AbstractAction{
+        private final int pressed;
+
+        public KeyAction(int keyCode){
+            super();
+            pressed = keyCode;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e){
+            switch(pressed){
+                case KeyEvent.VK_UP:
+                        pan(0, -5);
+                        break;
+                        
+                    case KeyEvent.VK_DOWN:
+                        pan(0, 5);
+                        break;
+                        
+                    case KeyEvent.VK_LEFT:
+                        pan(-5, 0);
+                        break;
+                        
+                    case KeyEvent.VK_RIGHT:
+                        pan(5, 0);
+                        break;
+                        
+                    default:
+                        //do nothing
+            }
+        }
     }
 }
