@@ -1,6 +1,7 @@
 package nodemanager.gui;
 
 import javax.swing.JFrame;
+import nodemanager.Session;
 
 /**
  * Basic JFrame used to host the EditCanvas

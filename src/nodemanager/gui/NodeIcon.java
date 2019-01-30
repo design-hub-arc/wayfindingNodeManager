@@ -52,6 +52,17 @@ public class NodeIcon{
     
     
     /**
+     * Sets the size of node icons,
+     * this changes both how they are drawn,
+     * and their bounds when checking if they were clicked
+     * @param s 
+     */
+    public static void setSize(int s){
+        size = s;
+    }
+    
+    
+    /**
      * Gets the width and height of NodeIcons, in pixels
      * @return the size of NodeIcons
      */

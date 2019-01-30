@@ -28,10 +28,9 @@ public class EditCanvas extends JPanel{
     * Creates many different components, then adds them to the JPanel.
     */
     public EditCanvas(){
-        
         super();
         
-        Session.masterPanel = this;
+        Session.currentPanel = this;
         
         GridBagLayout lo = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
@@ -64,10 +63,10 @@ public class EditCanvas extends JPanel{
         c.fill = GridBagConstraints.BOTH;
         add(sideBar, c);
         
-        
         selectedNode = new NodeDataPane();
         sideBar.add(selectedNode);
         Session.dataPane = selectedNode;
+        sideBar.add(Session.controlList);
         
         body.setLayout(new GridLayout(1, 1));
         map = new MapImage();
@@ -79,6 +78,9 @@ public class EditCanvas extends JPanel{
         JMenu exportMenu = createExportMenu();
         menu.add(exportMenu);
         
+        JMenu optionMenu = createOptionMenu();
+        menu.add(optionMenu);
+        
         JMenuItem addNodeButton = new JMenuItem("Add a new Node");
         addNodeButton.addActionListener((ActionEvent e) -> {
                 Session.mode = Mode.ADD;
@@ -87,7 +89,6 @@ public class EditCanvas extends JPanel{
         menu.add(addNodeButton);
         
         setBackground(Color.blue);
-        
         
         
         //set defaults
@@ -201,6 +202,33 @@ public class EditCanvas extends JPanel{
         return menu;
     }
     
+    
+    private JMenu createOptionMenu() {
+        JMenu m = new JMenu("Options");
+        
+        JMenuItem chooseNodeSize = new JMenuItem("Change node icon size");
+        chooseNodeSize.addActionListener((ActionEvent e) -> {
+            try{
+                NodeIcon.setSize(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new size for node icons:")));
+            } catch(NumberFormatException ex){
+                //just ignore it
+            }
+        });
+        m.add(chooseNodeSize);
+        
+        JMenuItem choosePanSpeed = new JMenuItem("Change pan speed");
+        choosePanSpeed.addActionListener((ActionEvent e) -> {
+            try{
+                map.setPanSpeed(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new panning speed:")));
+            } catch(NumberFormatException ex){
+                //just ignore it
+            }
+        });
+        m.add(choosePanSpeed);
+        
+        return m;
+    }
+    
     /**
      * Creates a button that allows the user to select a file with a given extention, 
      * then invokes the given file listener's run method, passing in the file selected as a parameter
@@ -230,29 +258,6 @@ public class EditCanvas extends JPanel{
         return ret;
     }
     
-    /**
-     * Used to move some of the cluttered code out of the constructor.
-     * Creates a menu item which, when clicked, allows the user to choose
-     * a directory to export the data created by the program to.
-     * @return  the menu item constructed
-     */
-    private JMenuItem createExportButton(){
-        JMenuItem j = new JMenuItem("Export node data");
-        j.addActionListener(new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                JFileChooser destination = new JFileChooser();
-                destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int response = destination.showOpenDialog(destination);
-                if(response == JFileChooser.APPROVE_OPTION){
-                    File f = destination.getSelectedFile();
-                    Node.generateDataAt(f.getAbsolutePath());
-                }
-            }
-        });
-        
-        return j;
-    }
     
     /**
      * Imports node position data from a csv file,
@@ -278,6 +283,7 @@ public class EditCanvas extends JPanel{
     private void loadConn(InputStream i){
         NodeParser.parseConnFile(i);
     }
+
     
     /**
      * Used by createSelector to react to choosing a file through a JFileChooser
