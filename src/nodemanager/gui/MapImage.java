@@ -82,7 +82,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         });
         
         key = new MapKeyAdapter();
-        addKeyListener(key);
+        //addKeyListener(key);
         
         updateKeys = new ActionListener(){
             @Override
@@ -112,27 +112,22 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             }
         };
         
-        JComponent head = this;
-        /*
-        while(head.getParent() != null){
-            head = (JComponent)head.getParent();
-        }*/
         
-        
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "panUp");
-        getActionMap().put("panUp", new AbstractAction(){
+        Session.masterPanel.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "panUp");
+        Session.masterPanel.getActionMap().put("panUp", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e){
-                pan(-5, 0);
+                pan(0, -5);
                 System.out.println("up");
             }
         });
         
+        /*
         System.out.println(Arrays.toString(getInputMap(WHEN_IN_FOCUSED_WINDOW).keys()));
         getActionMap().get("panUp").actionPerformed(new ActionEvent(this, 0, "whatever"){});
-        
-        update = new javax.swing.Timer(500, updateKeys);
-        update.setRepeats(true);
+        */
+        //update = new javax.swing.Timer(500, updateKeys);
+        //update.setRepeats(true);
         //update.start();
     }
     

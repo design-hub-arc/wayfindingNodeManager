@@ -1,5 +1,6 @@
 package nodemanager;
 
+import javax.swing.JPanel;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
 
@@ -22,6 +23,7 @@ public class Session {
     public static int newMapY = 0;
     public static int newMapWidth = 0;
     public static int newMapHeight = 0;
+    public static JPanel masterPanel;
     
     public static void selectNode(Node n){
         selectedNode = n;

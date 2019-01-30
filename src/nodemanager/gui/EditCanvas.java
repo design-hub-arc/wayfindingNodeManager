@@ -31,6 +31,8 @@ public class EditCanvas extends JPanel{
         
         super();
         
+        Session.masterPanel = this;
+        
         GridBagLayout lo = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(lo);
