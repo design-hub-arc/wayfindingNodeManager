@@ -21,9 +21,6 @@ import nodemanager.*;
  * Upon creating a MapImage, you need to call setImage on a file, then scaleTo a
  * set of coordinates
  *
- * Displays a portion of the image it is displaying by taking a subsection of
- * that image, a 'clip', then displaying that clip over this component using
- * paintcomponent
  */
 public class MapImage extends JLabel{
 
@@ -44,6 +41,21 @@ public class MapImage extends JLabel{
     private int panSpeed; //how fast the map pans
     private double zoomSpeed; //how fast the map zooms
     
+    /**
+    The way this component handles mouse events:
+     *
+     * Whenever the user moves the mouse, a MouseAdapter calls its mouseMoved
+     * method, checking what Session.mode is, then calling the EasyMouseListener
+     * stored in mouseMoveActions.get(Session.mode).
+     *
+     * Functions similarly for mouse clicking.
+     *
+     * To add your own mouse reactions, use
+     * <br>      
+     * {@code
+     * mouseMoveAction.put(Mode, (me) -> { STUFF }); }
+     * <br>
+     */
     private final HashMap<Mode, EasyMouseListener> mouseMoveActions; //responses to mouse movement
     private final HashMap<Mode, EasyMouseListener> mouseClickActions; //responses to mouse click
 
@@ -67,9 +79,6 @@ public class MapImage extends JLabel{
         zoomSpeed = 0.01;
 
         setBackground(Color.BLACK);
-
-        //addMouseListener(this);
-        //addMouseMotionListener(this);
         
         mouseMoveActions = new HashMap<>();
         mouseClickActions = new HashMap<>();
@@ -77,6 +86,11 @@ public class MapImage extends JLabel{
         registerControls();
     }
 
+    
+    /**
+     * Adds the controls to the map image, 
+     * and registers all the mouse listeners
+     */
     private void registerControls() {
         mouseMoveActions.put(Mode.MOVE, (me) -> Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY())));
         mouseMoveActions.put(Mode.RESCALE_UL, (me) -> {
@@ -370,129 +384,8 @@ public class MapImage extends JLabel{
             return icon.isIn(x, y);
         }).findFirst().orElse(null);
     }
-    /*
-    @Override
-    public void mouseMoved(MouseEvent me) {
-
-        NodeIcon oldOver = hoveringOver;
-        hoveringOver = hoveredNodeIcon(me.getX(), me.getY());
-
-        if (oldOver != hoveringOver) {
-            if (hoveringOver != null) {
-                hoveringOver.mouseEntered(me);
-            }
-            if (oldOver != null) {
-                oldOver.mouseExited(me);
-            }
-        }
-        
-        mouseMoveActions.getOrDefault(Session.mode, (me2) -> {}).mouseMoved(me);
-        
-        switch (Session.mode) {
-            case RESCALE_UL:
-                double shiftX = translateClickX(me.getX());
-                double shiftY = translateClickY(me.getY());
-                double baseX;
-                double baseY;
-                for (NodeIcon ni : nodeIcons.values()) {
-                    baseX = scaler.x(ni.node.rawX);
-                    baseY = scaler.y(ni.node.rawY);
-                    ni.setPos((int) (baseX + shiftX), (int) (baseY + shiftY));
-                }
-                break;
-            case RESCALE_LR:
-                scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
-                resizeNodeIcons();
-                break;
-        }//end switch
-        repaint();
-    }
     
-    @Override
-    public void mouseClicked(MouseEvent me) {
-        if (hoveringOver != null) {
-            hoveringOver.mouseClicked(me);
-        }
 
-        switch (Session.mode) {
-            case ADD:
-                //adds a Node where the user clicks
-                Node n = new Node(
-                        (int) scaler.inverseX(translateClickX(me.getX())),
-                        (int) scaler.inverseY(translateClickY(me.getY()))
-                );
-                addNode(n);
-                repaint();
-                Session.mode = Mode.NONE;
-                break;
-            case MOVE:
-                //repositions a Node to where the user clicks
-                //Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
-                Session.mode = Mode.NONE;
-                break;
-            case RESCALE_UL:
-                // sets the upper-left corner of the new map image clip
-                Session.mode = Mode.RESCALE_LR;
-                Session.newMapX = Node.get(-1).getIcon().getX();
-                Session.newMapY = Node.get(-1).getIcon().getY();
-                JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
-                break;
-            case RESCALE_LR:
-                // sets the lower-right corner of the new map image clip
-                Session.mode = Mode.NONE;
-                Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
-                Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
-
-                int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
-
-                out.print("Clip: ");
-                for (int i : clip) {
-                    out.print(i + " ");
-                }
-
-                if (clip[0] < 0) {
-                    clip[0] = 0;
-                }
-                if (clip[1] < 0) {
-                    clip[1] = 0;
-                }
-                if (clip[2] > buff.getWidth() - clip[0]) {
-                    clip[2] = buff.getWidth() - clip[0];
-                }
-                if (clip[3] > buff.getHeight() - clip[1]) {
-                    clip[3] = buff.getHeight() - clip[1];
-                }
-
-                out.println();
-                for (int i : clip) {
-                    out.print(i + " ");
-                }
-
-                setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
-                break;
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent me) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent me) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent me) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent me) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent me) {
-    }
-    */
     /**
      * Saves a BufferedImage to a file
      *

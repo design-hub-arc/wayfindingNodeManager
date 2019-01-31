@@ -5,6 +5,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
@@ -44,6 +45,7 @@ public class EditCanvas extends JPanel{
         c.weightx = 1;
         c.fill = GridBagConstraints.BOTH;
         add(menu, c);
+        menu.setLayout(new FlowLayout());
         
         body = new JComponent(){};
         body.setLayout(new FlowLayout());
@@ -89,6 +91,17 @@ public class EditCanvas extends JPanel{
             });
         menu.add(addNodeButton);
         
+        JMenuItem resetData = new JMenuItem("Clear all data");
+        resetData.addActionListener((ActionEvent e) -> {
+            map.removeAllNodes();
+            Node.removeAll();
+            map.addNode(new Node(-1, 0, 0));
+            map.addNode(new Node(-2, 100, 100));
+            map.scaleTo(0, 0, 100, 100);
+            map.setImage(new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)); //dummy image to prevent NullPointerException
+        });
+        menu.add(resetData);
+        
         setBackground(Color.blue);
         revalidate();
         repaint();
@@ -124,53 +137,43 @@ public class EditCanvas extends JPanel{
     private JMenu createImportMenu(){
         JMenu menu = new JMenu("Import");
         
-        menu.add(createSelector(
-                "node file", 
-                new String[]{"Comma Separated Values", "csv"},
-                new FileSelectedListener(){
-                    @Override
-                    public void run(File f){
-                        try {
-                            loadNodesFromFile(new FileInputStream(f));
-                        } catch (FileNotFoundException ex) {
-                            ex.printStackTrace();
-                        }
+        menu.add(createSelector("node file", 
+                new String[]{"Comma Separated Values", "csv"}, (File f) -> {
+                    try {
+                        loadNodesFromFile(new FileInputStream(f));
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
                     }
-                }
-        ));
+        }));
+        
+        menu.add(createSelector("connection file",
+                new String[]{"Comma Separated Values", "csv"}, (File f) -> {
+                    try {
+                        loadConn(new FileInputStream(f));
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
+        }));
         
         menu.add(createSelector(
-                "connection file",
-                new String[]{"Comma Separated Values", "csv"},
-                new FileSelectedListener(){
-                    @Override
-                    public void run(File f){
-                        try {
-                            loadConn(new FileInputStream(f));
-                        } catch (FileNotFoundException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-        ));
-        
-        menu.add(createSelector(
-                "map Image", 
+                "map Image",
                 new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
-                new FileSelectedListener(){
-                    @Override
-                    public void run(File f){
-                        try {
-                            map.setImage(ImageIO.read(f));
-                            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
-                            Session.mode = Mode.RESCALE_UL;
-                            repaint();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+                (File f) -> {
+                    try {
+                        map.setImage(ImageIO.read(f));
+                        repaint();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
                 }
         ));
+        
+        JMenuItem resize = new JMenuItem("Resize map image");
+        resize.addActionListener((ActionEvent e) -> {
+            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
+            Session.mode = Mode.RESCALE_UL;
+        });
+        menu.add(resize);
         
         return menu;
     }
@@ -222,7 +225,7 @@ public class EditCanvas extends JPanel{
         JMenuItem choosePanSpeed = new JMenuItem("Change pan speed");
         choosePanSpeed.addActionListener((ActionEvent e) -> {
             try{
-                map.setPanSpeed(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new panning speed:")));
+                map.setPanSpeed(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new panning speed (5-10 recommended):")));
             } catch(NumberFormatException ex){
                 //just ignore it
             }
@@ -302,7 +305,7 @@ public class EditCanvas extends JPanel{
     /**
      * Used by createSelector to react to choosing a file through a JFileChooser
      */
-    private abstract class FileSelectedListener{
+    private interface FileSelectedListener{
         public abstract void run(File f);
     }
 }
