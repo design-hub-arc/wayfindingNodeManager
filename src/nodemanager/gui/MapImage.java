@@ -154,8 +154,7 @@ public class MapImage extends JLabel{
         
         
         
-        
-        addMouseListener(new MouseAdapter() {
+        MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent me) {
                 NodeIcon oldOver = hoveringOver;
@@ -172,8 +171,6 @@ public class MapImage extends JLabel{
 
                 mouseMoveActions.getOrDefault(Session.mode, (me2) -> {}).mouseAction(me);
                 
-                System.out.println("mouse was moved");
-                
                 repaint();
             }
             
@@ -184,7 +181,10 @@ public class MapImage extends JLabel{
                 }
                 mouseClickActions.getOrDefault(Session.mode, (me2) -> {}).mouseAction(me);
             }
-        });
+        };
+        
+        addMouseListener(ma);
+        addMouseMotionListener(ma);
 
         addComponentListener(new ComponentAdapter() {
             @Override
