@@ -25,7 +25,7 @@ import nodemanager.*;
  * that image, a 'clip', then displaying that clip over this component using
  * paintcomponent
  */
-public class MapImage extends JLabel implements MouseListener, MouseMotionListener{
+public class MapImage extends JLabel{
 
     private BufferedImage buff;
     private final Scale scaler;
@@ -40,8 +40,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private double zoom;
 
     private NodeIcon hoveringOver;
-    
+
     private int panSpeed; //how fast the map pans
+    private double zoomSpeed; //how fast the map zooms
+    
+    private final HashMap<Mode, EasyMouseListener> mouseMoveActions; //responses to mouse movement
+    private final HashMap<Mode, EasyMouseListener> mouseClickActions; //responses to mouse click
 
     /**
      * Initially, does not have any image or scale.
@@ -58,13 +62,129 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipY = 0;
 
         hoveringOver = null;
-        
+
         panSpeed = 5;
+        zoomSpeed = 0.01;
 
         setBackground(Color.BLACK);
 
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        //addMouseListener(this);
+        //addMouseMotionListener(this);
+        
+        mouseMoveActions = new HashMap<>();
+        mouseClickActions = new HashMap<>();
+        
+        registerControls();
+    }
+
+    private void registerControls() {
+        mouseMoveActions.put(Mode.MOVE, (me) -> Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY())));
+        mouseMoveActions.put(Mode.RESCALE_UL, (me) -> {
+            double shiftX = translateClickX(me.getX());
+            double shiftY = translateClickY(me.getY());
+            double baseX;
+            double baseY;
+            for (NodeIcon ni : nodeIcons.values()) {
+                baseX = scaler.x(ni.node.rawX);
+                baseY = scaler.y(ni.node.rawY);
+                ni.setPos((int) (baseX + shiftX), (int) (baseY + shiftY));
+            }
+        });
+        mouseMoveActions.put(Mode.RESCALE_LR, (me) -> {
+            scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
+            resizeNodeIcons();
+        });
+        
+        mouseClickActions.put(Mode.ADD, (me) -> {
+            //adds a Node where the user clicks
+            Node n = new Node(
+                    (int) scaler.inverseX(translateClickX(me.getX())),
+                    (int) scaler.inverseY(translateClickY(me.getY()))
+            );
+            addNode(n);
+            repaint();
+            Session.mode = Mode.NONE;
+        });
+        
+        mouseClickActions.put(Mode.MOVE, (me) -> {
+            Session.mode = Mode.NONE;
+        });
+        
+        mouseClickActions.put(Mode.RESCALE_UL, (me) -> {
+            // sets the upper-left corner of the new map image clip
+            Session.mode = Mode.RESCALE_LR;
+            Session.newMapX = Node.get(-1).getIcon().getX();
+            Session.newMapY = Node.get(-1).getIcon().getY();
+            JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
+        });
+        
+        mouseClickActions.put(Mode.RESCALE_LR, (me) -> {
+            // sets the lower-right corner of the new map image clip
+            Session.mode = Mode.NONE;
+            Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
+            Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
+
+            int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
+
+            out.print("Clip: ");
+            for (int i : clip) {
+                out.print(i + " ");
+            }
+
+            if (clip[0] < 0) {
+                clip[0] = 0;
+            }
+            if (clip[1] < 0) {
+                clip[1] = 0;
+            }
+            if (clip[2] > buff.getWidth() - clip[0]) {
+                clip[2] = buff.getWidth() - clip[0];
+            }
+            if (clip[3] > buff.getHeight() - clip[1]) {
+                clip[3] = buff.getHeight() - clip[1];
+            }
+
+            out.println();
+            for (int i : clip) {
+                out.print(i + " ");
+            }
+
+            setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
+        });
+        
+        
+        
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent me) {
+                NodeIcon oldOver = hoveringOver;
+                hoveringOver = hoveredNodeIcon(me.getX(), me.getY());
+
+                if (oldOver != hoveringOver) {
+                    if (hoveringOver != null) {
+                        hoveringOver.mouseEntered(me);
+                    }
+                    if (oldOver != null) {
+                        oldOver.mouseExited(me);
+                    }
+                }
+
+                mouseMoveActions.getOrDefault(Session.mode, (me2) -> {}).mouseAction(me);
+                
+                System.out.println("mouse was moved");
+                
+                repaint();
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent me){
+                if (hoveringOver != null) {
+                    hoveringOver.mouseClicked(me);
+                }
+                mouseClickActions.getOrDefault(Session.mode, (me2) -> {}).mouseAction(me);
+            }
+        });
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -75,15 +195,13 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
         /*
         For some reason, VK_UP & co don't work
-        
-        see down for KeyAction definition
          */
-        Session.registerControl(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), new KeyAction(KeyEvent.VK_UP), "pan the map up");
-        Session.registerControl(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), new KeyAction(KeyEvent.VK_DOWN), "pan the map down");
-        Session.registerControl(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), new KeyAction(KeyEvent.VK_LEFT), "pan the map left");
-        Session.registerControl(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), new KeyAction(KeyEvent.VK_RIGHT), "pan the map right");
-        Session.registerControl(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), new KeyAction(KeyEvent.VK_PLUS), "zoom in");
-        Session.registerControl(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), new KeyAction(KeyEvent.VK_MINUS), "zoom out");
+        Session.registerControl(KeyEvent.VK_W, () -> pan(0, -panSpeed), "pan the map up");
+        Session.registerControl(KeyEvent.VK_S, () -> pan(0, panSpeed), "pan the map down");
+        Session.registerControl(KeyEvent.VK_A, () -> pan(-panSpeed, 0), "pan the map left");
+        Session.registerControl(KeyEvent.VK_D, () -> pan(panSpeed, 0), "pan the map right");
+        Session.registerControl(KeyEvent.VK_Q, () -> zoom(-zoomSpeed), "zoom in");
+        Session.registerControl(KeyEvent.VK_E, () -> zoom(zoomSpeed), "zoom out");
     }
 
     /**
@@ -159,27 +277,36 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipY += y;
         repaint();
     }
-    
-    
+
     /**
      * Sets how fast the map will pan
-     * @param speed the amount, in pixels, the map moves when the user presses a directional key
+     *
+     * @param speed the amount, in pixels, the map moves when the user presses a
+     * directional key
      */
-    public void setPanSpeed(int speed){
+    public void setPanSpeed(int speed) {
         panSpeed = speed;
     }
-    
-    
+
     /**
-     * Reduces the width and height of the clip area of the image. Since the
-     * clip is still rendered at the same size, it has to fill the same area,
-     * but with a smaller image, giving the illusion of zooming in.
+     * changes the zoom level of the image
      *
      * @param perc the percentage to zoom in. Negative to zoom in.
      */
     private void zoom(double perc) {
         zoom -= perc;
         repaint();
+    }
+
+    /**
+     * changes how fast the map zooms in and out. 0.01 corresponds to a 1% zoom
+     * out
+     *
+     * @param speed the amount the map will zoom each time the user presses the
+     * zoom key
+     */
+    public void setZoomSpeed(double speed) {
+        zoomSpeed = speed;
     }
 
     /**
@@ -217,7 +344,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     }
 
     /**
-     * Currently doesn't work with resized image?
+     * exports the map image to a directory
      */
     public void saveImage() {
         JFileChooser cd = new JFileChooser();
@@ -243,7 +370,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             return icon.isIn(x, y);
         }).findFirst().orElse(null);
     }
-
+    /*
     @Override
     public void mouseMoved(MouseEvent me) {
 
@@ -258,12 +385,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 oldOver.mouseExited(me);
             }
         }
-
+        
+        mouseMoveActions.getOrDefault(Session.mode, (me2) -> {}).mouseMoved(me);
+        
         switch (Session.mode) {
-            case MOVE:
-                // shows where the selected node will be repositioned when the user clicks
-                Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
-                break;
             case RESCALE_UL:
                 double shiftX = translateClickX(me.getX());
                 double shiftY = translateClickY(me.getY());
@@ -282,7 +407,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }//end switch
         repaint();
     }
-
+    
     @Override
     public void mouseClicked(MouseEvent me) {
         if (hoveringOver != null) {
@@ -367,7 +492,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     @Override
     public void mouseDragged(MouseEvent me) {
     }
-
+    */
     /**
      * Saves a BufferedImage to a file
      *
@@ -407,49 +532,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         g2d.drawImage(buff, 0, 0, this);
         nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
     }
-
-    /**
-     * KeyAction is used for adding controls
-     */
-    class KeyAction extends AbstractAction {
-
-        private final int pressed;
-
-        public KeyAction(int keyCode) {
-            super();
-            pressed = keyCode;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            switch (pressed) {
-                case KeyEvent.VK_UP:
-                    pan(0, -panSpeed);
-                    break;
-
-                case KeyEvent.VK_DOWN:
-                    pan(0, panSpeed);
-                    break;
-
-                case KeyEvent.VK_LEFT:
-                    pan(-panSpeed, 0);
-                    break;
-
-                case KeyEvent.VK_RIGHT:
-                    pan(panSpeed, 0);
-                    break;
-                
-                case KeyEvent.VK_PLUS:
-                    zoom(-0.01);
-                    break;
-                    
-                case KeyEvent.VK_MINUS:
-                    zoom(0.01);
-                    break;
-                    
-                default:
-                //do nothing
-            }
-        }
+    
+    private interface EasyMouseListener{
+        public void mouseAction(MouseEvent e);
     }
 }

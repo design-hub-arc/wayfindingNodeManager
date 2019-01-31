@@ -1,5 +1,7 @@
 package nodemanager;
 
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
@@ -26,8 +28,12 @@ public class Session {
     public static int newMapWidth = 0;
     public static int newMapHeight = 0;
     public static JPanel currentPanel = null;
-    public static JTextArea controlList = new JTextArea("Controls:\n");
-    {
+
+    /**
+     * A text component used to display the program's controls
+     */
+    public static final JTextArea controlList = new JTextArea("Controls:\n");
+    static{
         controlList.setEditable(false);
     }
     
@@ -38,12 +44,41 @@ public class Session {
         }
     }
     
-    public static void registerControl(KeyStroke key, Action a, String desc){
+    /**
+     * Adds a key control to the program.
+     * 
+     * For the run parameter, you can simply do
+     * <br>
+     * {@code
+     * () -> {
+     *     code to run when key is pressed
+     * }
+     * }
+     * <br>
+     * or
+     * <br>
+     * {@code
+     * () -> code to run when key is pressed
+     * }
+     * <br>
+     * it's that easy.
+     * 
+     * @param keyCode the keycode of the key to trigger the action. Use KeyEvent.VK_X to get the keycode
+     * @param run the runnable to run whenever the given key is pressed
+     * @param desc the description that will be displayed next to the key in the control list
+     */
+    public static void registerControl(int keyCode, Runnable run, String desc){
+        KeyStroke key = KeyStroke.getKeyStroke(keyCode, 0);
         if(currentPanel == null){
             throw new NullPointerException("Must set currentWindow before registering controls!");
         }
         currentPanel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(key, key.toString());
-        currentPanel.getActionMap().put(key.toString(), a);
+        currentPanel.getActionMap().put(key.toString(), new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                run.run();
+            }
+        });
         
         controlList.append(key.toString() + ": " + desc + "\n");
     }

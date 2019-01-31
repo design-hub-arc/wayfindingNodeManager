@@ -226,6 +226,17 @@ public class EditCanvas extends JPanel{
         });
         m.add(choosePanSpeed);
         
+        JMenuItem chooseZoomSpeed = new JMenuItem("Change zoom speed");
+        chooseZoomSpeed.addActionListener((ActionEvent e) -> {
+            try{
+                int perc = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new zooming speed (1-10 recommended):"));
+                map.setZoomSpeed(0.01 * perc);
+            } catch(NumberFormatException ex){
+                //just ignore it
+            }
+        });
+        m.add(chooseZoomSpeed);
+        
         return m;
     }
     
