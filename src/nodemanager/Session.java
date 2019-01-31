@@ -1,7 +1,6 @@
 package nodemanager;
 
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import nodemanager.node.Node;
 import nodemanager.gui.*;

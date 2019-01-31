@@ -37,6 +37,7 @@ public class EditCanvas extends JPanel{
         setLayout(lo);
         
         menu = new JMenuBar();
+        menu.setMinimumSize(new Dimension(50, 50));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -89,6 +90,8 @@ public class EditCanvas extends JPanel{
         menu.add(addNodeButton);
         
         setBackground(Color.blue);
+        revalidate();
+        repaint();
         
         
         //set defaults
