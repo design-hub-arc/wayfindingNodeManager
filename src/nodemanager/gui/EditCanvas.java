@@ -107,24 +107,7 @@ public class EditCanvas extends JPanel{
         repaint();
         
         
-        //set defaults
-        try{
-            map.setImage(ImageIO.read(getClass().getResourceAsStream("/map.png")));
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-        
-        try{
-            loadNodesFromFile(getClass().getResourceAsStream("/nodeData.csv"));
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-        
-        try{
-           loadConn(getClass().getResourceAsStream("/nodeConnections.csv"));
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+        loadDefaults();
     }
     
     /**
@@ -301,6 +284,27 @@ public class EditCanvas extends JPanel{
         NodeParser.parseConnFile(i);
     }
 
+    
+    private void loadDefaults(){
+        //set defaults
+        try{
+            map.setImage(ImageIO.read(getClass().getResourceAsStream("/map.png")));
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+        
+        try{
+            loadNodesFromFile(getClass().getResourceAsStream("/nodeData.csv"));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        
+        try{
+           loadConn(getClass().getResourceAsStream("/nodeConnections.csv"));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     
     /**
      * Used by createSelector to react to choosing a file through a JFileChooser

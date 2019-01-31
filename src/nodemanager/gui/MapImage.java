@@ -140,11 +140,6 @@ public class MapImage extends JLabel{
 
             int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
 
-            out.print("Clip: ");
-            for (int i : clip) {
-                out.print(i + " ");
-            }
-
             if (clip[0] < 0) {
                 clip[0] = 0;
             }
