@@ -69,7 +69,8 @@ public class EditCanvas extends JPanel{
         selectedNode = new NodeDataPane();
         sideBar.add(selectedNode);
         Session.dataPane = selectedNode;
-        sideBar.add(Session.controlList);
+        sideBar.add(Session.CONTROL_LIST);
+        sideBar.add(Session.MODE_LABEL);
         
         body.setLayout(new GridLayout(1, 1));
         map = new MapImage();
@@ -86,7 +87,7 @@ public class EditCanvas extends JPanel{
         
         JMenuItem addNodeButton = new JMenuItem("Add a new Node");
         addNodeButton.addActionListener((ActionEvent e) -> {
-                Session.mode = Mode.ADD;
+                Session.setMode(Mode.ADD);
                 JOptionPane.showMessageDialog(null, "Click on any location on the map to add a new node");
             });
         menu.add(addNodeButton);
@@ -154,7 +155,7 @@ public class EditCanvas extends JPanel{
         JMenuItem resize = new JMenuItem("Resize map image");
         resize.addActionListener((ActionEvent e) -> {
             JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
-            Session.mode = Mode.RESCALE_UL;
+            Session.setMode(Mode.RESCALE_UL);
         });
         menu.add(resize);
         

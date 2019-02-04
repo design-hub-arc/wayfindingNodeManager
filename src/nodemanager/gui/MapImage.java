@@ -117,16 +117,16 @@ public class MapImage extends JLabel{
             );
             addNode(n);
             repaint();
-            Session.mode = Mode.NONE;
+            Session.setMode(Mode.NONE);
         });
         
         mouseClickActions.put(Mode.MOVE, (me) -> {
-            Session.mode = Mode.NONE;
+            Session.setMode(Mode.NONE);
         });
         
         mouseClickActions.put(Mode.RESCALE_UL, (me) -> {
             // sets the upper-left corner of the new map image clip
-            Session.mode = Mode.RESCALE_LR;
+            Session.setMode(Mode.RESCALE_LR);
             Session.newMapX = Node.get(-1).getIcon().getX();
             Session.newMapY = Node.get(-1).getIcon().getY();
             JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
@@ -134,7 +134,7 @@ public class MapImage extends JLabel{
         
         mouseClickActions.put(Mode.RESCALE_LR, (me) -> {
             // sets the lower-right corner of the new map image clip
-            Session.mode = Mode.NONE;
+            Session.setMode(Mode.NONE);
             Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
             Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
 
@@ -178,7 +178,7 @@ public class MapImage extends JLabel{
                     }
                 }
 
-                mouseMoveActions.getOrDefault(Session.mode, (me2) -> {}).mouseAction(me);
+                mouseMoveActions.getOrDefault(Session.getMode(), (me2) -> {}).mouseAction(me);
                 
                 repaint();
             }
@@ -188,7 +188,7 @@ public class MapImage extends JLabel{
                 if (hoveringOver != null) {
                     hoveringOver.mouseClicked(me);
                 }
-                mouseClickActions.getOrDefault(Session.mode, (me2) -> {}).mouseAction(me);
+                mouseClickActions.getOrDefault(Session.getMode(), (me2) -> {}).mouseAction(me);
             }
         };
         

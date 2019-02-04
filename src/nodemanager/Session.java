@@ -1,5 +1,7 @@
 package nodemanager;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import nodemanager.node.Node;
@@ -19,7 +21,7 @@ public class Session {
     * 
     * Maybe make this extend JFrame?
     */
-    public static Mode mode = Mode.NONE;
+    private static Mode mode = Mode.NONE;
     public static Node selectedNode = null;
     public static NodeDataPane dataPane = null;
     public static int newMapX = 0;
@@ -31,9 +33,16 @@ public class Session {
     /**
      * A text component used to display the program's controls
      */
-    public static final JTextArea controlList = new JTextArea("Controls:\n");
+    public static final JTextArea CONTROL_LIST = new JTextArea("Controls:\n");
+    
+    public static final JLabel MODE_LABEL = new JLabel("Current mode: " + Mode.NONE.toString());
+    
     static{
-        controlList.setEditable(false);
+        CONTROL_LIST.setEditable(false);
+        MODE_LABEL.setMaximumSize(new Dimension(100, 30));
+        MODE_LABEL.setBackground(Color.GRAY);
+        MODE_LABEL.setOpaque(true);
+        MODE_LABEL.revalidate();
     }
     
     public static void selectNode(Node n){
@@ -79,6 +88,15 @@ public class Session {
             }
         });
         
-        controlList.append(key.toString() + ": " + desc + "\n");
+        CONTROL_LIST.append(key.toString() + ": " + desc + "\n");
+    }
+    
+    public static void setMode(Mode m){
+        mode = m;
+        MODE_LABEL.setText("Current mode: " + m.toString());
+    }
+    
+    public static Mode getMode(){
+        return mode;
     }
 }

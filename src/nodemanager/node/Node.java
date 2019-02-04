@@ -85,6 +85,7 @@ public class Node{
      */
     public static void removeAll(){
         allNodes.clear();
+        nextId = 0;
     }
     
     //how deal with not found?

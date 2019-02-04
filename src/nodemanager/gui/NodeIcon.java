@@ -160,19 +160,19 @@ public class NodeIcon{
     
     
     public void mouseClicked(MouseEvent me) {
-        switch (Session.mode) {
+        switch (Session.getMode()) {
             case NONE:
                 Session.selectNode(node);
                 node.displayData();
                 break;
             case ADD_CONNECTION:
                 Session.selectedNode.addAdjId(node.id);
-                Session.mode = Mode.NONE;
+                Session.setMode(Mode.NONE);
                 break;
             case REMOVE_CONNECTION:
                 Session.selectedNode.removeAdj(node.id);
                 node.removeAdj(Session.selectedNode.id);
-                Session.mode = Mode.NONE;
+                Session.setMode(Mode.NONE);
                 break;
             default:
                 break;
