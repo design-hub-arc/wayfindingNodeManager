@@ -18,16 +18,21 @@ public class NodeDataPane extends JComponent{
     private Node selectedNode;
     private boolean hasNodeSelected;
     private final JTextArea nodeInfo;
+    private GridBagConstraints gbc;
     
     public NodeDataPane(){
-        setLayout(new GridLayout(6, 1));
+        setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
         selectedNode = null;
         hasNodeSelected = false;
         
         nodeInfo = new JTextArea("No node selected");
         nodeInfo.setBackground(Color.red);
         nodeInfo.setEditable(false);
-        add(nodeInfo);
+        add(nodeInfo, gbc);
         
         addOption("Delete this node", () ->{
             if(selectedNode.id < 0){
@@ -81,7 +86,7 @@ public class NodeDataPane extends JComponent{
                 action.run();
             }
         });
-        add(j);
+        add(j, gbc);
     }
     
     
@@ -102,7 +107,6 @@ public class NodeDataPane extends JComponent{
         hasNodeSelected = true;
         selectedNode = n;
         nodeInfo.setText(n.getDesc());
-        nodeInfo.setRows(n.getDesc().split("\n").length);
     }
     
     /**

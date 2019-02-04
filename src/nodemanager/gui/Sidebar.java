@@ -9,7 +9,18 @@ import java.awt.*;
  * @author Matt Crow
  */
 public class Sidebar extends JComponent{
-
+    private GridBagConstraints gbc;
+    
+    public Sidebar(){
+        super();
+        setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weighty = 1.0;
+    }
+    
     /**
      * Adds a component to this element, then sets the layout to evenly distribute space among each element
      * @param c the Component to add
@@ -17,8 +28,8 @@ public class Sidebar extends JComponent{
      */
     @Override
     public Component add(Component c){
-        super.add(c);
-        setLayout(new GridLayout(getComponentCount(), 1));
+        super.add(c, gbc);
+        gbc.gridy++;
         revalidate();
         repaint();
         return c;
