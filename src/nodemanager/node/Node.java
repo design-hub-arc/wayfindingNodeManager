@@ -28,6 +28,7 @@ public class Node{
     public final int rawY;
     
     private HashSet<Integer> adjacentIds;
+    private ArrayList<String> labels; //rooms, buildings, etc.
     private NodeIcon icon;
     
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
@@ -45,6 +46,7 @@ public class Node{
         rawY = y;
         
         adjacentIds = new HashSet<>();
+        labels = new ArrayList<>();
         icon = new NodeIcon(this);
         
         //need this for now, but can remove once we get to one line per node in node file
@@ -142,6 +144,14 @@ public class Node{
     }
     
     /**
+     * Adds a label to this node
+     * @param s the label to add (room, building, etc)
+     */
+    public void addLabel(String s){
+        labels.add(s);
+    }
+    
+    /**
      * Severs a connection between this Node and another. Does nothing if no connection exists
      * @param i the ID of the Node to disconnect from
      */
@@ -186,15 +196,20 @@ public class Node{
      * @return a description of this Node
      */
     public String getDesc(){
-        String ret = 
-                "Node #" + id + System.lineSeparator() +
-                "Raw coordinates: (" + (int)rawX + ", " + (int)rawY + ")" + System.lineSeparator() +
-                "Adjacent ids: " + System.lineSeparator();
+        StringBuilder ret = new StringBuilder();
+        String n = System.lineSeparator();
+        
+        ret.append("Node #").append(id).append(n);
+        ret.append("Raw coordinates: (").append((int)rawX).append(", ").append((int)rawY).append(")").append(n);
+        ret.append("Adjacent ids: ").append(n);
         //streaming doesn't work here
         for(int i : adjacentIds){
-            ret += ("* " + i + System.lineSeparator());
+            ret.append("* ").append(i).append(n);
         }
-        return ret;
+        ret.append("Labels: ").append(n);
+        labels.stream().forEach(l -> ret.append("* ").append(l).append(n));
+        
+        return ret.toString();
     }
     
     /**
@@ -215,6 +230,33 @@ public class Node{
         }
     }
     
+    /**
+     * Returns this node's line in the coordinate csv file, without the end of line character
+     * @return a csv representation of this node's coordinates
+     */
+    public String getCoordLine(){
+        return new StringBuilder()
+                .append(id)
+                .append(',')
+                .append(getIcon().getX())
+                .append(',')
+                .append(getIcon().getY())
+                .toString();
+    }
+    
+    /**
+     * Gets this node's lines in the label csv file, 
+     * with the end of line character at the end of each line
+     * @return a csv representation of this node's labels
+     */
+    public String getLabelLines(){
+        StringBuilder ret = new StringBuilder();
+        labels.stream().forEach(l -> {
+           ret.append(l).append(',').append(id).append(System.lineSeparator());
+        });
+        
+        return ret.toString();
+    }
     
     /**
      * Exports the Node data in the form of two csv files
@@ -233,16 +275,37 @@ public class Node{
             out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
             out.write("id, x, y" + nl);
             for(Node n : allNodes.values()){
-                out.write(n.id + ", " + n.getIcon().getX() + ", " + n.getIcon().getY() + nl);
+                out.write(n.getCoordLine() + nl);
             }
             out.close();
             
             out = new BufferedWriter(new FileWriter(connectFile.getAbsoluteFile()));
             for(Node n : allNodes.values()){
                 for(int id : n.adjacentIds){
-                    //TODO: no duplicates
                     out.write(n.id + ", " + id + nl);
                 }
+            }
+            out.close();
+        } catch (FileNotFoundException ex) {
+            
+        } catch (IOException ex) {
+            
+        }
+    }
+    
+    public static void generateLabelFile(String path){
+        BufferedWriter out = null;
+        String nl = System.getProperty("line.separator");
+        
+        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
+        
+        try {
+            File labelFile = new File(path + File.separator + "label" + time + ".csv");
+            
+            out = new BufferedWriter(new FileWriter(labelFile.getAbsolutePath()));
+            out.write("label, id" + nl);
+            for(Node n : allNodes.values()){
+                out.write(n.getLabelLines());
             }
             out.close();
         } catch (FileNotFoundException ex) {
