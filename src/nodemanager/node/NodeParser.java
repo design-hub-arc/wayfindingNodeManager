@@ -100,4 +100,24 @@ public class NodeParser {
             e.printStackTrace();
         }
     }
+    
+    public static void parseFile(InputStream s, FileParser parser){
+        BufferedReader br;
+        String[] line = new String[0];
+        
+        try{
+            br = new BufferedReader(new InputStreamReader(s));
+            while(br.ready()){
+                line = br.readLine().split(",");
+                parser.parse(line);
+            }
+        } catch(Exception e){
+            out.println("Line fail: " + Arrays.toString(line));
+            e.printStackTrace();
+        }
+    }
+}
+
+interface FileParser{
+    public void parse(String[] line);
 }
