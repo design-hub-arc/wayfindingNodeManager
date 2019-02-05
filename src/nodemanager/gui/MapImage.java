@@ -10,6 +10,7 @@ import static java.lang.System.out;
 import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
+import nodemanager.events.NodeCreateEvent;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -116,6 +117,7 @@ public class MapImage extends JLabel{
                     (int) scaler.inverseY(translateClickY(me.getY()))
             );
             addNode(n);
+            Session.logAction(new NodeCreateEvent(n, this));
             repaint();
             Session.setMode(Mode.NONE);
         });

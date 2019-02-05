@@ -3,7 +3,9 @@ package nodemanager;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Stack;
 import javax.swing.*;
+import nodemanager.events.EditEvent;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
 
@@ -29,6 +31,9 @@ public class Session {
     public static int newMapWidth = 0;
     public static int newMapHeight = 0;
     public static JPanel currentPanel = null;
+    
+    //used to undo actions
+    private static final Stack<EditEvent> ACTIONS = new Stack<>();
 
     /**
      * A text component used to display the program's controls
@@ -98,5 +103,17 @@ public class Session {
     
     public static Mode getMode(){
         return mode;
+    }
+    
+    public static void logAction(EditEvent e){
+        ACTIONS.add(e);
+    }
+    
+    public static void undoLastAction(){
+        if(!ACTIONS.isEmpty()){
+            EditEvent e = ACTIONS.pop();
+            System.out.println("Undoing " + e.toString());
+            e.undo();
+        }
     }
 }

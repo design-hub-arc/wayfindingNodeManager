@@ -103,6 +103,12 @@ public class EditCanvas extends JPanel {
             map.setImage(new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)); //dummy image to prevent NullPointerException
         });
         menu.add(resetData);
+        
+        JMenuItem undo = new JMenuItem("Undo");
+        undo.addActionListener((ActionEvent e) -> {
+            Session.undoLastAction();
+        });
+        menu.add(undo);
 
         setBackground(Color.blue);
         revalidate();
