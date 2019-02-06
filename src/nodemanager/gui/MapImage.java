@@ -93,7 +93,10 @@ public class MapImage extends JLabel{
      * and registers all the mouse listeners
      */
     private void registerControls() {
-        mouseMoveActions.put(Mode.MOVE, (me) -> Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY())));
+        mouseMoveActions.put(Mode.MOVE, (me) -> {
+            Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
+                
+        });
         mouseMoveActions.put(Mode.RESCALE_UL, (me) -> {
             double shiftX = translateClickX(me.getX());
             double shiftY = translateClickY(me.getY());

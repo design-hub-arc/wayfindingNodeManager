@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import nodemanager.Mode;
 import nodemanager.Session;
+import nodemanager.events.*;
 import nodemanager.node.Node;
 
 /**
@@ -167,12 +168,14 @@ public class NodeIcon{
                 break;
             case ADD_CONNECTION:
                 Session.selectedNode.addAdjId(node.id);
+                Session.logAction(new ConnectionAddedEvent(Session.selectedNode.id, node.id));
                 Session.setMode(Mode.NONE);
                 break;
             case REMOVE_CONNECTION:
-                Session.selectedNode.removeAdj(node.id);
-                node.removeAdj(Session.selectedNode.id);
-                Session.setMode(Mode.NONE);
+                if(Session.selectedNode.removeAdj(node.id)){
+                    Session.logAction(new ConnectionRemovedEvent(Session.selectedNode.id, node.id));
+                    Session.setMode(Mode.NONE);
+                }
                 break;
             default:
                 break;

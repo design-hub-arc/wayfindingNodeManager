@@ -49,12 +49,10 @@ public class Node{
         labels = new ArrayList<>();
         icon = new NodeIcon(this);
         
-        //need this for now, but can remove once we get to one line per node in node file
-        if(!allNodes.containsKey(id)){
-            allNodes.put(id, this);
-            if(id >= nextId){
-                nextId = id + 1;
-            }
+        
+        addNode(this);
+        if(id >= nextId){
+            nextId = id + 1;
         }
     }
     
@@ -65,6 +63,16 @@ public class Node{
      */
     public Node(int x, int y){
         this(nextId, x, y);
+    }
+    
+    /**
+     * Adds a node to allNodes.
+     * The constructor does this automatically, 
+     * but this needs to be called to undo a NodeDeleteEvent
+     * @param n the node to add. If a node with that ID already exists, erases the existing node
+     */
+    public static void addNode(Node n){
+        allNodes.put(n.id, n);
     }
     
     /**
@@ -176,8 +184,9 @@ public class Node{
      * if it has the given label,
      * ignoring case
      * @param s the label to remove
+     * @return whether or not a label was removed 
      */
-    public void removeLabel(String s){
+    public boolean removeLabel(String s){
         boolean found = false;
         for(int i = 0; i < labels.size() && !found; i++){
             if(labels.get(i).equalsIgnoreCase(s)){
@@ -185,21 +194,25 @@ public class Node{
                 labels.remove(i);
             }
         }
+        return found;
     }
     
     /**
      * Severs a connection between this Node and another. Does nothing if no connection exists
      * @param i the ID of the Node to disconnect from
+     * @return whether or not an adj was removed
      */
-    public void removeAdj(int i){
+    public boolean removeAdj(int i){
         Integer remId = i;
-        if(adjacentIds.contains(remId)){
+        boolean ret = adjacentIds.contains(remId);
+        if(ret){
             Node connected = Node.get(i);
             adjacentIds.remove(remId);
-            if(connected.adjacentIds.contains(remId)){
+            if(connected.adjacentIds.contains(id)){
                 connected.removeAdj(id);
             }
         }
+        return ret;
     }
     
     /**
