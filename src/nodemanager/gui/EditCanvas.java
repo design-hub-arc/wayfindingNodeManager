@@ -82,7 +82,9 @@ public class EditCanvas extends JPanel {
 
         JMenu exportMenu = createExportMenu();
         menu.add(exportMenu);
-
+        
+        menu.add(createSelectMenu());
+        
         JMenu optionMenu = createOptionMenu();
         menu.add(optionMenu);
 
@@ -221,12 +223,47 @@ public class EditCanvas extends JPanel {
 
         return menu;
     }
+    
+    private JMenu createSelectMenu(){
+        JMenu m = new JMenu("Find a node");
+        
+        JMenuItem byId = new JMenuItem("...by id");
+        byId.addActionListener((e) -> {
+            try{
+                int id = Integer.parseInt(JOptionPane.showInputDialog("Enter the id of the node you want to find: "));
+            
+                Node find = Node.get(id);
+                if(find == null){
+                    JOptionPane.showMessageDialog(this, "Couldn't find a node with an id of " + id);
+                } else {
+                    selectedNode.selectNode(find);
+                }
+            } catch(NumberFormatException ex){
+                //do nothing
+            }
+        });
+        m.add(byId);
+        
+        JMenuItem byLabel = new JMenuItem("...by label");
+        byLabel.addActionListener((e) -> {
+            String label = JOptionPane.showInputDialog("Enter a label of the node you want to find: ");
+            Node find = Node.get(label);
+            if(find == null){
+                JOptionPane.showMessageDialog(menu, "Cannot find node with label " + label);
+            } else {
+                selectedNode.selectNode(find);
+            }
+        });
+        m.add(byLabel);
+        
+        return m;
+    }
 
     private JMenu createOptionMenu() {
         JMenu m = new JMenu("Options");
 
         JMenuItem chooseNodeSize = new JMenuItem("Change node icon size");
-        chooseNodeSize.addActionListener((ActionEvent e) -> {
+        chooseNodeSize.addActionListener((e) -> {
             try {
                 NodeIcon.setSize(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new size for node icons:")));
             } catch (NumberFormatException ex) {
@@ -340,13 +377,7 @@ public class EditCanvas extends JPanel {
         }
         
         try{
-            NodeParser.parseTitleFile(getClass().getResourceAsStream("/building.csv"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        try{
-            NodeParser.parseTitleFile(getClass().getResourceAsStream("/room.csv"));
+            NodeParser.parseTitleFile(getClass().getResourceAsStream("/labels.csv"));
         } catch (Exception e) {
             e.printStackTrace();
         }

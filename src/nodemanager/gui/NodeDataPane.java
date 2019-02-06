@@ -70,6 +70,16 @@ public class NodeDataPane extends JComponent{
             Session.setMode(Mode.REMOVE_CONNECTION);
         });
         
+        addOption("Add a label", () -> {
+            selectedNode.addLabel(JOptionPane.showInputDialog("Enter the label to add to this node: "));
+            selectNode(selectedNode); //reload node description
+        });
+        
+        addOption("Remove a label", () -> {
+            selectedNode.removeLabel(JOptionPane.showInputDialog("Enter the label to remove from this node: "));
+            selectNode(selectedNode); //reload node description
+        });
+        
         setVisible(true);
     }
     

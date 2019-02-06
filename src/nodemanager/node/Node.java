@@ -102,6 +102,25 @@ public class Node{
     }
     
     /**
+     * Gets a node with the given label, if one exists
+     * @param label the label to search for, ignoring case
+     * @return the node with the label, or null if none exists
+     * @throws NullPointerException if it returns null
+     */
+    public static Node get(String label) throws NullPointerException{
+        Node ret = null;
+        
+        for(Integer i : allNodes.keySet()){
+            if(allNodes.get(i).getHasLabel(label)){
+                ret = allNodes.get(i);
+                break;
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
      * Get all Nodes
      * @return a Collection of all Nodes
      */
@@ -151,6 +170,23 @@ public class Node{
         labels.add(s);
     }
     
+    
+    /**
+     * Removes a label from this,
+     * if it has the given label,
+     * ignoring case
+     * @param s the label to remove
+     */
+    public void removeLabel(String s){
+        boolean found = false;
+        for(int i = 0; i < labels.size() && !found; i++){
+            if(labels.get(i).equalsIgnoreCase(s)){
+                found = true;
+                labels.remove(i);
+            }
+        }
+    }
+    
     /**
      * Severs a connection between this Node and another. Does nothing if no connection exists
      * @param i the ID of the Node to disconnect from
@@ -181,6 +217,17 @@ public class Node{
      */
     public HashSet<Integer> getAdjIds(){
         return adjacentIds;
+    }
+    
+    /**
+     * checks if this node has the given label,
+     * ignoring case.
+     * 
+     * @param label the label to search for
+     * @return if this has the given label, ignoring case
+     */
+    public boolean getHasLabel(String label) {
+        return labels.stream().anyMatch(l -> l.equalsIgnoreCase(label));
     }
     
     /**
