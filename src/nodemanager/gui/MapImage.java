@@ -55,7 +55,7 @@ public class MapImage extends JLabel{
      * To add your own mouse reactions, use
      * <br>      
      * {@code
-     * mouseMoveAction.put(Mode, (me) -> { STUFF }); }
+     * mouseMoveActions.put(Mode, (me) -> { STUFF }); }
      * <br>
      */
     private final HashMap<Mode, EasyMouseListener> mouseMoveActions; //responses to mouse movement

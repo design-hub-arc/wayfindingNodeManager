@@ -18,9 +18,9 @@ public class NodeParser {
     public static void parseNodeFile(InputStream s){
         parseFile(s, (line) -> {
            new Node(
-                   Integer.parseInt(line[0]),
-                   Integer.parseInt(line[1]),
-                   Integer.parseInt(line[2])
+                   Integer.parseInt(line[0].trim()),
+                   Integer.parseInt(line[1].trim()),
+                   Integer.parseInt(line[2].trim())
            ); 
         });
     }
@@ -31,7 +31,7 @@ public class NodeParser {
      */
     public static void parseConnFile(InputStream s){
         parseFile(s, (line) -> {
-           Node.get(Integer.parseInt(line[0])).addAdjId(Integer.parseInt(line[1]));
+           Node.get(Integer.parseInt(line[0].trim())).addAdjId(Integer.parseInt(line[1].trim()));
         });
     }
     
@@ -44,7 +44,7 @@ public class NodeParser {
      */
     public static void parseTitleFile(InputStream s){
         parseFile(s, (line) -> {
-            Node.get(Integer.parseInt(line[1])).addLabel(line[0]);
+            Node.get(Integer.parseInt(line[1].trim())).addLabel(line[0].trim());
         });
     }
     

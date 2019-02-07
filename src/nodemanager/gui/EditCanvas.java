@@ -2,14 +2,12 @@ package nodemanager.gui;
 
 import nodemanager.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
-import nodemanager.events.*;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -130,48 +128,44 @@ public class EditCanvas extends JPanel {
      */
     private JMenu createImportMenu() {
         JMenu menu = new JMenu("Import");
+        String[] csv = new String[]{"Comma Separated Values", "csv"};
+        
+        menu.add(new FileSelector("Select Node File", csv, (File f) -> {
+            try {
+                loadNodesFromFile(new FileInputStream(f));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        }));
+        
 
-        menu.add(createSelector("node file",
-                new String[]{"Comma Separated Values", "csv"}, (File f) -> {
-                    try {
-                        loadNodesFromFile(new FileInputStream(f));
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    }
-                }));
+        menu.add(new FileSelector("Select connection file", csv, (File f) -> {
+            try {
+                NodeParser.parseConnFile(new FileInputStream(f));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        }));
 
-        menu.add(createSelector("connection file",
-                new String[]{"Comma Separated Values", "csv"}, (File f) -> {
-                    try {
-                        loadConn(new FileInputStream(f));
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    }
-                }));
+        menu.add(new FileSelector("Select label file", csv, (File f) -> {
+            try {
+                NodeParser.parseTitleFile(new FileInputStream(f));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        }));
 
-        menu.add(createSelector(
-                "Label file",
-                new String[]{"Comma Separated Values", "csv"},
-                (File f) -> {
-                    try {
-                        NodeParser.parseTitleFile(new FileInputStream(f));
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    }
-                }));
-
-        menu.add(createSelector(
-                "map Image",
-                new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
-                (File f) -> {
-                    try {
-                        map.setImage(ImageIO.read(f));
-                        repaint();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+        menu.add(new FileSelector("Select map image", 
+            new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
+            (File f) -> {
+                try {
+                    map.setImage(ImageIO.read(f));
+                    repaint();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
-                ));
+            }
+        ));
 
         JMenuItem resize = new JMenuItem("Resize map image");
         resize.addActionListener((ActionEvent e) -> {
@@ -293,39 +287,20 @@ public class EditCanvas extends JPanel {
             }
         });
         m.add(chooseZoomSpeed);
+        
+        JMenuItem showAllConn = new JMenuItem("Draw all connections");
+        showAllConn.addActionListener((e) -> {
+            Node.getAll().forEach(node -> node.getIcon().setDrawLinks(true));
+        });
+        m.add(showAllConn);
+        
+        JMenuItem hideAllConn = new JMenuItem("Hide all connections");
+        hideAllConn.addActionListener((e) -> {
+            Node.getAll().forEach(node -> node.getIcon().setDrawLinks(false));
+        });
+        m.add(hideAllConn);
 
         return m;
-    }
-
-    /**
-     * Creates a button that allows the user to select a file with a given
-     * extention, then invokes the given file listener's run method, passing in
-     * the file selected as a parameter
-     *
-     * @param type the caption on the button this will create
-     * @param types the file types the selector allows the user to select
-     * @param l the FileSelectedListener (see the bottom of this file) that will
-     * run after the user chooses a file
-     * @return the JButton constructed
-     */
-    private JMenuItem createSelector(String type, String[] types, FileSelectedListener l) {
-        JMenuItem ret = new JMenuItem("Select " + type);
-
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setFileFilter(new FileNameExtensionFilter(type, types));
-
-        ret.addActionListener(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int response = chooser.showOpenDialog(chooser);
-                if (response == JFileChooser.APPROVE_OPTION) {
-                    l.run(chooser.getSelectedFile());
-                }
-            }
-        });
-
-        return ret;
     }
 
     /**
@@ -347,16 +322,6 @@ public class EditCanvas extends JPanel {
         repaint();
     }
 
-    /**
-     * Imports node connection data from a csv file
-     *
-     * @param i the InputStream given by a FileInputStream generated from a csv
-     * file
-     */
-    private void loadConn(InputStream i) {
-        NodeParser.parseConnFile(i);
-    }
-
     private void loadDefaults() {
         //set defaults
         try {
@@ -372,7 +337,7 @@ public class EditCanvas extends JPanel {
         }
 
         try {
-            loadConn(getClass().getResourceAsStream("/nodeConnections.csv"));
+            NodeParser.parseConnFile(getClass().getResourceAsStream("/nodeConnections.csv"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -382,13 +347,5 @@ public class EditCanvas extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Used by createSelector to react to choosing a file through a JFileChooser
-     */
-    private interface FileSelectedListener {
-
-        public abstract void run(File f);
     }
 }

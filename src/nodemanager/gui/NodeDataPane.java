@@ -121,9 +121,14 @@ public class NodeDataPane extends JComponent{
      * @param n the Node this should display the data for
      */
     public void selectNode(Node n){
+        if(hasNodeSelected){
+            selectedNode.getIcon().setDrawLinks(false);
+        }
         hasNodeSelected = true;
         selectedNode = n;
         nodeInfo.setText(n.getDesc());
+        n.getIcon().setDrawLinks(true);
+        n.getIcon().getHost().repaint();
     }
     
     /**

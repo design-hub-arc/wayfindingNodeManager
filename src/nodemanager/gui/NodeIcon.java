@@ -159,6 +159,13 @@ public class NodeIcon{
                y + size >= yc;
     }
     
+    /**
+     * Sets if this should draw its links
+     * @param b whether or not this should draw its links
+     */
+    public void setDrawLinks(boolean b) {
+        drawLinks = b;
+    }
     
     public void mouseClicked(MouseEvent me) {
         switch (Session.getMode()) {
@@ -183,12 +190,12 @@ public class NodeIcon{
     }
 
     public void mouseEntered(MouseEvent me) {
-        drawLinks = true;
+        //drawLinks = true;
         //make this change to being displayed as node data
     }
     
     public void mouseExited(MouseEvent me) {
-        drawLinks = false;
+        //drawLinks = false;
         //make revert to displayed as node icon
     }
     

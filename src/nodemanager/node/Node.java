@@ -5,6 +5,7 @@ import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
 import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
 
 //seperate this into Node and NodeListener or something like that
 
@@ -32,6 +33,8 @@ public class Node{
     private NodeIcon icon;
     
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
+    private static HashMap<String, Node> labelToNode = new HashMap<>(); //stores as uppercase label
+    
     private static int nextId = 0;
     
     /**
@@ -95,6 +98,7 @@ public class Node{
      */
     public static void removeAll(){
         allNodes.clear();
+        labelToNode.clear();
         nextId = 0;
     }
     
@@ -116,16 +120,7 @@ public class Node{
      * @throws NullPointerException if it returns null
      */
     public static Node get(String label) throws NullPointerException{
-        Node ret = null;
-        
-        for(Integer i : allNodes.keySet()){
-            if(allNodes.get(i).getHasLabel(label)){
-                ret = allNodes.get(i);
-                break;
-            }
-        }
-        
-        return ret;
+        return labelToNode.get(label.toUpperCase());
     }
     
     /**
@@ -175,7 +170,12 @@ public class Node{
      * @param s the label to add (room, building, etc)
      */
     public void addLabel(String s){
-        labels.add(s);
+        if(labelToNode.containsKey(s.toUpperCase())){
+            JOptionPane.showMessageDialog(null, "Label " + s + " is already in use.");
+        } else {
+            labelToNode.put(s.toUpperCase(), this);
+            labels.add(s);
+        }
     }
     
     
@@ -192,6 +192,7 @@ public class Node{
             if(labels.get(i).equalsIgnoreCase(s)){
                 found = true;
                 labels.remove(i);
+                labelToNode.remove(s.toUpperCase());
             }
         }
         return found;
