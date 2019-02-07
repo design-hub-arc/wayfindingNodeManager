@@ -67,7 +67,7 @@ public class NodeParser {
     public static void parseFile(InputStream s, FileParser parser){
         BufferedReader br;
         String[] line = new String[0];
-        
+        boolean firstLine = true;
         try{
             br = new BufferedReader(new InputStreamReader(s));
             while(br.ready()){
@@ -75,9 +75,13 @@ public class NodeParser {
                     line = br.readLine().split(",");
                     parser.parse(line);
                 } catch(Exception e){
-                    out.println("Line fail: " + Arrays.toString(line));
-                    e.printStackTrace();
+                    if(!firstLine){
+                        //don't print errors for first line, as it will always fail, being a header
+                        out.println("Line fail: " + Arrays.toString(line));
+                        e.printStackTrace();
+                    }
                 }
+                firstLine = false;
             }
         } catch(IOException e){
             e.printStackTrace();

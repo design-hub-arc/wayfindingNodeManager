@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
 import nodemanager.node.*;
+import nodemanager.events.*;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -175,7 +176,7 @@ public class EditCanvas extends JPanel {
         JMenuItem resize = new JMenuItem("Resize map image");
         resize.addActionListener((ActionEvent e) -> {
             JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
-            Session.setMode(Mode.RESCALE_UL);
+            Session.setMode(Mode.RESCALE_UL);    
         });
         menu.add(resize);
 

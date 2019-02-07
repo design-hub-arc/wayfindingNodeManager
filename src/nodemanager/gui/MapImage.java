@@ -10,6 +10,7 @@ import static java.lang.System.out;
 import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
+import nodemanager.events.MapResizeEvent;
 import nodemanager.events.NodeCreateEvent;
 
 /**
@@ -134,6 +135,9 @@ public class MapImage extends JLabel{
             Session.setMode(Mode.RESCALE_LR);
             Session.newMapX = Node.get(-1).getIcon().getX();
             Session.newMapY = Node.get(-1).getIcon().getY();
+            
+            Session.logAction(new MapResizeEvent(this, buff));
+            
             JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
         });
         
@@ -162,7 +166,9 @@ public class MapImage extends JLabel{
             for (int i : clip) {
                 out.print(i + " ");
             }
-
+            
+            Session.newMapX = 0;
+            Session.newMapY = 0;
             setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
         });
         
@@ -275,7 +281,10 @@ public class MapImage extends JLabel{
      * resets the position of each NodeIcon.
      */
     private void resizeNodeIcons() {
-        nodeIcons.values().forEach(n -> n.scaleTo(scaler));
+        nodeIcons.values().forEach(n -> {
+            n.scaleTo(scaler);
+            n.setPos(n.getX() + Session.newMapX, n.getY() + Session.newMapY);
+        });
         repaint();
     }
 
@@ -385,29 +394,6 @@ public class MapImage extends JLabel{
         }).findFirst().orElse(null);
     }
     
-
-    /**
-     * Saves a BufferedImage to a file
-     *
-     * @param image the BufferedImage to save
-     * @return a File containing the new image
-     */
-    public static File createNewImageFile(BufferedImage image) {
-        File f = null;
-        JFileChooser cd = new JFileChooser();
-        cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        try {
-            if (cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION) {
-                f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + System.currentTimeMillis() + ".png");
-                ImageIO.write(image, "png", f);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return f;
-    }
-
     @Override
     /**
      * Renders a clip of the image. Note that this means the displayed image
