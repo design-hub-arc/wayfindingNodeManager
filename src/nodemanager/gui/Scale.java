@@ -105,7 +105,7 @@ public class Scale {
         return minY + (sourceHeight * (y - shiftY)) / destinationHeight;
     }
     
-    
+    //testing function
     public static void main(String[] args){
         Scale s = new Scale(0, 5, 290, 100);
         s.setSize(500, 37);

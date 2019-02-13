@@ -131,10 +131,14 @@ public class NodeIcon{
      * @param s the Scale to set position off of
      */
     public void scaleTo(Scale s){
-        if(scale == null){
+        if(true || scale == null){
             x = s.x(node.getX());
             y = s.y(node.getY());
         } else {
+            //this is causing problems, but I need it to work or user will have to repos nodes after scaleto is called
+            if(scale.inverseX(x) - s.inverseX(s.x(scale.inverseX(x))) != 0.0){
+                System.out.println("Moving from " + scale.inverseX(x) + " to " + s.inverseX(s.x(scale.inverseX(x))));
+            }
             x = s.x(scale.inverseX(x));
             y = s.y(scale.inverseY(y));
         }

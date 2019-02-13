@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 import java.awt.event.*;
 import static java.lang.System.out;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.MapResizeEvent;
@@ -102,15 +104,6 @@ public class MapImage extends JLabel{
             double shiftY = translateClickY(me.getY());
             scaler.setOrigin((int)shiftX, (int)shiftY);
             resizeNodeIcons();
-            /*
-            double baseX;
-            double baseY;
-            
-            for (NodeIcon ni : nodeIcons.values()) {
-                baseX = scaler.x(ni.node.rawX);
-                baseY = scaler.y(ni.node.rawY);
-                ni.setPos((int) (baseX + shiftX), (int) (baseY + shiftY));
-            }*/
         });
         mouseMoveActions.put(Mode.RESCALE_LR, (me) -> {
             scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
