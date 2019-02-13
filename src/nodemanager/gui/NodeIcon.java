@@ -131,9 +131,14 @@ public class NodeIcon{
      * @param s the Scale to set position off of
      */
     public void scaleTo(Scale s){
+        if(scale == null){
+            x = s.x(node.getX());
+            y = s.y(node.getY());
+        } else {
+            x = s.x(scale.inverseX(x));
+            y = s.y(scale.inverseY(y));
+        }
         scale = s;
-        x = scale.x(node.getX());
-        y = scale.y(node.getY());
     }
     
     /**

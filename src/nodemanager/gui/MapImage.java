@@ -95,22 +95,26 @@ public class MapImage extends JLabel{
      */
     private void registerControls() {
         mouseMoveActions.put(Mode.MOVE, (me) -> {
-            Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
-                
+            Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));     
         });
         mouseMoveActions.put(Mode.RESCALE_UL, (me) -> {
             double shiftX = translateClickX(me.getX());
             double shiftY = translateClickY(me.getY());
+            scaler.setOrigin((int)shiftX, (int)shiftY);
+            resizeNodeIcons();
+            /*
             double baseX;
             double baseY;
+            
             for (NodeIcon ni : nodeIcons.values()) {
                 baseX = scaler.x(ni.node.rawX);
                 baseY = scaler.y(ni.node.rawY);
                 ni.setPos((int) (baseX + shiftX), (int) (baseY + shiftY));
-            }
+            }*/
         });
         mouseMoveActions.put(Mode.RESCALE_LR, (me) -> {
             scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
+            //scaler.setSize(translateClickX(me.getX()), translateClickY(me.getY()));
             resizeNodeIcons();
         });
         
@@ -169,6 +173,7 @@ public class MapImage extends JLabel{
             
             Session.newMapX = 0;
             Session.newMapY = 0;
+            scaler.setOrigin(0, 0);
             setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
         });
         
@@ -283,7 +288,7 @@ public class MapImage extends JLabel{
     private void resizeNodeIcons() {
         nodeIcons.values().forEach(n -> {
             n.scaleTo(scaler);
-            n.setPos(n.getX() + Session.newMapX, n.getY() + Session.newMapY);
+            //n.setPos(n.getX() + Session.newMapX, n.getY() + Session.newMapY);
         });
         repaint();
     }
