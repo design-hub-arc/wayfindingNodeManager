@@ -44,8 +44,8 @@ public class NodeIcon{
         node = n;
         color = (n.id < 0) ? Color.green : Color.red;
         
-        x = node.rawX;
-        y = node.rawY;
+        x = node.getX();
+        y = node.getY();
         
         drawLinks = false;
         onImage = null;
@@ -99,6 +99,14 @@ public class NodeIcon{
     
     
     /**
+     * Gets the scale this is resized to
+     * @return this' scale
+     */
+    public Scale getScale(){
+        return scale;
+    }
+    
+    /**
      * 
      * @return this' x-coordinate on the map image
      */
@@ -126,6 +134,15 @@ public class NodeIcon{
     }
     
     /**
+     * Updates this' node's position on the source.
+     * this way, we can differentiate between moving a node,
+     * and calling scaleTo
+     */
+    public void respositionNode(){
+        node.update();
+    }
+    
+    /**
      * Sets the scale this should be positioned based on,
      * @see Scale for more info
      * @param s the Scale to set position off of
@@ -149,8 +166,8 @@ public class NodeIcon{
      * Moves this component back to where it was when the Node was initially imported
      */
     public void resetPos(){
-        x = scale.x(node.rawX);
-        y = scale.y(node.rawY);
+        x = scale.x(node.getX());
+        y = scale.y(node.getY());
     }
     
     

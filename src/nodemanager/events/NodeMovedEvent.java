@@ -20,6 +20,7 @@ public class NodeMovedEvent extends EditEvent{
     @Override
     public void undo() {
         moved.getIcon().setPos(initialX, initialY);
+        moved.getIcon().respositionNode(); //need to do this, or scaleTo will override the undo
         moved.getIcon().getHost().repaint();
     }
     

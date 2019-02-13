@@ -315,7 +315,7 @@ public class EditCanvas extends JPanel {
         Node.removeAll();
 
         NodeParser.parseNodeFile(i);
-        map.scaleTo(Node.get(-1).rawX, Node.get(-1).rawY, Node.get(-2).rawX, Node.get(-2).rawY);
+        map.scaleTo(Node.get(-1).getX(), Node.get(-1).getY(), Node.get(-2).getX(), Node.get(-2).getY());
 
         Node.getAll().forEach((n) -> map.addNode(n));
         revalidate();

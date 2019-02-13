@@ -25,8 +25,8 @@ public class Node{
     ANY set of horizontal and vertical components on
     ANY two dimensional grid, so long as x grows right, and y grows down
     */
-    public final int rawX;
-    public final int rawY;
+    private int rawX;
+    private int rawY;
     
     private HashSet<Integer> adjacentIds;
     private ArrayList<String> labels; //rooms, buildings, etc.
@@ -250,6 +250,14 @@ public class Node{
      */
     public NodeIcon getIcon(){
         return icon;
+    }
+    
+    /**
+     * Updates this' position to match that of its icon
+     */
+    public void update(){
+        rawX = (int)icon.getScale().inverseX(icon.getX());
+        rawY = (int)icon.getScale().inverseY(icon.getY());
     }
     
     /**
