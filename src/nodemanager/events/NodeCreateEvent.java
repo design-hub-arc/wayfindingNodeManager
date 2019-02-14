@@ -26,4 +26,10 @@ public class NodeCreateEvent extends EditEvent{
         addedTo.removeNode(nodeCreated);
         Node.removeNode(nodeCreated.id);
     }
+
+    @Override
+    public void redo() {
+        addedTo.addNode(nodeCreated);
+        Node.addNode(nodeCreated);
+    }
 }

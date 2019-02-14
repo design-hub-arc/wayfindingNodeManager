@@ -23,6 +23,13 @@ public class NodeDeleteEvent extends EditEvent{
         removedFrom.addNode(nodeDeleted);
         removedFrom.repaint();
     }
+
+    @Override
+    public void redo() {
+        Node.removeNode(nodeDeleted.id);
+        removedFrom.removeNode(nodeDeleted);
+        removedFrom.repaint();
+    }
     
     
 }

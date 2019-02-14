@@ -19,5 +19,8 @@ public class LabelRemovedEvent extends EditEvent{
     public void undo() {
         removedFrom.addLabel(label);
     }
-    
+    @Override
+    public void redo(){
+        removedFrom.removeLabel(label);
+    }
 }

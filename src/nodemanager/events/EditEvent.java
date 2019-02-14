@@ -6,4 +6,5 @@ package nodemanager.events;
  */
 public abstract class EditEvent {
     public abstract void undo();
+    public abstract void redo();
 }

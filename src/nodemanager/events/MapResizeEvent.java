@@ -11,10 +11,18 @@ import nodemanager.gui.MapImage;
 public class MapResizeEvent extends EditEvent{
     private final MapImage resized;
     private final BufferedImage origImage;
+    private final BufferedImage newImage;
     
-    public MapResizeEvent(MapImage m, BufferedImage bi){
+    /**
+     * Created by MapImage whenever the user changes the map.
+     * @param m the MapImage that was changed
+     * @param from the original image
+     * @param to the image it was changed to
+     */
+    public MapResizeEvent(MapImage m, BufferedImage from, BufferedImage to){
         resized = m;
-        origImage = bi;
+        origImage = from;
+        newImage = to;
     }
 
     @Override
@@ -24,4 +32,10 @@ public class MapResizeEvent extends EditEvent{
         Session.newMapY = 0;
     }
     
+    @Override
+    public void redo(){
+        resized.setImage(newImage);
+        Session.newMapX = 0;
+        Session.newMapY = 0;
+    }
 }

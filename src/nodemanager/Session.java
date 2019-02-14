@@ -3,7 +3,7 @@ package nodemanager;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Stack;
+import java.util.ArrayList;
 import javax.swing.*;
 import nodemanager.events.EditEvent;
 import nodemanager.node.Node;
@@ -35,7 +35,8 @@ public class Session {
     
     //used to undo actions
     //add redo button?
-    private static final Stack<EditEvent> ACTIONS = new Stack<>();
+    private static final ArrayList<EditEvent> ACTIONS = new ArrayList<>();
+    private static int actionIdx = -1; //the most recent action index
 
     /**
      * A text component used to display the program's controls
@@ -109,13 +110,19 @@ public class Session {
     
     public static void logAction(EditEvent e){
         ACTIONS.add(e);
+        actionIdx = ACTIONS.size() - 1;
     }
     
     public static void undoLastAction(){
-        if(!ACTIONS.isEmpty()){
-            EditEvent e = ACTIONS.pop();
-            System.out.println("Undoing " + e.toString());
-            e.undo();
+        if(actionIdx >= 0){
+            ACTIONS.get(actionIdx).undo();
+            actionIdx--;
+        }
+    }
+    public static void redoLastAction(){
+        if(actionIdx < ACTIONS.size() - 1){
+            actionIdx++;
+            ACTIONS.get(actionIdx).redo();
         }
     }
 }

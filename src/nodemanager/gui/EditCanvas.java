@@ -110,6 +110,12 @@ public class EditCanvas extends JPanel {
             Session.undoLastAction();
         });
         menu.add(undo);
+        
+        JMenuItem redo = new JMenuItem("Redo");
+        redo.addActionListener((ActionEvent e) -> {
+            Session.redoLastAction();
+        });
+        menu.add(redo);
 
         setBackground(Color.blue);
         revalidate();

@@ -19,5 +19,10 @@ public class ConnectionAddedEvent extends EditEvent{
     public void undo() {
         Node.get(id1).removeAdj(id2);
     }
+
+    @Override
+    public void redo() {
+        Node.get(id1).addAdjId(id2);
+    }
     
 }
