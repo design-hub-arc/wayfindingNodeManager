@@ -361,6 +361,21 @@ public class MapImage extends JLabel{
     public void scaleTo(double x1, double y1, double x2, double y2) {
         scaler.rescale(x1, y1, x2, y2);
     }
+    
+    
+    /**
+     * Invoked by ImportMenu after importing the node file.
+     * Sets the node icons on the map image to match the newly imported nodes.
+     * 
+     * Move this to map later?
+     */
+    public void refreshNodes() {
+        removeAllNodes();
+        scaleTo(Node.get(-1).getX(), Node.get(-1).getY(), Node.get(-2).getX(), Node.get(-2).getY());
+        Node.getAll().forEach((n) -> addNode(n));
+        revalidate();
+        repaint();
+    }
 
     /**
      * exports the map image to a directory

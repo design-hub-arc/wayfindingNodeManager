@@ -168,14 +168,16 @@ public class Node{
     /**
      * Adds a label to this node
      * @param s the label to add (room, building, etc)
+     * @return whether or not the label was successfully added
      */
-    public void addLabel(String s){
-        if(labelToNode.containsKey(s.toUpperCase())){
-            JOptionPane.showMessageDialog(null, "Label " + s + " is already in use.");
-        } else {
+    public boolean addLabel(String s){
+        boolean ret = !labelToNode.containsKey(s.toUpperCase());
+        if(ret){
             labelToNode.put(s.toUpperCase(), this);
             labels.add(s);
         }
+        
+        return ret;
     }
     
     

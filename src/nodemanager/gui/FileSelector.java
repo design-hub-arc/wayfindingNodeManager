@@ -16,6 +16,8 @@ public class FileSelector extends JMenuItem implements ActionListener{
     private final JFileChooser chooser;
     private final Consumer<File> action;
     
+    public static final String[] CSV = new String[]{"Comma Separated Values", "csv"};
+    
     /**
      * Creates a FileSelector, which is a menu item that allows the user to select a file
      * @param text the text to display on this component

@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import javax.imageio.ImageIO;
 import nodemanager.node.*;
 
 /**
@@ -75,8 +74,8 @@ public class EditCanvas extends JPanel {
         body.setLayout(new GridLayout(1, 1));
         map = new MapImage();
         body.add(map);
-
-        JMenu importMenu = createImportMenu();
+        
+        ImportMenu importMenu = new ImportMenu(map);
         menu.add(importMenu);
 
         JMenu exportMenu = createExportMenu();
@@ -121,66 +120,8 @@ public class EditCanvas extends JPanel {
         revalidate();
         repaint();
 
-        loadDefaults();
-    }
-
-    /**
-     * Creates the menu used to load data into the program. Note that it doesn't
-     * add the menu automatically.
-     *
-     * Move to another class in the future?
-     *
-     * @return the created menu.
-     */
-    private JMenu createImportMenu() {
-        JMenu menu = new JMenu("Import");
-        String[] csv = new String[]{"Comma Separated Values", "csv"};
         
-        menu.add(new FileSelector("Select Node File", csv, (File f) -> {
-            try {
-                loadNodesFromFile(new FileInputStream(f));
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        }));
-        
-
-        menu.add(new FileSelector("Select connection file", csv, (File f) -> {
-            try {
-                NodeParser.parseConnFile(new FileInputStream(f));
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        }));
-
-        menu.add(new FileSelector("Select label file", csv, (File f) -> {
-            try {
-                NodeParser.parseTitleFile(new FileInputStream(f));
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        }));
-
-        menu.add(new FileSelector("Select map image", 
-            new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
-            (File f) -> {
-                try {
-                    map.setImage(ImageIO.read(f));
-                    repaint();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        ));
-
-        JMenuItem resize = new JMenuItem("Resize map image");
-        resize.addActionListener((ActionEvent e) -> {
-            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
-            Session.setMode(Mode.RESCALE_UL);    
-        });
-        menu.add(resize);
-
-        return menu;
+        importMenu.loadDefaults();
     }
 
     /**
@@ -307,51 +248,5 @@ public class EditCanvas extends JPanel {
         m.add(hideAllConn);
 
         return m;
-    }
-
-    /**
-     * Imports node position data from a csv file, then adds their icons to the
-     * map
-     *
-     * @param i the InputStream given by a FileInputStream generated from a csv
-     * file
-     */
-    private void loadNodesFromFile(InputStream i) {
-        map.removeAllNodes();
-        Node.removeAll();
-
-        NodeParser.parseNodeFile(i);
-        map.scaleTo(Node.get(-1).getX(), Node.get(-1).getY(), Node.get(-2).getX(), Node.get(-2).getY());
-
-        Node.getAll().forEach((n) -> map.addNode(n));
-        revalidate();
-        repaint();
-    }
-
-    private void loadDefaults() {
-        //set defaults
-        try {
-            map.setImage(ImageIO.read(getClass().getResourceAsStream("/map.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            loadNodesFromFile(getClass().getResourceAsStream("/nodeData.csv"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            NodeParser.parseConnFile(getClass().getResourceAsStream("/nodeConnections.csv"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        try{
-            NodeParser.parseTitleFile(getClass().getResourceAsStream("/labels.csv"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

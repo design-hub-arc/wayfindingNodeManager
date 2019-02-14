@@ -74,9 +74,12 @@ public class NodeDataPane extends JComponent{
         
         addOption("Add a label", () -> {
             String ip = JOptionPane.showInputDialog("Enter the label to add to this node: ");
-            selectedNode.addLabel(ip);
-            Session.logAction(new LabelAddedEvent(selectedNode, ip));
-            selectNode(selectedNode); //reload node description
+            if(selectedNode.addLabel(ip)){
+                Session.logAction(new LabelAddedEvent(selectedNode, ip));
+                selectNode(selectedNode); //reload node description
+            } else {
+                JOptionPane.showMessageDialog(null, "Label '" + ip + "' is already in use.");
+            }
         });
         
         addOption("Remove a label", () -> {

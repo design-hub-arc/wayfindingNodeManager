@@ -1,36 +1,139 @@
 package nodemanager.gui;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.io.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import nodemanager.Mode;
+import nodemanager.Session;
+import nodemanager.node.*;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
  * 
  * use this to remove code from EditCanvas
  * 
- * not sure how to make this work
- * 
  * @author Matt Crow
  */
 public class ImportMenu extends JMenu{
-    public ImportMenu(){
+
+    
+    private final MapImage listener; 
+    
+    /**
+     * Creates a new ImportMenu, then associates an EditCanvas with it.
+     * @param notify the MapImage to notify of any imports made by this
+     */
+    public ImportMenu(MapImage notify){
         super("Import");
-        add(importNodeData());
+        
+        listener = notify;
+        
+        add(importMapMenu());
+        add(resizeMapMenu());
+        add(importNodeMenu());
+        add(importConnMenu());
+        add(importLabelMenu());
     }
     
-    private JMenuItem importNodeData(){
-        JMenuItem jmi = new JMenuItem("Import Node Data");
-        jmi.addActionListener((ActionEvent e) -> {
-            JFileChooser jfc = new JFileChooser();
-            jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            jfc.setFileFilter(new FileNameExtensionFilter("Node File", new String[]{"Comma Sperated Values", "csv"}));
-            
-            int response = jfc.showOpenDialog(jfc);
-            if(response == JFileChooser.APPROVE_OPTION){
-                
+    private JMenuItem importMapMenu(){
+        return new FileSelector("Select map image", 
+            new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
+            (File f) -> {
+                try {
+                    listener.setImage(ImageIO.read(f));
+                    repaint();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        );
+    }
+    private void importMap(InputStream s) throws IOException{
+        listener.setImage(ImageIO.read(s));
+    }
+    
+    
+    private JMenuItem resizeMapMenu(){
+        JMenuItem resize = new JMenuItem("Resize map image");
+        resize.addActionListener((ActionEvent e) -> {
+            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
+            Session.setMode(Mode.RESCALE_UL);    
+        });
+        return resize;
+    }
+    
+    
+    private JMenuItem importNodeMenu(){
+        return new FileSelector("Select Node File", FileSelector.CSV, (File f) -> {
+            try {
+                importNodes(new FileInputStream(f));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
             }
         });
-        return jmi;
+    }
+    private void importNodes(InputStream s){
+        Node.removeAll();
+        NodeParser.parseNodeFile(s);
+        listener.refreshNodes();
+    }
+    
+    
+    private JMenuItem importConnMenu(){
+        return new FileSelector("Select connection file", FileSelector.CSV, (File f) -> {
+            try {
+                NodeParser.parseConnFile(new FileInputStream(f));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+    private void importConns(InputStream s){
+        NodeParser.parseConnFile(s);
+    }
+    
+    
+    private JMenuItem importLabelMenu(){
+        return new FileSelector("Select label file", FileSelector.CSV, (File f) -> {
+            try {
+                importLabels(new FileInputStream(f));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+    private void importLabels(InputStream s){
+        NodeParser.parseTitleFile(s);
+    }
+    
+    
+    /**
+     * Imports the default data used by the program
+     */
+    public void loadDefaults() {
+        try {
+            importMap(getClass().getResourceAsStream("/map.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        try {
+            importNodes(getClass().getResourceAsStream("/nodeData.csv"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        try {
+            importConns(getClass().getResourceAsStream("/nodeConnections.csv"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        try{
+            importLabels(getClass().getResourceAsStream("/labels.csv"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
