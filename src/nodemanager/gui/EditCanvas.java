@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
 import nodemanager.node.*;
 
 /**
@@ -78,8 +77,7 @@ public class EditCanvas extends JPanel {
         ImportMenu importMenu = new ImportMenu(map);
         menu.add(importMenu);
 
-        JMenu exportMenu = createExportMenu();
-        menu.add(exportMenu);
+        menu.add(new ExportMenu(map));
         
         menu.add(createSelectMenu());
         
@@ -122,48 +120,6 @@ public class EditCanvas extends JPanel {
 
         
         importMenu.loadDefaults();
-    }
-
-    /**
-     * Creates the menu used to get data out of the program. Note that it
-     * doesn't add the menu automatically.
-     *
-     * Move to another class in the future?
-     *
-     * @return the created menu.
-     */
-    private JMenu createExportMenu() {
-        JMenu menu = new JMenu("Export");
-
-        JMenuItem exportNodeData = new JMenuItem("Export Node Data");
-        exportNodeData.addActionListener((ActionEvent ae) -> {
-            JFileChooser destination = new JFileChooser();
-            destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int response = destination.showOpenDialog(destination);
-            if (response == JFileChooser.APPROVE_OPTION) {
-                File f = destination.getSelectedFile();
-                Node.generateDataAt(f.getAbsolutePath());
-            }
-        });
-        menu.add(exportNodeData);
-        
-        JMenuItem exportLabels = new JMenuItem("Export labels");
-        exportLabels.addActionListener((ActionEvent ae) -> {
-            JFileChooser destination = new JFileChooser();
-            destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int response = destination.showOpenDialog(destination);
-            if (response == JFileChooser.APPROVE_OPTION) {
-                File f = destination.getSelectedFile();
-                Node.generateLabelFile(f.getAbsolutePath());
-            }
-        });
-        menu.add(exportLabels);
-        
-        JMenuItem saveMap = new JMenuItem("Export map");
-        saveMap.addActionListener((ActionEvent e) -> map.saveImage());
-        menu.add(saveMap);
-
-        return menu;
     }
     
     private JMenu createSelectMenu(){

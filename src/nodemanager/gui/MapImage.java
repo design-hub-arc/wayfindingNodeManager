@@ -7,11 +7,11 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
 import static java.lang.System.out;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
-import nodemanager.events.MapResizeEvent;
-import nodemanager.events.NodeCreateEvent;
+import nodemanager.events.*;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -385,7 +385,8 @@ public class MapImage extends JLabel{
         cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         try {
             if (cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION) {
-                File f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + System.currentTimeMillis() + ".png");
+                String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
+                File f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + time + ".png");
                 ImageIO.write(buff, "png", f);
             }
         } catch (IOException ex) {

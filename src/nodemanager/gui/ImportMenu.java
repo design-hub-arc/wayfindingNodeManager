@@ -4,15 +4,11 @@ import java.awt.event.ActionEvent;
 import java.io.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import nodemanager.Mode;
-import nodemanager.Session;
+import nodemanager.*;
 import nodemanager.node.*;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
- * 
- * use this to remove code from EditCanvas
- * 
  * @author Matt Crow
  */
 public class ImportMenu extends JMenu{
@@ -21,7 +17,7 @@ public class ImportMenu extends JMenu{
     private final MapImage listener; 
     
     /**
-     * Creates a new ImportMenu, then associates an EditCanvas with it.
+     * Creates a new ImportMenu, then associates a MapImage with it.
      * @param notify the MapImage to notify of any imports made by this
      */
     public ImportMenu(MapImage notify){
