@@ -1,4 +1,8 @@
 *.class
-build/
+build/*
 nbproject/private
 nbproject/private/private.xml
+*.html
+*.css
+
+
