@@ -44,7 +44,7 @@ public class FileUploadProgressListener implements MediaHttpUploaderProgressList
       case MEDIA_COMPLETE:
         System.out.println("Upload is Complete!");
         break;
-        
     }
+    System.out.println(uploader.getInitiationHeaders());
   }
 }

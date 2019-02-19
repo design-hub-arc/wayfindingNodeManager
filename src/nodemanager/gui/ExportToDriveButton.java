@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
 
 import nodemanager.FileUploadProgressListener;
 
@@ -75,7 +76,8 @@ public class ExportToDriveButton extends JMenuItem{
             System.out.println("Enter client ID and secret from https://code.google.com/apis/console/?api=drive into the clientData file");
             System.exit(1);
         }
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP, JSON, clientInfo, Collections.singleton(DriveScopes.DRIVE)).setDataStoreFactory(STORE).build();
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP, JSON, clientInfo, Collections.singleton(DriveScopes.DRIVE))
+                .setDataStoreFactory(STORE).build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
     
@@ -83,9 +85,8 @@ public class ExportToDriveButton extends JMenuItem{
         try {
             File googleFile = new File();
             FileContent content = new FileContent("csv", orig);
-            System.out.println("File: " + googleFile);
-            System.out.println("Content: " + content);
-            System.out.println(drive.files());
+            System.out.println(drive.getRootUrl());
+            System.out.println(drive.files().list().toString());
             Drive.Files.Create insert = drive.files().create(googleFile, content);
             MediaHttpUploader uploader = insert.getMediaHttpUploader();
             uploader.setProgressListener(new FileUploadProgressListener());
