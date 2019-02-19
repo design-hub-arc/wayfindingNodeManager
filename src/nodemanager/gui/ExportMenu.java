@@ -7,6 +7,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import nodemanager.node.Node;
 
+
 /**
  * This is used by EditCanvas to provide options for getting data out of the program
  * @author Matt Crow
@@ -38,6 +39,15 @@ public class ExportMenu extends JMenu{
             if (response == JFileChooser.APPROVE_OPTION) {
                 File f = destination.getSelectedFile();
                 Node.generateDataAt(f.getAbsolutePath());
+                
+                
+                
+                
+                new ExportToDriveButton().uploadFile(f.getAbsoluteFile());
+                
+                
+                
+                
             }
         });
         return exportNodeData;
