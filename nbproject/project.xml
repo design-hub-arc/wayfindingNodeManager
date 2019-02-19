@@ -5,6 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>NodeManager</name>
             <source-roots>
+                <root id="src.dependencies.dir"/>
                 <root id="src.drive.dir"/>
                 <root id="src.google-api-java-client.dir"/>
                 <root id="src.data.dir"/>
