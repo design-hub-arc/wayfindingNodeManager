@@ -42,15 +42,11 @@ public class ExportMenu extends JMenu{
             int response = destination.showOpenDialog(destination);
             if (response == JFileChooser.APPROVE_OPTION) {
                 File f = destination.getSelectedFile(); //this is a directory
-                
                 File coordFile = Node.generateCoordFile(f.getAbsolutePath());
                 File connFile = Node.generateConnFile(f.getAbsolutePath());
                 
                 GoogleDriveUploader.uploadFile(coordFile);
                 GoogleDriveUploader.uploadFile(connFile);
-                
-                
-                
             }
         });
         return exportNodeData;
@@ -64,7 +60,9 @@ public class ExportMenu extends JMenu{
             int response = destination.showOpenDialog(destination);
             if (response == JFileChooser.APPROVE_OPTION) {
                 File f = destination.getSelectedFile();
-                Node.generateLabelFile(f.getAbsolutePath());
+                File labelFile = Node.generateLabelFile(f.getAbsolutePath());
+                
+                GoogleDriveUploader.uploadFile(labelFile);
             }
         });
         return exportLabels;

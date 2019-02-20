@@ -14,14 +14,16 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.Revision;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.JOptionPane;
 
 /**
- *
+ * Used to upload files to the google drive
  * @author Matt Crow
  */
 public class GoogleDriveUploader {
@@ -59,6 +61,11 @@ public class GoogleDriveUploader {
         }
     }
     
+    /**
+     * Uploads a file to the google drive
+     * @param orig the local file to upload
+     * @return the file after it has been uploaded to the google drive
+     */
     public static File uploadFile(java.io.File orig){
         File googleFile = null;
         try {
@@ -69,8 +76,27 @@ public class GoogleDriveUploader {
             googleFile.setParents(parents);
             Drive.Files.Create insert = drive.files().create(googleFile, content);
             MediaHttpUploader uploader = insert.getMediaHttpUploader();
+            
+            String id = googleFile.getId();
+            Revision pubToWeb = new Revision();
+            pubToWeb.setPublished(true);
+            pubToWeb.setPublishAuto(true);
+            
+            
             uploader.setProgressListener((up) -> {
-                System.out.println(orig.getName() + ": " + up.getUploadState());
+                switch(up.getUploadState()){
+                    case INITIATION_STARTED:
+                        JOptionPane.showMessageDialog(null, "Beginning upload to the google drive...");
+                        break;
+                    case MEDIA_COMPLETE:
+                        JOptionPane.showMessageDialog(null, "Upload successful! drive.google.com/folders/" + FOLDER_ID); //not able to copy-paste
+                        //publishToWeb(googleFile);
+                        break;
+                    default:
+                        System.out.println(orig.getName() + ": " + up.getUploadState());
+                        break;
+                }
+                
             });
             googleFile.setName(orig.getName());
             
@@ -79,6 +105,13 @@ public class GoogleDriveUploader {
             ex.printStackTrace();
         }
         return googleFile;
+    }
+    
+    private static void publishToWeb(File f) throws IOException{
+        Revision pubToWeb = new Revision();
+        pubToWeb.setPublished(true);
+        pubToWeb.setPublishAuto(true);
+        drive.revisions().update(f.getId(), FOLDER_ID, pubToWeb).execute();
     }
     
     private static Credential authorize() throws Exception{
