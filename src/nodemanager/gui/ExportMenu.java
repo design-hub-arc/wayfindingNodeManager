@@ -9,6 +9,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import nodemanager.node.Node;
+import nodemanager.save.GoogleDriveUploader;
 
 
 /**
@@ -43,12 +44,10 @@ public class ExportMenu extends JMenu{
                 File f = destination.getSelectedFile(); //this is a directory
                 
                 File coordFile = Node.generateCoordFile(f.getAbsolutePath());
-                Node.generateDataAt(f.getAbsolutePath());
+                File connFile = Node.generateConnFile(f.getAbsolutePath());
                 
-                System.out.println(f.getAbsolutePath());
-                
-                
-                new ExportToDriveButton().uploadFile(coordFile);
+                GoogleDriveUploader.uploadFile(coordFile);
+                GoogleDriveUploader.uploadFile(connFile);
                 
                 
                 
