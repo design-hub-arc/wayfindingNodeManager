@@ -19,6 +19,7 @@ import com.google.api.services.drive.DriveScopes;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,16 +85,21 @@ public class ExportToDriveButton extends JMenuItem{
     public File uploadFile(java.io.File orig){
         try {
             File googleFile = new File();
-            FileContent content = new FileContent("csv", orig);
+            FileContent content = new FileContent("text/csv", orig);
             System.out.println(drive.getRootUrl());
+            System.out.println(drive.getBaseUrl());
             System.out.println(drive.files().list().toString());
+            ArrayList<String> parents = new ArrayList<>();
+            parents.add(FOLDER_ID);
+            googleFile.setParents(parents);
             Drive.Files.Create insert = drive.files().create(googleFile, content);
             MediaHttpUploader uploader = insert.getMediaHttpUploader();
             uploader.setProgressListener(new FileUploadProgressListener());
             googleFile.setName(orig.getName());
+            
             return insert.execute();
         } catch (IOException ex) {
-            
+            ex.printStackTrace();
         }
         return null;
     }

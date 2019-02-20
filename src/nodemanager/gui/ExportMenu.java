@@ -2,6 +2,9 @@ package nodemanager.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -37,14 +40,15 @@ public class ExportMenu extends JMenu{
             destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             int response = destination.showOpenDialog(destination);
             if (response == JFileChooser.APPROVE_OPTION) {
-                File f = destination.getSelectedFile();
+                File f = destination.getSelectedFile(); //this is a directory
+                
+                File coordFile = Node.generateCoordFile(f.getAbsolutePath());
                 Node.generateDataAt(f.getAbsolutePath());
                 
+                System.out.println(f.getAbsolutePath());
                 
                 
-                
-                new ExportToDriveButton().uploadFile(f.getAbsoluteFile());
-                
+                new ExportToDriveButton().uploadFile(coordFile);
                 
                 
                 

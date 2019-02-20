@@ -329,6 +329,30 @@ public class Node{
         return ret.toString();
     }
     
+    public static File generateCoordFile(String path){
+        File nodeFile = null;
+        BufferedWriter out = null;
+        String nl = System.getProperty("line.separator");
+        
+        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
+        
+        try {
+            nodeFile = new File(path + File.separator + "nodeData" + time + ".csv");
+            
+            out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
+            out.write("id, x, y" + nl);
+            for(Node n : allNodes.values()){
+                out.write(n.getCoordLine() + nl);
+            }
+            out.close();
+        } catch (FileNotFoundException ex) {
+            
+        } catch (IOException ex) {
+            
+        }
+        return nodeFile;
+    }
+    
     /**
      * Exports the Node data in the form of two csv files
      * @param path the path to the directory where the new files will be created
