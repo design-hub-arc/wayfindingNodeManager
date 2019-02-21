@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import nodemanager.node.Node;
 
 /**
  * Work in progress. Will create a manifest file containing all the currently active data,
@@ -25,12 +26,27 @@ public class WayfindingManifest {
         urls = new HashMap<>();
     }
     
+    public void populate(String path){
+        com.google.api.services.drive.model.File googleFile = null;
+        
+        googleFile = GoogleDriveUploader.uploadFile(Node.generateCoordFile(path));
+        urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        
+        googleFile = GoogleDriveUploader.uploadFile(Node.generateConnFile(path));
+        urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        
+        googleFile = GoogleDriveUploader.uploadFile(Node.generateLabelFile(path));
+        urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+    }
+    
     public File export(String path){
         File f = null;
         BufferedWriter out = null;
         String nl = System.getProperty("line.separator");
         
         String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
+        
+        populate(path);
         
         try {
             f = new File(path + File.separator + "wayfindingManifest" + time + ".csv");

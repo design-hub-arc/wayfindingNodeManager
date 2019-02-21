@@ -2,14 +2,12 @@ package nodemanager.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Set;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import nodemanager.node.Node;
 import nodemanager.save.GoogleDriveUploader;
+import nodemanager.save.WayfindingManifest;
 
 
 /**
@@ -32,6 +30,7 @@ public class ExportMenu extends JMenu{
         add(exportNodeMenu());
         add(exportLabelMenu());
         add(exportMapMenu());
+        add(exportManifest());
     }
     
     private JMenuItem exportNodeMenu(){
@@ -72,5 +71,21 @@ public class ExportMenu extends JMenu{
         JMenuItem saveMap = new JMenuItem("Export map");
         saveMap.addActionListener((ActionEvent e) -> listener.saveImage());
         return saveMap;
+    }
+    
+    private JMenuItem exportManifest(){
+        JMenuItem exportManifest = new JMenuItem("Export manifest");
+        exportManifest.addActionListener((ActionEvent ae) -> {
+            JFileChooser destination = new JFileChooser();
+            destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int response = destination.showOpenDialog(destination);
+            if (response == JFileChooser.APPROVE_OPTION) {
+                File f = destination.getSelectedFile();
+                //File labelFile = Node.generateLabelFile(f.getAbsolutePath());
+                
+                GoogleDriveUploader.uploadFile(new WayfindingManifest().export(f.getAbsolutePath()));
+            }
+        });
+        return exportManifest;
     }
 }
