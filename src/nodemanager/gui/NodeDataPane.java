@@ -3,6 +3,7 @@ package nodemanager.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
@@ -73,9 +74,14 @@ public class NodeDataPane extends JComponent{
         });
         
         addOption("Add a label", () -> {
+            String type = JOptionPane.showInputDialog("Enter the type of label you are adding. "
+                    + "Current types include " 
+                    + Arrays.toString(Node.getLabelTypes())
+            );
+            
             String ip = JOptionPane.showInputDialog("Enter the label to add to this node: ");
-            if(selectedNode.addLabel(ip)){
-                Session.logAction(new LabelAddedEvent(selectedNode, ip));
+            if(selectedNode.addLabel(type, ip)){
+                Session.logAction(new LabelAddedEvent(selectedNode, ip, type));
                 selectNode(selectedNode); //reload node description
             } else {
                 JOptionPane.showMessageDialog(null, "Label '" + ip + "' is already in use.");
@@ -84,8 +90,9 @@ public class NodeDataPane extends JComponent{
         
         addOption("Remove a label", () -> {
             String ip = JOptionPane.showInputDialog("Enter the label to remove from this node: ");
+            String type = Node.getLabelType(ip);
             if(selectedNode.removeLabel(ip)){
-                Session.logAction(new LabelRemovedEvent(selectedNode, ip));
+                Session.logAction(new LabelRemovedEvent(selectedNode, ip, type));
                 selectNode(selectedNode); //reload node description
             }
         });

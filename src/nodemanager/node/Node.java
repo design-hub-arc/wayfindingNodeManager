@@ -5,9 +5,7 @@ import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
 import java.text.SimpleDateFormat;
-import javax.swing.JOptionPane;
 
-//seperate this into Node and NodeListener or something like that
 
 /**
  * The Node class is used to store data pertaining to points on campus.
@@ -33,6 +31,7 @@ public class Node{
     private NodeIcon icon;
     
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
+    private static HashMap<String, HashMap<String, Node>> labelTypeToLabelToNode = new HashMap<>();
     private static HashMap<String, Node> labelToNode = new HashMap<>(); //stores as uppercase label
     
     private static int nextId = 0;
@@ -98,6 +97,7 @@ public class Node{
      */
     public static void removeAll(){
         allNodes.clear();
+        labelTypeToLabelToNode.clear();
         labelToNode.clear();
         nextId = 0;
     }
@@ -167,13 +167,19 @@ public class Node{
     
     /**
      * Adds a label to this node
+     * @param type the type of this label
      * @param s the label to add (room, building, etc)
      * @return whether or not the label was successfully added
      */
-    public boolean addLabel(String s){
+    public boolean addLabel(String type, String s){
         boolean ret = !labelToNode.containsKey(s.toUpperCase());
         if(ret){
             labelToNode.put(s.toUpperCase(), this);
+            if(!labelTypeToLabelToNode.containsKey(type.toUpperCase())){
+                labelTypeToLabelToNode.put(type.toUpperCase(), new HashMap<>());
+            }
+            labelTypeToLabelToNode.get(type.toUpperCase()).put(s.toUpperCase(), this);
+            
             labels.add(s);
         }
         
@@ -198,6 +204,27 @@ public class Node{
             }
         }
         return found;
+    }
+    
+    public static String[] getLabelTypes(){
+        Object[] labels = labelTypeToLabelToNode.keySet().toArray();
+        return Arrays.copyOf(labels, labels.length, String[].class);
+    }
+    
+    /**
+     * Gets the type of a label, if it exists in labelTypeToLabelToNode
+     * @param label
+     * @return 
+     */
+    public static String getLabelType(String label){
+        String ret = "";
+        for(String key : labelTypeToLabelToNode.keySet()){
+            if(labelTypeToLabelToNode.get(key).containsKey(label.toUpperCase())){
+                ret = key;
+                break;
+            }
+        }
+        return ret;
     }
     
     /**

@@ -2,7 +2,6 @@ package nodemanager.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import nodemanager.node.Node;
@@ -41,47 +40,39 @@ public class ExportMenu extends JMenu{
                     File coordFile = Node.generateCoordFile(f.getAbsolutePath());
                     File connFile = Node.generateConnFile(f.getAbsolutePath());
                     
-                    GoogleDriveUploader.uploadFile(coordFile);
-                    GoogleDriveUploader.uploadFile(connFile);
+                    GoogleDriveUploader.uploadCsv(coordFile);
+                    GoogleDriveUploader.uploadCsv(connFile);
                 }
         );
     }
     
     private JMenuItem exportLabelMenu(){
-        JMenuItem exportLabels = new JMenuItem("Export labels");
-        exportLabels.addActionListener((ActionEvent ae) -> {
-            JFileChooser destination = new JFileChooser();
-            destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int response = destination.showOpenDialog(destination);
-            if (response == JFileChooser.APPROVE_OPTION) {
-                File f = destination.getSelectedFile();
-                File labelFile = Node.generateLabelFile(f.getAbsolutePath());
-                
-                GoogleDriveUploader.uploadFile(labelFile);
-            }
-        });
-        return exportLabels;
+        return new FileSelector(
+                "Export labels",
+                FileSelector.DIR,
+                (File f)->{
+                    File labelFile = Node.generateLabelFile(f.getAbsolutePath());
+                    GoogleDriveUploader.uploadCsv(labelFile);
+                }
+        );
     }
     
     private JMenuItem exportMapMenu(){
         JMenuItem saveMap = new JMenuItem("Export map");
-        saveMap.addActionListener((ActionEvent e) -> listener.saveImage());
+        saveMap.addActionListener((ActionEvent e) -> {
+                GoogleDriveUploader.uploadFile(listener.saveImage(), "image/png");
+            }
+        );
         return saveMap;
     }
     
     private JMenuItem exportManifest(){
-        JMenuItem exportManifest = new JMenuItem("Export manifest");
-        exportManifest.addActionListener((ActionEvent ae) -> {
-            JFileChooser destination = new JFileChooser();
-            destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int response = destination.showOpenDialog(destination);
-            if (response == JFileChooser.APPROVE_OPTION) {
-                File f = destination.getSelectedFile();
-                //File labelFile = Node.generateLabelFile(f.getAbsolutePath());
-                
-                GoogleDriveUploader.uploadFile(new WayfindingManifest().export(f.getAbsolutePath()));
-            }
-        });
-        return exportManifest;
+        return new FileSelector(
+                "Export manifest",
+                FileSelector.DIR,
+                (File f)->{
+                    GoogleDriveUploader.uploadCsv(new WayfindingManifest().export(f.getAbsolutePath()));
+                }
+        );
     }
 }

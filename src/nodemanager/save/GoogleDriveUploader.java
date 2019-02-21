@@ -64,10 +64,12 @@ public class GoogleDriveUploader {
     /**
      * Uploads a file to the google drive
      * @param orig the local file to upload
+     * @param type the type of the file (text/csv, image/png)
      * @return the file after it has been uploaded to the google drive
      */
-    public static File uploadFile(java.io.File orig){
+    public static File uploadFile(java.io.File orig, String type){
         File googleFile = null;
+        
         try {
             googleFile = new File();
             FileContent content = new FileContent("text/csv", orig);
@@ -105,6 +107,10 @@ public class GoogleDriveUploader {
             ex.printStackTrace();
         }
         return googleFile;
+    }
+    
+    public static File uploadCsv(java.io.File file){
+        return uploadFile(file, "text/csv");
     }
     
     private static void publishToWeb(File f) throws IOException{

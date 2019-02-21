@@ -29,13 +29,13 @@ public class WayfindingManifest {
     public void populate(String path){
         com.google.api.services.drive.model.File googleFile = null;
         
-        googleFile = GoogleDriveUploader.uploadFile(Node.generateCoordFile(path));
+        googleFile = GoogleDriveUploader.uploadCsv(Node.generateCoordFile(path));
         urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         
-        googleFile = GoogleDriveUploader.uploadFile(Node.generateConnFile(path));
+        googleFile = GoogleDriveUploader.uploadCsv(Node.generateConnFile(path));
         urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         
-        googleFile = GoogleDriveUploader.uploadFile(Node.generateLabelFile(path));
+        googleFile = GoogleDriveUploader.uploadCsv(Node.generateLabelFile(path));
         urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
     }
     

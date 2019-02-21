@@ -379,19 +379,22 @@ public class MapImage extends JLabel{
 
     /**
      * exports the map image to a directory
+     * @return the newly created file
      */
-    public void saveImage() {
+    public File saveImage() {
+        File f = null;
         JFileChooser cd = new JFileChooser();
         cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         try {
             if (cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION) {
                 String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-                File f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + time + ".png");
+                f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + time + ".png");
                 ImageIO.write(buff, "png", f);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        return f;
     }
 
     /**

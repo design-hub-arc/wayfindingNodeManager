@@ -20,7 +20,8 @@ public class FileSelector extends JMenuItem implements ActionListener{
     public static final String[] DIR = new String[]{"Directory", "Folder"};
     
     /**
-     * Creates a FileSelector, which is a menu item that allows the user to select a file
+     * Creates a FileSelector, which is a menu item that allows the user to select a file,
+     * or a directory if they pass in JFileChooser.DIR as the types.
      * @param text the text to display on this component
      * @param types the file extentions this should allow
      * @param act a lambda expression to run when a file is chosen, passing in the file as a parameter
