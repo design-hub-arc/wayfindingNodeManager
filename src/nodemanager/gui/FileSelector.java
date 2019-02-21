@@ -17,6 +17,7 @@ public class FileSelector extends JMenuItem implements ActionListener{
     private final Consumer<File> action;
     
     public static final String[] CSV = new String[]{"Comma Separated Values", "csv"};
+    public static final String[] DIR = new String[]{"Directory", "Folder"};
     
     /**
      * Creates a FileSelector, which is a menu item that allows the user to select a file
@@ -27,7 +28,7 @@ public class FileSelector extends JMenuItem implements ActionListener{
     public FileSelector(String text, String[] types, Consumer<File> act){
         super(text);
         chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setFileSelectionMode((types == DIR)? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
         chooser.setFileFilter(new FileNameExtensionFilter(Arrays.toString(types), types));
         action = act;
         addActionListener(this);

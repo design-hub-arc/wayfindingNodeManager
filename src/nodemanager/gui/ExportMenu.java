@@ -34,21 +34,17 @@ public class ExportMenu extends JMenu{
     }
     
     private JMenuItem exportNodeMenu(){
-        JMenuItem exportNodeData = new JMenuItem("Export Node Data");
-        exportNodeData.addActionListener((ActionEvent ae) -> {
-            JFileChooser destination = new JFileChooser();
-            destination.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int response = destination.showOpenDialog(destination);
-            if (response == JFileChooser.APPROVE_OPTION) {
-                File f = destination.getSelectedFile(); //this is a directory
-                File coordFile = Node.generateCoordFile(f.getAbsolutePath());
-                File connFile = Node.generateConnFile(f.getAbsolutePath());
-                
-                GoogleDriveUploader.uploadFile(coordFile);
-                GoogleDriveUploader.uploadFile(connFile);
-            }
-        });
-        return exportNodeData;
+        return new FileSelector(
+                "Export Node Data",
+                FileSelector.DIR,
+                (File f)->{
+                    File coordFile = Node.generateCoordFile(f.getAbsolutePath());
+                    File connFile = Node.generateConnFile(f.getAbsolutePath());
+                    
+                    GoogleDriveUploader.uploadFile(coordFile);
+                    GoogleDriveUploader.uploadFile(connFile);
+                }
+        );
     }
     
     private JMenuItem exportLabelMenu(){
