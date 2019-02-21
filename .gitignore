@@ -1,5 +1,6 @@
 *.class
-build/*
+build/build-jar.properties
+build/classes
 nbproject/private
 nbproject/private/private.xml
 *.html
