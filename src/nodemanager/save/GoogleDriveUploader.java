@@ -18,8 +18,13 @@ import com.google.api.services.drive.model.Revision;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -80,10 +85,11 @@ public class GoogleDriveUploader {
             MediaHttpUploader uploader = insert.getMediaHttpUploader();
             
             String id = googleFile.getId();
-            Revision pubToWeb = new Revision();
-            pubToWeb.setPublished(true);
-            pubToWeb.setPublishAuto(true);
             
+            
+            
+            //createFolder("whatever");
+            //System.out.println(getTodaysFolder().getId());
             
             uploader.setProgressListener((up) -> {
                 switch(up.getUploadState()){
@@ -102,7 +108,9 @@ public class GoogleDriveUploader {
             });
             googleFile.setName(orig.getName());
             
-            return insert.execute();
+            googleFile = insert.execute();
+            publishToWeb(googleFile);
+            
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -113,10 +121,54 @@ public class GoogleDriveUploader {
         return uploadFile(file, "text/csv");
     }
     
+    //not work
+    private static File getTodaysFolder(){
+        File folder = null;
+        try {
+            String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
+            drive.files().list().setQ("name='" + time + "'").execute().forEach((a, b) -> System.out.print(a + ", " + b.toString())); //not working
+            Set<String> folderIds = drive.files().list().setQ("name='" + time + "'").execute().keySet();
+            folderIds.forEach(n -> System.out.println(n));
+            if(folderIds.isEmpty()){
+                folderIds.add(createFolder(time).getId());
+                
+            }
+            folder = drive.files().get(folderIds.stream().findFirst().orElse(FOLDER_ID)).execute();
+            
+            //drive.files().list().setQ("name=" + time).execute().forEach((k, v) -> System.out.println(k + ", " + v));
+            //drive.files().get(FOLDER_ID).execute().values().forEach(a -> System.out.println(a));
+            
+            //drive.files().list().execute().getFiles().forEach(file -> System.out.println(file.getName()));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return folder;
+    }
+    
+    private static File createFolder(String title){
+        File folder = null;
+        try {
+            folder = new File();
+            
+            folder.setName(title);
+            folder.setMimeType("application/vnd.google-apps.folder");
+            ArrayList<String> parents = new ArrayList<>();
+            parents.add(FOLDER_ID);
+            folder.setParents(parents);
+            
+            folder = drive.files().create(folder).setFields("id").execute();
+            
+        } catch (IOException ex) {
+            
+        }
+        return folder;
+    }
+    
     private static void publishToWeb(File f) throws IOException{
         Revision pubToWeb = new Revision();
         pubToWeb.setPublished(true);
         pubToWeb.setPublishAuto(true);
+        System.out.println(f.getId());
         drive.revisions().update(f.getId(), FOLDER_ID, pubToWeb).execute();
     }
     
