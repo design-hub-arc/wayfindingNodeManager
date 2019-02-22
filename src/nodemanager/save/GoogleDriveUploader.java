@@ -168,8 +168,13 @@ public class GoogleDriveUploader {
         Revision pubToWeb = new Revision();
         pubToWeb.setPublished(true);
         pubToWeb.setPublishAuto(true);
-        System.out.println(f.getId());
-        drive.revisions().update(f.getId(), FOLDER_ID, pubToWeb).execute();
+        pubToWeb.setId("1");
+        
+        drive.revisions().list(f.getId());
+        
+        System.out.println(pubToWeb.getId());
+        
+        drive.revisions().update(f.getId(), pubToWeb.getId(), pubToWeb).execute(); //not working. What ID do I use?
     }
     
     private static Credential authorize() throws Exception{
