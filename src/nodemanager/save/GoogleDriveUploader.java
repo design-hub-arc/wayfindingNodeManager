@@ -113,6 +113,9 @@ public class GoogleDriveUploader {
             
         } catch (IOException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "If you received a 403 error, it could mean you tried to upload using your personal GMail account."
+                + " If you want to log in using your student email, delete the file " + STORE.getDataDirectory().getAbsolutePath()
+            );
         }
         return googleFile;
     }
@@ -170,11 +173,7 @@ public class GoogleDriveUploader {
         pubToWeb.setPublishAuto(true);
         pubToWeb.setId("1");
         
-        drive.revisions().list(f.getId());
-        
-        System.out.println(pubToWeb.getId());
-        
-        drive.revisions().update(f.getId(), pubToWeb.getId(), pubToWeb).execute(); //not working. What ID do I use?
+        //drive.revisions().update(f.getId(), pubToWeb.getId(), pubToWeb).execute(); //not working. What ID do I use?
     }
     
     private static Credential authorize() throws Exception{
