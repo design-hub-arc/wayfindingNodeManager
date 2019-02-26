@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import javafx.scene.input.KeyCode;
 import nodemanager.node.*;
 
 /**
@@ -113,6 +114,19 @@ public class EditCanvas extends JPanel {
             Session.redoLastAction();
         });
         menu.add(redo);
+        
+        
+        Session.registerControl(KeyStroke.getKeyStroke("control Z"), ()->{
+            for(ActionListener al : undo.getActionListeners()){
+                al.actionPerformed(null);
+            }
+        }, "undo");
+        
+        Session.registerControl(KeyStroke.getKeyStroke("control Y"), ()->{
+            for(ActionListener al : redo.getActionListeners()){
+                al.actionPerformed(null);
+            }
+        }, "redo");
 
         setBackground(Color.blue);
         revalidate();
