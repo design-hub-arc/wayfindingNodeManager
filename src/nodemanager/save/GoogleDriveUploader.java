@@ -15,9 +15,13 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import static java.lang.System.out;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -201,8 +205,19 @@ public class GoogleDriveUploader {
                 .setDataStoreFactory(STORE).build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
-
+    
+    
+    
     public static void main(String[] args) throws IOException{
-        getTodaysFolder();
+        InputStream response = drive.files().get("1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5").executeMedia().getContent();
+        BufferedReader br = new BufferedReader(new InputStreamReader(response));
+        while(br.ready()){
+            out.println(br.readLine());
+        }
+        
+                /*.forEach((k, v)->{
+            System.out.println(k + ", " + v);
+        });*/
+        //how to get file contents?
     }
 }
