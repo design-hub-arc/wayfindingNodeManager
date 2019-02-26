@@ -9,17 +9,15 @@ import nodemanager.node.Node;
 public class LabelRemovedEvent extends EditEvent{
     private final Node removedFrom;
     private final String label;
-    private final String labelType;
     
-    public LabelRemovedEvent(Node n, String s, String type){
+    public LabelRemovedEvent(Node n, String s){
         removedFrom = n;
         label = s;
-        labelType = type;
     }
     
     @Override
     public void undo() {
-        removedFrom.addLabel(labelType, label);
+        removedFrom.addLabel(label);
     }
     @Override
     public void redo(){

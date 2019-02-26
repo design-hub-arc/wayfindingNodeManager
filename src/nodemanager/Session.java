@@ -31,7 +31,10 @@ public class Session {
     public static int newMapY = 0;
     public static int newMapWidth = 0;
     public static int newMapHeight = 0;
+    public static boolean isSaved = true;
+    
     public static JPanel currentPanel = null;
+    
     
     //used to undo actions
     //add redo button?
@@ -42,7 +45,6 @@ public class Session {
      * A text component used to display the program's controls
      */
     public static final JTextArea CONTROL_LIST = new JTextArea("Controls:\n");
-    
     public static final JLabel MODE_LABEL = new JLabel("Current mode: " + Mode.NONE.toString());
     
     static{
@@ -137,6 +139,17 @@ public class Session {
     public static void logAction(EditEvent e){
         ACTIONS.add(e);
         actionIdx = ACTIONS.size() - 1;
+        Session.isSaved = false;
+    }
+    
+    /**
+     * Called after uploading the manifest.
+     * Clears all actions
+    */
+    public static void purgeActions(){
+        ACTIONS.clear();
+        actionIdx = -1;
+        Session.isSaved = true;
     }
     
     public static void undoLastAction(){
@@ -144,11 +157,16 @@ public class Session {
             ACTIONS.get(actionIdx).undo();
             actionIdx--;
         }
+        if(actionIdx == -1){
+            //no actions, so nothing to save
+            Session.isSaved = true;
+        }
     }
     public static void redoLastAction(){
         if(actionIdx < ACTIONS.size() - 1){
             actionIdx++;
             ACTIONS.get(actionIdx).redo();
+            Session.isSaved = false;
         }
     }
 }

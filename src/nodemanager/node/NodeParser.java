@@ -41,11 +41,10 @@ public class NodeParser {
      * adding labels to nodes.
      * 
      * @param s an InputStream generated from a csv file with a string in the first column, and an integer in the second
-     * @param labelType the type of label this file contains (room, building, etc)
      */
-    public static void parseTitleFile(InputStream s, String labelType){
+    public static void parseTitleFile(InputStream s){
         parseFile(s, (line) -> {
-            Node.get(Integer.parseInt(line[1].trim())).addLabel(labelType, line[0].trim());
+            Node.get(Integer.parseInt(line[1].trim())).addLabel(line[0].trim());
         });
     }
     

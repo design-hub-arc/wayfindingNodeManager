@@ -100,7 +100,7 @@ public class ImportMenu extends JMenu{
         });
     }
     private void importLabels(InputStream s){
-        NodeParser.parseTitleFile(s, "");
+        NodeParser.parseTitleFile(s);
     }
     
     

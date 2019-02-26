@@ -4,6 +4,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import nodemanager.Session;
 
 /**
  * Basic JFrame used to host the EditCanvas
@@ -19,7 +20,7 @@ public class Window extends JFrame{
         addWindowListener(new WindowAdapter(){
             @Override
             public void windowClosing(WindowEvent we) {
-                boolean close = JOptionPane.showConfirmDialog(
+                boolean close = Session.isSaved || JOptionPane.showConfirmDialog(
                         self, 
                         "You might have unsaved work, are you sure you want to exit?", 
                         "Warning", 

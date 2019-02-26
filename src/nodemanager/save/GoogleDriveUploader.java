@@ -72,10 +72,11 @@ public class GoogleDriveUploader {
      * Uploads a file to the google drive
      * @param orig the local file to upload
      * @param type the type of the file (text/csv, image/png)
+     * @param subfolderName the name of the folder to put the data in. The program creates this for you
      * @param suppressMessages whether or not to notify the user that files are being uploaded
      * @return the file after it has been uploaded to the google drive
      */
-    public static File uploadFile(java.io.File orig, String type, boolean suppressMessages){
+    public static File uploadFile(java.io.File orig, String type, String subfolderName, boolean suppressMessages){
         File googleFile = null;
         
         try {
@@ -84,7 +85,7 @@ public class GoogleDriveUploader {
             
             
             ArrayList<String> parents = new ArrayList<>();
-            parents.add(getTodaysFolder().getId());
+            parents.add(getFolderByName(subfolderName).getId());
             googleFile.setParents(parents);
             
             
@@ -121,32 +122,30 @@ public class GoogleDriveUploader {
         return googleFile;
     }
     
-    public static File uploadFile(java.io.File orig, String type){
-        return uploadFile(orig, type, false);
+    public static File uploadFile(java.io.File orig, String type, String subfolderName){
+        return uploadFile(orig, type, subfolderName, false);
     }
     
-    public static File uploadCsv(java.io.File file, boolean suppressMessages){
-        return uploadFile(file, "text/csv", suppressMessages);
+    public static File uploadCsv(java.io.File file, String subfolderName, boolean suppressMessages){
+        return uploadFile(file, "text/csv", subfolderName, suppressMessages);
     }
     
-    public static File uploadCsv(java.io.File file){
-        return uploadCsv(file, false);
+    public static File uploadCsv(java.io.File file, String subfolderName){
+        return uploadCsv(file, subfolderName, false);
     }
     
-    private static File getTodaysFolder(){
+    private static File getFolderByName(String name){
         File folder = null;
         try {
-            String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-            
             drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false").execute().getFiles().forEach((file) -> {
                 System.out.println(file.getName());
             });
             
-            List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + time + "'").execute().getFiles();
+            List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + name + "'").execute().getFiles();
             folders.forEach(n -> System.out.println(n));
             
             if(folders.isEmpty()){
-                folders.add(createFolder(time));
+                folders.add(createFolder(name));
                 
             }
             folder = drive.files().get(folders.stream().findFirst().get().getId()).execute();
@@ -155,6 +154,10 @@ public class GoogleDriveUploader {
             ex.printStackTrace();
         }
         return folder;
+    }
+    
+    private static File getTodaysFolder(){
+        return getFolderByName(new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime()));
     }
     
     private static File createFolder(String title){
@@ -214,10 +217,5 @@ public class GoogleDriveUploader {
         while(br.ready()){
             out.println(br.readLine());
         }
-        
-                /*.forEach((k, v)->{
-            System.out.println(k + ", " + v);
-        });*/
-        //how to get file contents?
     }
 }

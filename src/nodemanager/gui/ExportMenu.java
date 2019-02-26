@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import nodemanager.Session;
 import nodemanager.node.Node;
 import nodemanager.save.GoogleDriveUploader;
 import nodemanager.save.WayfindingManifest;
@@ -26,12 +28,12 @@ public class ExportMenu extends JMenu{
         
         listener = notify;
         
-        add(exportNodeMenu());
-        add(exportLabelMenu());
-        add(exportMapMenu());
+        //add(exportNodeMenu());
+        //add(exportLabelMenu());
+        //add(exportMapMenu());
         add(exportManifest());
     }
-    
+    /*
     private JMenuItem exportNodeMenu(){
         return new FileSelector(
                 "Export Node Data",
@@ -64,14 +66,17 @@ public class ExportMenu extends JMenu{
             }
         );
         return saveMap;
-    }
+    }*/
     
     private JMenuItem exportManifest(){
         return new FileSelector(
-                "Export manifest",
+                "Export everything",
                 FileSelector.DIR,
                 (File f)->{
-                    GoogleDriveUploader.uploadCsv(new WayfindingManifest().export(f.getAbsolutePath()));
+                    String folderName = JOptionPane.showInputDialog(this, "What do you want to call this import?");
+                    GoogleDriveUploader.uploadCsv(new WayfindingManifest(folderName).export(f.getAbsolutePath()), folderName);
+                    GoogleDriveUploader.uploadFile(listener.saveImage(), "image/png", folderName);
+                    Session.purgeActions();
                 }
         );
     }

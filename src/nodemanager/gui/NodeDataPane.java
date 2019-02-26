@@ -74,14 +74,9 @@ public class NodeDataPane extends JComponent{
         });
         
         addOption("Add a label", () -> {
-            String type = JOptionPane.showInputDialog("Enter the type of label you are adding. "
-                    + "Current types include " 
-                    + Arrays.toString(Node.getLabelTypes())
-            );
-            
             String ip = JOptionPane.showInputDialog("Enter the label to add to this node: ");
-            if(selectedNode.addLabel(type, ip)){
-                Session.logAction(new LabelAddedEvent(selectedNode, ip, type));
+            if(selectedNode.addLabel(ip)){
+                Session.logAction(new LabelAddedEvent(selectedNode, ip));
                 selectNode(selectedNode); //reload node description
             } else {
                 JOptionPane.showMessageDialog(null, "Label '" + ip + "' is already in use.");
@@ -90,9 +85,8 @@ public class NodeDataPane extends JComponent{
         
         addOption("Remove a label", () -> {
             String ip = JOptionPane.showInputDialog("Enter the label to remove from this node: ");
-            String type = Node.getLabelType(ip);
             if(selectedNode.removeLabel(ip)){
-                Session.logAction(new LabelRemovedEvent(selectedNode, ip, type));
+                Session.logAction(new LabelRemovedEvent(selectedNode, ip));
                 selectNode(selectedNode); //reload node description
             }
         });

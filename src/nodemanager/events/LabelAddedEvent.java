@@ -9,12 +9,10 @@ import nodemanager.node.Node;
 public class LabelAddedEvent extends EditEvent{
     private final Node addedTo;
     private final String label;
-    private final String labelType;
     
-    public LabelAddedEvent(Node n, String s, String type){
+    public LabelAddedEvent(Node n, String s){
         addedTo = n;
         label = s;
-        labelType = type;
     }
 
     @Override
@@ -24,6 +22,6 @@ public class LabelAddedEvent extends EditEvent{
 
     @Override
     public void redo() {
-        addedTo.addLabel(labelType, label);
+        addedTo.addLabel(label);
     }
 }

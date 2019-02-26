@@ -19,23 +19,25 @@ import nodemanager.node.Node;
  */
 public class WayfindingManifest {
     private final String title;
+    private final String inDriveFolder;
     private final HashMap<String, String> urls;
     
-    public WayfindingManifest(){
+    public WayfindingManifest(String folderName){
         title = "manifest" + new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime()) + ".csv";
+        inDriveFolder = folderName;
         urls = new HashMap<>();
     }
     
     public void populate(String path){
         com.google.api.services.drive.model.File googleFile = null;
         
-        googleFile = GoogleDriveUploader.uploadCsv(Node.generateCoordFile(path), true);
+        googleFile = GoogleDriveUploader.uploadCsv(Node.generateCoordFile(path), inDriveFolder, true);
         urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         
-        googleFile = GoogleDriveUploader.uploadCsv(Node.generateConnFile(path), true);
+        googleFile = GoogleDriveUploader.uploadCsv(Node.generateConnFile(path), inDriveFolder, true);
         urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         
-        googleFile = GoogleDriveUploader.uploadCsv(Node.generateLabelFile(path), true);
+        googleFile = GoogleDriveUploader.uploadCsv(Node.generateLabelFile(path), inDriveFolder, true);
         urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
     }
     
