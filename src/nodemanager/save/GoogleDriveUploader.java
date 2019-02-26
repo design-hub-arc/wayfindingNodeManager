@@ -14,6 +14,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.Permission;
 import com.google.api.services.drive.model.Revision;
 
 import java.io.IOException;
@@ -129,7 +130,9 @@ public class GoogleDriveUploader {
         File folder = null;
         try {
             String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-            drive.files().list().setQ("name='" + time + "'").execute().forEach((a, b) -> System.out.print(a + ", " + b.toString())); //not working
+            drive.files().list().setQ("parents in " + FOLDER_ID).execute().forEach((a, b) -> System.out.print(a + ", " + b.toString())); //not working
+            //untested
+            
             Set<String> folderIds = drive.files().list().setQ("name='" + time + "'").execute().keySet();
             folderIds.forEach(n -> System.out.println(n));
             if(folderIds.isEmpty()){
@@ -173,6 +176,12 @@ public class GoogleDriveUploader {
         pubToWeb.setPublishAuto(true);
         pubToWeb.setId("1");
         
+        Permission p = new Permission();
+        p.setType("anyone");
+        p.setAllowFileDiscovery(true);
+        p.setRole("reader");
+        drive.permissions().create(f.getId(), p).execute();
+        
         //drive.revisions().update(f.getId(), pubToWeb.getId(), pubToWeb).execute(); //not working. What ID do I use?
     }
     
@@ -196,5 +205,12 @@ public class GoogleDriveUploader {
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP, JSON, clientInfo, Collections.singleton(DriveScopes.DRIVE))
                 .setDataStoreFactory(STORE).build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+    }
+
+    public static void main(String[] args) throws IOException{
+        drive.permissions().list("1Iz-CzJLD04tAzfzt73tp1CxoGWGxZbNo").execute().forEach((k, v) -> {
+            System.out.println(k + ", " + v);
+        });
+        publishToWeb(drive.files().get("1bFY6eGQxUR7RsxENkHv0mh229rQROhox").execute());
     }
 }
