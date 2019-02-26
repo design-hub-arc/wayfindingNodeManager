@@ -15,7 +15,6 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
-import com.google.api.services.drive.model.Revision;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,9 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -71,42 +68,41 @@ public class GoogleDriveUploader {
      * Uploads a file to the google drive
      * @param orig the local file to upload
      * @param type the type of the file (text/csv, image/png)
+     * @param suppressMessages whether or not to notify the user that files are being uploaded
      * @return the file after it has been uploaded to the google drive
      */
-    public static File uploadFile(java.io.File orig, String type){
+    public static File uploadFile(java.io.File orig, String type, boolean suppressMessages){
         File googleFile = null;
         
         try {
             googleFile = new File();
-            FileContent content = new FileContent("text/csv", orig);
+            FileContent content = new FileContent(type, orig);
+            
+            
             ArrayList<String> parents = new ArrayList<>();
-            parents.add(FOLDER_ID);
+            parents.add(getTodaysFolder().getId());
             googleFile.setParents(parents);
+            
+            
+            
             Drive.Files.Create insert = drive.files().create(googleFile, content);
             MediaHttpUploader uploader = insert.getMediaHttpUploader();
             
-            String id = googleFile.getId();
-            
-            
-            
-            //createFolder("whatever");
-            //System.out.println(getTodaysFolder().getId());
-            
-            uploader.setProgressListener((up) -> {
-                switch(up.getUploadState()){
-                    case INITIATION_STARTED:
-                        JOptionPane.showMessageDialog(null, "Beginning upload to the google drive...");
-                        break;
-                    case MEDIA_COMPLETE:
-                        JOptionPane.showMessageDialog(null, "Upload successful! drive.google.com/folders/" + FOLDER_ID); //not able to copy-paste
-                        //publishToWeb(googleFile);
-                        break;
-                    default:
-                        System.out.println(orig.getName() + ": " + up.getUploadState());
-                        break;
-                }
-                
-            });
+            if(!suppressMessages){
+                uploader.setProgressListener((up) -> {
+                    switch(up.getUploadState()){
+                        case INITIATION_STARTED:
+                            JOptionPane.showMessageDialog(null, "Beginning upload to the google drive...");
+                            break;
+                        case MEDIA_COMPLETE:
+                            JOptionPane.showMessageDialog(null, "Upload successful!");
+                            break;
+                        default:
+                            System.out.println(orig.getName() + ": " + up.getUploadState());
+                            break;
+                    }    
+                });
+            }
             googleFile.setName(orig.getName());
             
             googleFile = insert.execute();
@@ -121,30 +117,36 @@ public class GoogleDriveUploader {
         return googleFile;
     }
     
-    public static File uploadCsv(java.io.File file){
-        return uploadFile(file, "text/csv");
+    public static File uploadFile(java.io.File orig, String type){
+        return uploadFile(orig, type, false);
     }
     
-    //not work
+    public static File uploadCsv(java.io.File file, boolean suppressMessages){
+        return uploadFile(file, "text/csv", suppressMessages);
+    }
+    
+    public static File uploadCsv(java.io.File file){
+        return uploadCsv(file, false);
+    }
+    
     private static File getTodaysFolder(){
         File folder = null;
         try {
             String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-            drive.files().list().setQ("parents in " + FOLDER_ID).execute().forEach((a, b) -> System.out.print(a + ", " + b.toString())); //not working
-            //untested
             
-            Set<String> folderIds = drive.files().list().setQ("name='" + time + "'").execute().keySet();
-            folderIds.forEach(n -> System.out.println(n));
-            if(folderIds.isEmpty()){
-                folderIds.add(createFolder(time).getId());
+            drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false").execute().getFiles().forEach((file) -> {
+                System.out.println(file.getName());
+            });
+            
+            List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + time + "'").execute().getFiles();
+            folders.forEach(n -> System.out.println(n));
+            
+            if(folders.isEmpty()){
+                folders.add(createFolder(time));
                 
             }
-            folder = drive.files().get(folderIds.stream().findFirst().orElse(FOLDER_ID)).execute();
-            
-            //drive.files().list().setQ("name=" + time).execute().forEach((k, v) -> System.out.println(k + ", " + v));
-            //drive.files().get(FOLDER_ID).execute().values().forEach(a -> System.out.println(a));
-            
-            //drive.files().list().execute().getFiles().forEach(file -> System.out.println(file.getName()));
+            folder = drive.files().get(folders.stream().findFirst().get().getId()).execute();
+            System.out.println(folder);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -165,24 +167,17 @@ public class GoogleDriveUploader {
             folder = drive.files().create(folder).setFields("id").execute();
             
         } catch (IOException ex) {
-            
+            ex.printStackTrace();
         }
         return folder;
     }
     
     private static void publishToWeb(File f) throws IOException{
-        Revision pubToWeb = new Revision();
-        pubToWeb.setPublished(true);
-        pubToWeb.setPublishAuto(true);
-        pubToWeb.setId("1");
-        
         Permission p = new Permission();
         p.setType("anyone");
         p.setAllowFileDiscovery(true);
         p.setRole("reader");
         drive.permissions().create(f.getId(), p).execute();
-        
-        //drive.revisions().update(f.getId(), pubToWeb.getId(), pubToWeb).execute(); //not working. What ID do I use?
     }
     
     private static Credential authorize() throws Exception{
@@ -208,9 +203,6 @@ public class GoogleDriveUploader {
     }
 
     public static void main(String[] args) throws IOException{
-        drive.permissions().list("1Iz-CzJLD04tAzfzt73tp1CxoGWGxZbNo").execute().forEach((k, v) -> {
-            System.out.println(k + ", " + v);
-        });
-        publishToWeb(drive.files().get("1bFY6eGQxUR7RsxENkHv0mh229rQROhox").execute());
+        getTodaysFolder();
     }
 }

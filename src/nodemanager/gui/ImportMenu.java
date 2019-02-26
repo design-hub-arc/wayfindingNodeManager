@@ -112,24 +112,28 @@ public class ImportMenu extends JMenu{
             importMap(getClass().getResourceAsStream("/map.png"));
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println("Try running clean/build");
         }
         
         try {
             importNodes(getClass().getResourceAsStream("/nodeData.csv"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Try running clean/build");
         }
         
         try {
             importConns(getClass().getResourceAsStream("/nodeConnections.csv"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Try running clean/build");
         }
         
         try{
             importLabels(getClass().getResourceAsStream("/labels.csv"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Try running clean/build");
         }
     }
 }
