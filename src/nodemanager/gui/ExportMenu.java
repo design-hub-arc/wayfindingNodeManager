@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import nodemanager.Session;
 import nodemanager.node.Node;
 import nodemanager.save.GoogleDriveUploader;
+import nodemanager.save.NodeCoordFile;
 import nodemanager.save.WayfindingManifest;
 
 
@@ -31,6 +32,7 @@ public class ExportMenu extends JMenu{
         //add(exportNodeMenu());
         //add(exportLabelMenu());
         //add(exportMapMenu());
+        add(saveLocal());
         add(exportManifest());
     }
     /*
@@ -67,7 +69,16 @@ public class ExportMenu extends JMenu{
         );
         return saveMap;
     }*/
-    
+    private JMenuItem saveLocal(){
+        return new FileSelector(
+                "Save to this computer",
+                FileSelector.DIR,
+                (File f)->{
+                    String name = JOptionPane.showInputDialog(this, "What do you want to call this save?");
+                    new NodeCoordFile(name).save(f.getAbsolutePath());
+                }
+        );
+    }
     private JMenuItem exportManifest(){
         return new FileSelector(
                 "Export everything",

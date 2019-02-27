@@ -1,6 +1,7 @@
 package nodemanager.save;
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -14,35 +15,38 @@ public abstract class AbstractWayfindingFile {
     private java.io.File localCopy; // The local version of this file
     private String driveId;         // The fileId of this' copy in the google drive
     private String folderName;      // The name of the folder this' copy is in in the google drive
-    private final String type; //todo change to an Enum with extention and MIME type parameters
+    private final FileType type; 
     
-    private static String NL = System.getProperty("line.separator");
+    public static String NL = System.getProperty("line.separator");
     
-    public AbstractWayfindingFile(String title, String mimeType){
+    public AbstractWayfindingFile(String title, FileType t){
         name = title;
         localCopy = null;
         driveId = null;
         folderName = null;
-        type = mimeType;
+        type = t;
     }
     
-    //not done
+    public abstract void writeContents(BufferedWriter buff) throws IOException;
+    
     public final java.io.File save(String directory){
         localCopy = null;
         BufferedWriter out = null;
-        /*
+        
         try{
-            localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type);
-            
+            localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileType());
+            out = new BufferedWriter(new FileWriter(localCopy.getAbsolutePath()));
+            writeContents(out);
+            out.close();
         } catch(IOException ex){
-            
-        }*/
+            ex.printStackTrace();
+        }
         
         return localCopy;
     }
     
     public final com.google.api.services.drive.model.File upload(boolean suppressMessages){
-        return GoogleDriveUploader.uploadFile(localCopy, type, folderName, suppressMessages);
+        return GoogleDriveUploader.uploadFile(localCopy, type.getDriveType(), folderName, suppressMessages);
     }
     public final com.google.api.services.drive.model.File upload(){
         return upload(false);
