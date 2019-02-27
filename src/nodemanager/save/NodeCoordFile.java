@@ -1,35 +1,28 @@
 package nodemanager.save;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import nodemanager.node.Node;
 
 /**
- *
+ * Used as an interface to easily save the Node connection data
+ * to either the computer or the google drive
  * @author Matt Crow
  */
 public class NodeCoordFile extends AbstractWayfindingFile{
-    
     public NodeCoordFile(String title){
-        super(title, FileType.CSV);
+        super(title + "NodeCoords", FileType.CSV);
     }
 
     /**
-     * writes the node data to a node coordinate file
-     * @param buff a BufferedWriter connected to a csv file
-     * @throws IOException
+     * gets 
+     * @return 
      */
     @Override
-    public void writeContents(BufferedWriter buff) throws IOException{
-        buff.write("id, x, y");
-        for(Node n : Node.getAll()){
-            buff.write(NL + n.getCoordLine());
-        }
-    }
-    
-    
-    public static void main(String[] args){
-        NodeCoordFile f = new NodeCoordFile("test");
-        f.save("C:\\Users\\w1599227\\Desktop");
+    public final String getContents(){
+        StringBuilder s = new StringBuilder("id, x, y");
+        
+        Node.getAll().forEach((n) -> {
+            s.append(NL).append(n.getCoordLine());
+        });
+        return s.toString();
     }
 }

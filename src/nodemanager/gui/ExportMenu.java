@@ -6,10 +6,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import nodemanager.Session;
-import nodemanager.node.Node;
-import nodemanager.save.GoogleDriveUploader;
-import nodemanager.save.NodeCoordFile;
-import nodemanager.save.WayfindingManifest;
+import nodemanager.save.*;
 
 
 /**
@@ -29,53 +26,22 @@ public class ExportMenu extends JMenu{
         
         listener = notify;
         
-        //add(exportNodeMenu());
-        //add(exportLabelMenu());
-        //add(exportMapMenu());
         add(saveLocal());
         add(exportManifest());
     }
-    /*
-    private JMenuItem exportNodeMenu(){
-        return new FileSelector(
-                "Export Node Data",
-                FileSelector.DIR,
-                (File f)->{
-                    File coordFile = Node.generateCoordFile(f.getAbsolutePath());
-                    File connFile = Node.generateConnFile(f.getAbsolutePath());
-                    
-                    GoogleDriveUploader.uploadCsv(coordFile);
-                    GoogleDriveUploader.uploadCsv(connFile);
-                }
-        );
-    }
     
-    private JMenuItem exportLabelMenu(){
-        return new FileSelector(
-                "Export labels",
-                FileSelector.DIR,
-                (File f)->{
-                    File labelFile = Node.generateLabelFile(f.getAbsolutePath());
-                    GoogleDriveUploader.uploadCsv(labelFile);
-                }
-        );
-    }
-    
-    private JMenuItem exportMapMenu(){
-        JMenuItem saveMap = new JMenuItem("Export map");
-        saveMap.addActionListener((ActionEvent e) -> {
-                GoogleDriveUploader.uploadFile(listener.saveImage(), "image/png");
-            }
-        );
-        return saveMap;
-    }*/
     private JMenuItem saveLocal(){
         return new FileSelector(
                 "Save to this computer",
                 FileSelector.DIR,
                 (File f)->{
                     String name = JOptionPane.showInputDialog(this, "What do you want to call this save?");
-                    new NodeCoordFile(name).save(f.getAbsolutePath());
+                    File newDir = new File(f.getAbsoluteFile() + File.separator + name);
+                    newDir.mkdir();
+                    new NodeCoordFile(name).save(newDir.getAbsolutePath());
+                    new NodeConnFile(name).save(newDir.getAbsolutePath());
+                    new NodeLabelFile(name).save(newDir.getAbsolutePath());
+                    listener.saveImage();
                 }
         );
     }

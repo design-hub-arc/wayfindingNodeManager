@@ -8,37 +8,53 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import nodemanager.node.Node;
 
 /**
- * Work in progress. Will create a manifest file containing all the currently active data,
+ * creates a manifest file containing all the currently active data,
  * then upload each file to the google drive,
  * export them to the web,
  * and paste their URLs into the manifest
  * @author Matt Crow
+ * 
+ * 
+ * make this extend abstractwayfindingfile
+ * TODO: make this able to save a local copy?
  */
 public class WayfindingManifest {
+    private final String prefix;
     private final String title;
     private final String inDriveFolder;
     private final HashMap<String, String> urls;
     
     public WayfindingManifest(String folderName){
-        title = "manifest" + new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime()) + ".csv";
+        title = folderName + "manifest.csv";
+        prefix = folderName;
         inDriveFolder = folderName;
         urls = new HashMap<>();
     }
     
     public void populate(String path){
         com.google.api.services.drive.model.File googleFile = null;
+        try{
+            googleFile = new NodeCoordFile(prefix).upload(inDriveFolder, true);
+            urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        } catch(IOException ex){
+            ex.printStackTrace();
+        }
         
-        googleFile = GoogleDriveUploader.uploadCsv(Node.generateCoordFile(path), inDriveFolder, true);
-        urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        try{
+            googleFile = new NodeConnFile(prefix).upload(inDriveFolder, true);
+            urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        } catch(IOException ex){
+            ex.printStackTrace();
+        }
         
-        googleFile = GoogleDriveUploader.uploadCsv(Node.generateConnFile(path), inDriveFolder, true);
-        urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
-        
-        googleFile = GoogleDriveUploader.uploadCsv(Node.generateLabelFile(path), inDriveFolder, true);
-        urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        try{
+            googleFile = new NodeLabelFile(prefix).upload(inDriveFolder, true);
+            urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        } catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
     
     public File export(String path){

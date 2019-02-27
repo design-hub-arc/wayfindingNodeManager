@@ -1,10 +1,8 @@
 package nodemanager.node;
 
-import java.io.*;
 import java.util.*;
 import nodemanager.gui.NodeIcon;
 import static java.lang.System.out;
-import java.text.SimpleDateFormat;
 
 
 /**
@@ -325,92 +323,5 @@ public class Node{
         });
         
         return ret.toString();
-    }
-    
-    
-    //move to uploader class?
-    /**
-     * Creates a file containing the node coordinate data at the specified directory,
-     * then returns the file, or null if it failed
-     * @param path
-     * @return the newly created file
-     */
-    public static File generateCoordFile(String path){
-        File nodeFile = null;
-        BufferedWriter out = null;
-        String nl = System.getProperty("line.separator");
-        
-        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-        
-        try {
-            nodeFile = new File(path + File.separator + "nodeData" + time + ".csv");
-            
-            out = new BufferedWriter(new FileWriter(nodeFile.getAbsolutePath()));
-            out.write("id, x, y" + nl);
-            for(Node n : allNodes.values()){
-                out.write(n.getCoordLine() + nl);
-            }
-            out.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return nodeFile;
-    }
-    
-    /**
-     * Creates a file containing the node connection data at the specified directory,
-     * then returns the file, or null if it failed
-     * @param path
-     * @return the newly created file
-     */
-    public static File generateConnFile(String path){
-        File connectFile = null;
-        BufferedWriter out = null;
-        String nl = System.getProperty("line.separator");
-        
-        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-        
-        try {
-            connectFile = new File(path + File.separator + "nodeConnections" + time + ".csv");
-            
-            out = new BufferedWriter(new FileWriter(connectFile.getAbsoluteFile()));
-            for(Node n : allNodes.values()){
-                for(int id : n.adjacentIds){
-                    out.write(n.id + ", " + id + nl);
-                }
-            }
-            out.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return connectFile;
-    }
-    
-    /**
-     * Creates a file containing the node label data at the specified directory,
-     * then returns the file, or null if it failed
-     * @param path
-     * @return the newly created file
-     */
-    public static File generateLabelFile(String path){
-        File labelFile = null;
-        BufferedWriter out = null;
-        String nl = System.getProperty("line.separator");
-        
-        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-        
-        try {
-            labelFile = new File(path + File.separator + "label" + time + ".csv");
-            
-            out = new BufferedWriter(new FileWriter(labelFile.getAbsolutePath()));
-            out.write("label, id" + nl);
-            for(Node n : allNodes.values()){
-                out.write(n.getLabelLines());
-            }
-            out.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return labelFile;
     }
 }
