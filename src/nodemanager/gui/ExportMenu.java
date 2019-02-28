@@ -54,7 +54,7 @@ public class ExportMenu extends JMenu{
                 new WayfindingManifest(folderName).upload(folderName);
                 GoogleDriveUploader.uploadFile(listener.saveImage(folderName), "image/png", folderName);
                 Session.purgeActions();
-            } catch(IOException ex){
+            } catch(Exception ex){
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(
                         this, 
