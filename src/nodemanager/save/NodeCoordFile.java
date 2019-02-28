@@ -1,28 +1,60 @@
 package nodemanager.save;
 
+import java.io.InputStream;
 import nodemanager.node.Node;
+import nodemanager.node.NodeParser;
 
 /**
  * Used as an interface to easily save the Node connection data
  * to either the computer or the google drive
+ * 
+ * 
+ * TODO: make AbstractCsvFile class
  * @author Matt Crow
  */
 public class NodeCoordFile extends AbstractWayfindingFile{
     public NodeCoordFile(String title){
         super(title + "NodeCoords", FileType.CSV);
     }
+    
+    public NodeCoordFile(){
+        this("temp");
+    }
 
     /**
-     * gets 
-     * @return 
+     * generates the contents of a csv file containing the data of all the nodes used by the program.
+     * The csv has three columns: the node's ID, and the x and y coordinates of that node's icon on the canvas
+     * each row is a separate node.
+     * @return the file's contents
      */
     @Override
-    public final String getContents(){
+    public final String getContentsToWrite(){
         StringBuilder s = new StringBuilder("id, x, y");
         
         Node.getAll().forEach((n) -> {
-            s.append(NL).append(n.getCoordLine());
+            s
+                    .append(NL)
+                    .append(n.id)
+                    .append(", ")
+                    .append(n.getIcon().getX())
+                    .append(", ")
+                    .append(n.getIcon().getY());
         });
         return s.toString();
+    }
+
+    /**
+     * Reads an InputStream, creating new Nodes based on the data.
+     * @param s an InputStream from a node file
+     */
+    @Override
+    public void readStream(InputStream s) {
+        NodeParser.parseFile(s, (line)->{
+            new Node(
+                    Integer.parseInt(line[0].trim()),
+                    Integer.parseInt(line[1].trim()),
+                   Integer.parseInt(line[2].trim())
+            );
+        });
     }
 }

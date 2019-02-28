@@ -6,6 +6,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import nodemanager.*;
 import nodemanager.node.*;
+import nodemanager.save.NodeConnFile;
+import nodemanager.save.NodeCoordFile;
+import nodemanager.save.NodeLabelFile;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
@@ -71,7 +74,7 @@ public class ImportMenu extends JMenu{
     }
     private void importNodes(InputStream s){
         Node.removeAll();
-        NodeParser.parseNodeFile(s);
+        new NodeCoordFile().readStream(s);
         listener.refreshNodes();
     }
     
@@ -79,14 +82,14 @@ public class ImportMenu extends JMenu{
     private JMenuItem importConnMenu(){
         return new FileSelector("Select connection file", FileSelector.CSV, (File f) -> {
             try {
-                NodeParser.parseConnFile(new FileInputStream(f));
+                importConns(new FileInputStream(f));
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
             }
         });
     }
     private void importConns(InputStream s){
-        NodeParser.parseConnFile(s);
+        new NodeConnFile().readStream(s);
     }
     
     
@@ -100,7 +103,7 @@ public class ImportMenu extends JMenu{
         });
     }
     private void importLabels(InputStream s){
-        NodeParser.parseTitleFile(s);
+        new NodeLabelFile().readStream(s);
     }
     
     

@@ -231,6 +231,10 @@ public class Node{
         return adjacentIds;
     }
     
+    public String[] getLabels(){
+        return Arrays.copyOf(labels.toArray(), labels.size(), String[].class);
+    }
+    
     /**
      * checks if this node has the given label,
      * ignoring case.
@@ -295,33 +299,5 @@ public class Node{
             out.println("");
             n.displayData();
         }
-    }
-    
-    /**
-     * Returns this node's line in the coordinate csv file, without the end of line character
-     * @return a csv representation of this node's coordinates
-     */
-    public String getCoordLine(){
-        return new StringBuilder()
-                .append(id)
-                .append(',')
-                .append(getIcon().getX())
-                .append(',')
-                .append(getIcon().getY())
-                .toString();
-    }
-    
-    /**
-     * Gets this node's lines in the label csv file, 
-     * with the end of line character at the end of each line
-     * @return a csv representation of this node's labels
-     */
-    public String getLabelLines(){
-        StringBuilder ret = new StringBuilder();
-        labels.stream().forEach(l -> {
-           ret.append(l).append(',').append(id).append(System.lineSeparator());
-        });
-        
-        return ret.toString();
     }
 }
