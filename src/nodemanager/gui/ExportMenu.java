@@ -2,6 +2,7 @@ package nodemanager.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -41,20 +42,29 @@ public class ExportMenu extends JMenu{
                     new NodeCoordFile(name).save(newDir.getAbsolutePath());
                     new NodeConnFile(name).save(newDir.getAbsolutePath());
                     new NodeLabelFile(name).save(newDir.getAbsolutePath());
-                    listener.saveImage();
+                    listener.saveImage(name, newDir.getAbsolutePath());
                 }
         );
     }
     private JMenuItem exportManifest(){
-        return new FileSelector(
-                "Export everything",
-                FileSelector.DIR,
-                (File f)->{
-                    String folderName = JOptionPane.showInputDialog(this, "What do you want to call this import?");
-                    GoogleDriveUploader.uploadCsv(new WayfindingManifest(folderName).export(f.getAbsolutePath()), folderName);
-                    GoogleDriveUploader.uploadFile(listener.saveImage(), "image/png", folderName);
-                    Session.purgeActions();
-                }
-        );
+        JMenuItem j = new JMenuItem("Export Everything");
+        j.addActionListener((ActionEvent e) -> {
+            String folderName = JOptionPane.showInputDialog(this, "What do you want to call this import?");
+            try{
+                new WayfindingManifest(folderName).upload(folderName);
+                GoogleDriveUploader.uploadFile(listener.saveImage(folderName), "image/png", folderName);
+                Session.purgeActions();
+            } catch(IOException ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        this, 
+                        "An error occured while uploading to the drive, so let's save a local copy", 
+                        "Not good!", 
+                        JOptionPane.ERROR_MESSAGE
+                );
+                System.err.println("not done with ExportMenu.exportManifest");
+            }
+        });
+        return j;
     }
 }

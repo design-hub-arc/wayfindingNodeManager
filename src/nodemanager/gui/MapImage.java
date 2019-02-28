@@ -7,8 +7,12 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.event.*;
 import static java.lang.System.out;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.*;
@@ -379,18 +383,32 @@ public class MapImage extends JLabel{
 
     /**
      * exports the map image to a directory
+     * @param name what to append to the beginning of the file name: nameMapImage.png 
+     * @param path the directory to save the image to
      * @return the newly created file
      */
-    public File saveImage() {
+    public File saveImage(String name, String path) {
         File f = null;
-        JFileChooser cd = new JFileChooser();
-        cd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         try {
-            if (cd.showDialog(cd, "Select a location to place the new map file") == JFileChooser.APPROVE_OPTION) {
-                String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-                f = new File(cd.getSelectedFile().getPath() + File.separator + "mapImage" + time + ".png");
-                ImageIO.write(buff, "png", f);
-            }
+            f = new File(path + File.separator + "MapImage.png");
+            ImageIO.write(buff, "png", f);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return f;
+    }
+    
+    /**
+     * Creates a temporary file with the given name 
+     * @param name appended to the beginning of the file name: nameMapImage.png
+     * @return the newly created file
+    */
+    public File saveImage(String name){
+        File f = null;
+        try {
+            f = new File(name + "MapImage.png");
+            f.deleteOnExit();
+            ImageIO.write(buff, "png", f);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

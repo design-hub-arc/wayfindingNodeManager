@@ -1,11 +1,7 @@
 package nodemanager.save;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,23 +13,21 @@ import java.util.Map;
  * @author Matt Crow
  * 
  * 
- * make this extend abstractwayfindingfile
  * TODO: make this able to save a local copy?
  */
-public class WayfindingManifest {
+public class WayfindingManifest extends AbstractWayfindingFile{
     private final String prefix;
-    private final String title;
     private final String inDriveFolder;
     private final HashMap<String, String> urls;
     
     public WayfindingManifest(String folderName){
-        title = folderName + "manifest.csv";
+        super(folderName + "Manifest", FileType.CSV);
         prefix = folderName;
         inDriveFolder = folderName;
         urls = new HashMap<>();
     }
     
-    public void populate(String path){
+    private final void populate(){
         com.google.api.services.drive.model.File googleFile = null;
         try{
             googleFile = new NodeCoordFile(prefix).upload(inDriveFolder, true);
@@ -56,30 +50,23 @@ public class WayfindingManifest {
             ex.printStackTrace();
         }
     }
-    
-    public File export(String path){
-        File f = null;
-        BufferedWriter out = null;
-        String nl = System.getProperty("line.separator");
-        
-        String time = new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime());
-        
-        populate(path);
-        
-        try {
-            f = new File(path + File.separator + "wayfindingManifest" + time + ".csv");
-            
-            out = new BufferedWriter(new FileWriter(f.getAbsolutePath()));
-            out.write("Data, URL" + nl);
-            
-            for(Map.Entry<String, String> entry : urls.entrySet()){
-                out.write(entry.getKey() + ", " + entry.getValue() + nl);
+
+    @Override
+    public String getContentsToWrite() {
+        populate();
+        StringBuilder sb = new StringBuilder("Data, URL");
+        for(Map.Entry<String, String> entry : urls.entrySet()){
+                sb
+                        .append(NL)
+                        .append(entry.getKey())
+                        .append(", ")
+                        .append(entry.getValue());
             }
-            
-            out.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return f;
+        return sb.toString();
+    }
+
+    @Override
+    public void readStream(InputStream s) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

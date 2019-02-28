@@ -6,7 +6,8 @@ package nodemanager.save;
  * @author Matt Crow
  */
 public enum FileType {
-    CSV("csv", "text/csv");
+    CSV("csv", "text/csv"),
+    PNG("png", "image/png");
     
     private final String extention;
     private final String driveType;
