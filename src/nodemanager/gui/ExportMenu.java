@@ -51,18 +51,21 @@ public class ExportMenu extends JMenu{
         j.addActionListener((ActionEvent e) -> {
             String folderName = JOptionPane.showInputDialog(this, "What do you want to call this import?");
             try{
+                Class.forName("com.google.api.client.http.HttpTransport"); //will throw if don't have google drive API
                 new WayfindingManifest(folderName).upload(folderName);
                 GoogleDriveUploader.uploadFile(listener.saveImage(folderName), "image/png", folderName);
                 Session.purgeActions();
-            } catch(Exception ex){
+            } catch(ClassNotFoundException ex){
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(
                         this, 
-                        "An error occured while uploading to the drive, so let's save a local copy", 
+                        "An error occured while uploading to the drive (did you remember the lib folder?), so you need to save a local copy", 
                         "Not good!", 
                         JOptionPane.ERROR_MESSAGE
                 );
                 System.err.println("not done with ExportMenu.exportManifest");
+            } catch(IOException ex){
+                ex.printStackTrace();
             }
         });
         return j;

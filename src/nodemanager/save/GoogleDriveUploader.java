@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
  * Used to upload files to the google drive
  * @author Matt Crow
  */
-public class GoogleDriveUploader {
+public class GoogleDriveUploader{
     private static final String FOLDER_ID = "1-HZrReHNM6szXfmZ1rNoG2HXf2ejal1o"; //the 'Matt, Implement These' folder
     
     private static JacksonFactory JSON;
