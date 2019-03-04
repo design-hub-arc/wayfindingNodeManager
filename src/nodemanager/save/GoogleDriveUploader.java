@@ -156,10 +156,6 @@ public class GoogleDriveUploader{
         return folder;
     }
     
-    private static File getTodaysFolder(){
-        return getFolderByName(new SimpleDateFormat("MM_dd_yyyy").format(Calendar.getInstance().getTime()));
-    }
-    
     private static File createFolder(String title){
         File folder = null;
         try {
@@ -187,6 +183,27 @@ public class GoogleDriveUploader{
         drive.permissions().create(f.getId(), p).execute();
     }
     
+    /**
+     * Gets the contents of a file in the Google Drive with the given ID
+     * @param id either the id of a file, or a url to that file
+     * @return and inputstream containing the data of the file, or null if it wasn't found
+     */
+    public static InputStream download(String id){
+        InputStream ret = null;
+        
+        if(id.contains("id=")){
+            id = id.split("id=")[1];
+        }
+        
+        try{
+            ret = drive.files().get(id).executeMediaAsInputStream();
+        } catch(IOException e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Couldn't download " + id, "Faied to download", JOptionPane.ERROR_MESSAGE);
+        }
+        return ret;
+    }
+    
     private static Credential authorize() throws Exception{
         //load a json file containing the user's login data
         GoogleClientSecrets clientInfo = GoogleClientSecrets.load(
@@ -212,10 +229,9 @@ public class GoogleDriveUploader{
     
     
     public static void main(String[] args) throws IOException{
-        InputStream response = drive.files().get("1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5").executeMedia().getContent();
-        BufferedReader br = new BufferedReader(new InputStreamReader(response));
-        while(br.ready()){
-            out.println(br.readLine());
+        InputStreamReader r = new InputStreamReader(download("https://drive.google.com/open?id=1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5"));
+        while(r.ready()){
+            System.out.println((char)r.read());
         }
     }
 }
