@@ -8,7 +8,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploader.UploadState;
-import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -120,22 +119,10 @@ public class GoogleDriveUploader{
     
     
     
-    //not working
+    
     public static final com.google.api.services.drive.model.File revise(VersionLog vl) throws IOException{
         com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
-        //drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp())).execute();
-        
-        Drive.Files.Update i = drive.files().update(file.getId(), new File(), new FileContent("text/csv", vl.createTemp()));
-        i.forEach((k, v)->{
-            System.out.println(k + ", " + v);
-        });
-        out.println(i.getAlt());
-        
-        i.execute();
-        
-        
-        
-        //not working
+        drive.files().update(file.getId(), new File(), new FileContent("text/csv", vl.createTemp())).execute();
         return file;
     }
     

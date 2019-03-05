@@ -8,9 +8,7 @@ import nodemanager.io.WayfindingManifest;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import nodemanager.Session;
 
 
@@ -53,6 +51,12 @@ public class ExportMenu extends JMenu{
     private JMenuItem exportManifest(){
         JMenuItem j = new JMenuItem("Export To The Drive");
         j.addActionListener((ActionEvent e) -> {
+            
+            
+            //make this replace everything later
+            new ExportDialog((JFrame)SwingUtilities.getRoot(this));
+            
+            
             String folderName = JOptionPane.showInputDialog(this, "What do you want to call this export?");
             try{
                 Class.forName("com.google.api.client.http.HttpTransport"); //will throw if don't have google drive API

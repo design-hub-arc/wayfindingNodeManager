@@ -1,11 +1,11 @@
 package nodemanager.io;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 /**
@@ -48,6 +48,10 @@ public class VersionLog extends AbstractWayfindingFile{
             urls.put(wayfindingVersion, new ArrayList<>());
         } //note that this is not an if/else
         urls.get(wayfindingVersion).add(url);
+    }
+    
+    public String[] getTypes(){
+        return Arrays.copyOf(urls.keySet().toArray(), urls.size(), String[].class);
     }
     
     /**
@@ -134,7 +138,6 @@ public class VersionLog extends AbstractWayfindingFile{
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
         v.download();
-        v.save("/Users/matt/Desktop");
         //GoogleDriveUploader.revise(v);
     }
 }
