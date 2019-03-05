@@ -1,5 +1,10 @@
 package nodemanager.gui;
 
+import nodemanager.io.NodeConnFile;
+import nodemanager.io.NodeLabelFile;
+import nodemanager.io.NodeCoordFile;
+import nodemanager.io.GoogleDriveUploader;
+import nodemanager.io.WayfindingManifest;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +12,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import nodemanager.Session;
-import nodemanager.save.*;
 
 
 /**
@@ -47,12 +51,15 @@ public class ExportMenu extends JMenu{
         );
     }
     private JMenuItem exportManifest(){
-        JMenuItem j = new JMenuItem("Export Everything");
+        JMenuItem j = new JMenuItem("Export To The Drive");
         j.addActionListener((ActionEvent e) -> {
-            String folderName = JOptionPane.showInputDialog(this, "What do you want to call this import?");
+            String folderName = JOptionPane.showInputDialog(this, "What do you want to call this export?");
             try{
                 Class.forName("com.google.api.client.http.HttpTransport"); //will throw if don't have google drive API
-                new WayfindingManifest(folderName).upload(folderName);
+                JOptionPane.showMessageDialog(this, "Beginning upload...");
+                new WayfindingManifest(folderName).upload(folderName, ()->{
+                    JOptionPane.showMessageDialog(this, "Upload complete!");
+                });
                 GoogleDriveUploader.uploadFile(listener.saveImage(folderName), "image/png", folderName);
                 Session.purgeActions();
             } catch(ClassNotFoundException ex){
@@ -66,6 +73,12 @@ public class ExportMenu extends JMenu{
                 System.err.println("not done with ExportMenu.exportManifest");
             } catch(IOException ex){
                 ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        this,
+                        ex.getMessage(),
+                        "Not good!",
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         });
         return j;

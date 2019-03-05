@@ -33,7 +33,7 @@ public class NodeIcon{
     private boolean drawLinks; //whether or not this should draw links
     private MapImage onImage; // the image this is being drawn on
     
-    private static int size = 30; //add ability to resize
+    private static int size = 30;
     
     /**
      * Creates a visual representation of the given Node
@@ -262,7 +262,7 @@ public class NodeIcon{
     private void drawLink(Graphics g, Node n){
         Graphics2D g2d = (Graphics2D)g;
         g2d.setColor(color);
-        g2d.setStroke(new BasicStroke(10));
+        g2d.setStroke(new BasicStroke(size / 2));
         g2d.drawLine(getX(), getY(), n.getIcon().getX(), n.getIcon().getY());
     }
 }

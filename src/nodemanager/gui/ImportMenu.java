@@ -6,9 +6,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import nodemanager.*;
 import nodemanager.node.*;
-import nodemanager.save.NodeConnFile;
-import nodemanager.save.NodeCoordFile;
-import nodemanager.save.NodeLabelFile;
+import nodemanager.io.NodeConnFile;
+import nodemanager.io.NodeCoordFile;
+import nodemanager.io.NodeLabelFile;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.

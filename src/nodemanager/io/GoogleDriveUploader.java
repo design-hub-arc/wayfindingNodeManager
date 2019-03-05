@@ -1,4 +1,4 @@
-package nodemanager.save;
+package nodemanager.io;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -7,6 +7,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
+import com.google.api.client.googleapis.media.MediaHttpUploader.UploadState;
+import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -15,19 +17,16 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import static java.lang.System.out;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JOptionPane;
+
+import static java.lang.System.out;
 
 /**
  * Used to upload files to the google drive
@@ -73,10 +72,10 @@ public class GoogleDriveUploader{
      * @param orig the local file to upload
      * @param type the type of the file (text/csv, image/png)
      * @param subfolderName the name of the folder to put the data in. The program creates this for you
-     * @param suppressMessages whether or not to notify the user that files are being uploaded
+     * @param onUploadComplete what to run once the upload is complete
      * @return the file after it has been uploaded to the google drive
      */
-    public static File uploadFile(java.io.File orig, String type, String subfolderName, boolean suppressMessages){
+    public static File uploadFile(java.io.File orig, String type, String subfolderName, Runnable onUploadComplete){
         File googleFile = null;
         
         try {
@@ -91,24 +90,15 @@ public class GoogleDriveUploader{
             
             
             Drive.Files.Create insert = drive.files().create(googleFile, content);
-            MediaHttpUploader uploader = insert.getMediaHttpUploader();
             
-            if(!suppressMessages){
-                uploader.setProgressListener((up) -> {
-                    switch(up.getUploadState()){
-                        case INITIATION_STARTED:
-                            JOptionPane.showMessageDialog(null, "Beginning upload to the google drive...");
-                            break;
-                        case MEDIA_COMPLETE:
-                            JOptionPane.showMessageDialog(null, "Upload successful!");
-                            break;
-                        default:
-                            System.out.println(orig.getName() + ": " + up.getUploadState());
-                            break;
-                    }    
-                });
-            }
             googleFile.setName(orig.getName());
+            
+            MediaHttpUploader uploader = insert.getMediaHttpUploader();
+            uploader.setProgressListener((up) -> {
+                if(up.getUploadState() == UploadState.MEDIA_COMPLETE){
+                    onUploadComplete.run();
+                }
+            });
             
             googleFile = insert.execute();
             publishToWeb(googleFile);
@@ -123,23 +113,30 @@ public class GoogleDriveUploader{
     }
     
     public static File uploadFile(java.io.File orig, String type, String subfolderName){
-        return uploadFile(orig, type, subfolderName, false);
+        return uploadFile(orig, type, subfolderName, ()->{});
     }
     
-    public static File uploadCsv(java.io.File file, String subfolderName, boolean suppressMessages){
-        return uploadFile(file, "text/csv", subfolderName, suppressMessages);
-    }
     
-    public static File uploadCsv(java.io.File file, String subfolderName){
-        return uploadCsv(file, subfolderName, false);
-    }
     
+    
+    
+    //not working
     public static final com.google.api.services.drive.model.File revise(VersionLog vl) throws IOException{
         com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
-        drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp())).execute();
+        //drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp())).execute();
+        
+        Drive.Files.Update i = drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp()));
+        i.forEach((k, v)->{
+            System.out.println(k + ", " + v);
+        });
+        out.println(i.getAlt());
+        
+        i.execute();
         //not working
         return file;
     }
+    
+    
     
     private static File getFolderByName(String name){
         File folder = null;

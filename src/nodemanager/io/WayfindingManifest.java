@@ -1,4 +1,4 @@
-package nodemanager.save;
+package nodemanager.io;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,21 +30,21 @@ public class WayfindingManifest extends AbstractWayfindingFile{
     private final void populate(){
         com.google.api.services.drive.model.File googleFile = null;
         try{
-            googleFile = new NodeCoordFile(prefix).upload(inDriveFolder, true);
+            googleFile = new NodeCoordFile(prefix).upload(inDriveFolder);
             urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         } catch(IOException ex){
             ex.printStackTrace();
         }
         
         try{
-            googleFile = new NodeConnFile(prefix).upload(inDriveFolder, true);
+            googleFile = new NodeConnFile(prefix).upload(inDriveFolder);
             urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         } catch(IOException ex){
             ex.printStackTrace();
         }
         
         try{
-            googleFile = new NodeLabelFile(prefix).upload(inDriveFolder, true);
+            googleFile = new NodeLabelFile(prefix).upload(inDriveFolder);
             urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
         } catch(IOException ex){
             ex.printStackTrace();

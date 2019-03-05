@@ -1,4 +1,4 @@
-package nodemanager.save;
+package nodemanager.io;
 
 import java.io.InputStream;
 import nodemanager.gui.MapImage;

@@ -1,9 +1,9 @@
-package nodemanager.save;
+package nodemanager.io;
 
 import java.io.InputStream;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
-import static nodemanager.save.AbstractWayfindingFile.NL;
+import static nodemanager.io.AbstractWayfindingFile.NL;
 
 /**
  * Used to read/write the node connections file

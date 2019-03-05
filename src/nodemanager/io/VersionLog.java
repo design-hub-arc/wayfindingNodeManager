@@ -1,4 +1,4 @@
-package nodemanager.save;
+package nodemanager.io;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -100,10 +100,6 @@ public class VersionLog extends AbstractWayfindingFile{
         }
         
         return sb.toString();
-    }
-
-    public InputStream getAsStream(){
-        return new ByteArrayInputStream(getContentsToWrite().getBytes());
     }
     
     @Override

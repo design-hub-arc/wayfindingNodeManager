@@ -1,4 +1,4 @@
-package nodemanager.save;
+package nodemanager.io;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -34,6 +34,12 @@ public abstract class AbstractWayfindingFile {
         type = t;
     }
     
+    /**
+     * Creates a new file on the local system in the given directory.
+     * The contents of the file are given by this.getContentsToWrite()
+     * @param directory the directory to save the file to.
+     * @return the file created, or null if it failed
+     */
     public final java.io.File save(String directory){
         localCopy = null;
         BufferedWriter out = null;
@@ -50,6 +56,11 @@ public abstract class AbstractWayfindingFile {
         return localCopy;
     }
     
+    /**
+     * Creates a temporary file on the local system
+     * @return the newly created file, or null if it failed.
+     * @throws IOException 
+     */
     public final java.io.File createTemp() throws IOException{
         java.io.File temp = java.io.File.createTempFile(name, type.getFileType());
         temp.deleteOnExit();
@@ -57,12 +68,12 @@ public abstract class AbstractWayfindingFile {
         return temp;
     }
     
-    public final com.google.api.services.drive.model.File upload(String folderName, boolean suppressMessages) throws IOException{
-        return GoogleDriveUploader.uploadFile(createTemp(), type.getDriveType(), folderName, suppressMessages);
+    public final com.google.api.services.drive.model.File upload(String folderName, Runnable r) throws IOException{
+        return GoogleDriveUploader.uploadFile(createTemp(), type.getDriveType(), folderName, r);
     }
     
     public final com.google.api.services.drive.model.File upload(String folderName) throws IOException{
-        return upload(folderName, false);
+        return upload(folderName, ()->{});
     }
     
     
