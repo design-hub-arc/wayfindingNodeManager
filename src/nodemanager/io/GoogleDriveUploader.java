@@ -125,13 +125,16 @@ public class GoogleDriveUploader{
         com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
         //drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp())).execute();
         
-        Drive.Files.Update i = drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp()));
+        Drive.Files.Update i = drive.files().update(file.getId(), new File(), new FileContent("text/csv", vl.createTemp()));
         i.forEach((k, v)->{
             System.out.println(k + ", " + v);
         });
         out.println(i.getAlt());
         
         i.execute();
+        
+        
+        
         //not working
         return file;
     }

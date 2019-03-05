@@ -134,13 +134,7 @@ public class VersionLog extends AbstractWayfindingFile{
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
         v.download();
-        v.addUrl("wayfinding", "test1");
-        v.addUrl("wayfinding", "test2");
-        v.addUrl("wayfinding", "test3");
-        v.addUrl("artfinding", "test4");
-        v.addUrl("blarg", "test5");
-        //v.save("C:\\Users\\w1599227\\Desktop");
-        GoogleDriveUploader.revise(v);
-        //v.upload("dummy");
+        v.save("/Users/matt/Desktop");
+        //GoogleDriveUploader.revise(v);
     }
 }
