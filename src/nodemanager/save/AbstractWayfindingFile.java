@@ -50,14 +50,15 @@ public abstract class AbstractWayfindingFile {
         return localCopy;
     }
     
-    public final com.google.api.services.drive.model.File upload(String folderName, boolean suppressMessages) throws IOException{
+    public final java.io.File createTemp() throws IOException{
         java.io.File temp = java.io.File.createTempFile(name, type.getFileType());
         temp.deleteOnExit();
         temp = save(temp.getParent());
-        
-        driveCopy = GoogleDriveUploader.uploadFile(temp, type.getDriveType(), folderName, suppressMessages);
-        
-        return driveCopy;
+        return temp;
+    }
+    
+    public final com.google.api.services.drive.model.File upload(String folderName, boolean suppressMessages) throws IOException{
+        return GoogleDriveUploader.uploadFile(createTemp(), type.getDriveType(), folderName, suppressMessages);
     }
     
     public final com.google.api.services.drive.model.File upload(String folderName) throws IOException{

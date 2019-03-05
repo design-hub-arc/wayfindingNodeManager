@@ -134,6 +134,13 @@ public class GoogleDriveUploader{
         return uploadCsv(file, subfolderName, false);
     }
     
+    public static final com.google.api.services.drive.model.File revise(VersionLog vl) throws IOException{
+        com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
+        drive.files().update(file.getId(), file, new FileContent("text/csv", vl.createTemp())).execute();
+        //not working
+        return file;
+    }
+    
     private static File getFolderByName(String name){
         File folder = null;
         try {

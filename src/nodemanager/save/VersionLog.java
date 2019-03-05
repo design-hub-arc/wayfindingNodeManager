@@ -1,11 +1,11 @@
 package nodemanager.save;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -19,7 +19,8 @@ import java.util.LinkedHashMap;
  * @author Matt Crow
  */
 public class VersionLog extends AbstractWayfindingFile{
-    private static final String URL = "https://drive.google.com/open?id=1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
+    public static final String ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
+    public static final String URL = "https://drive.google.com/open?id=" + ID;
     private final LinkedHashMap<String, ArrayList<String>> urls; //Each column is a wayfinding type(artfinding, wayfinding, etc), and each cell in the column is the URL of a manifest
     
     public VersionLog(){
@@ -49,6 +50,11 @@ public class VersionLog extends AbstractWayfindingFile{
         urls.get(wayfindingVersion).add(url);
     }
     
+    /**
+     * Gets what to write to the version log.
+     * Currently not optimal, so I'll probably redo it later.
+     * @return the updated contents of the version log.
+     */
     @Override
     public String getContentsToWrite() {
         StringBuilder sb = new StringBuilder();
@@ -78,13 +84,28 @@ public class VersionLog extends AbstractWayfindingFile{
             }
             
             //check if good. Check if any list has urls left to append to the stream
-            //good = urls.values().stream().map((list) -> list.size()).anyMatch((size)->size > idx);
+            /*
+            lambda doesn't work because of .size()
+            good = urls.values().stream().anyMatch((list)->{
+                return list.size() > idx;
+            });*/
+            
+            good = false;
             idx++;
+            for(ArrayList<String> urlList : urls.values()){
+                if(urlList.size() > idx){
+                    good = true;
+                }
+            }
         }
         
         return sb.toString();
     }
 
+    public InputStream getAsStream(){
+        return new ByteArrayInputStream(getContentsToWrite().getBytes());
+    }
+    
     @Override
     public void readStream(InputStream s) {
         BufferedReader br = new BufferedReader(new InputStreamReader(s));
@@ -122,7 +143,8 @@ public class VersionLog extends AbstractWayfindingFile{
         v.addUrl("wayfinding", "test3");
         v.addUrl("artfinding", "test4");
         v.addUrl("blarg", "test5");
-        v.save("C:\\Users\\w1599227\\Desktop");
-        v.upload("dummy");
+        //v.save("C:\\Users\\w1599227\\Desktop");
+        GoogleDriveUploader.revise(v);
+        //v.upload("dummy");
     }
 }
