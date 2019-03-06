@@ -58,6 +58,10 @@ public class VersionLog extends AbstractWayfindingFile{
         return Arrays.copyOf(urls.keySet().toArray(), urls.size(), String[].class);
     }
     
+    public String[] getExportsFor(String type){
+        return Arrays.copyOf(urls.get(type).toArray(), urls.get(type).size(), String[].class);
+    }
+    
     /**
      * Gets what to write to the version log.
      * Currently not optimal, so I'll probably redo it later.

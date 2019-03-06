@@ -11,9 +11,10 @@ import nodemanager.io.WayfindingManifest;
 
 /**
  * Acts as the body of the export dialog whenever the user clicks the export to drive button.
+ * Allows the user to specify which version of wayfinding they are uploading to, as well as what to name the export.
  * 
- * TODO: make this modify the version log
- * @author matt
+ * TODO: combine this and ImportBody
+ * @author Matt Crow
  */
 public class ExportBody extends Container {
     
@@ -25,7 +26,6 @@ public class ExportBody extends Container {
     
     public ExportBody() {
         super();
-        setBackground(Color.red);
         setLayout(new FlowLayout());
         name = new JTextField("Enter the name for this export");
         add(name);
@@ -41,19 +41,20 @@ public class ExportBody extends Container {
         wayfindingType = new JComboBox<>(options);
         wayfindingType.addItemListener((ItemEvent e)->{
             newType.setText(e.getItem().toString());
+            newType.setEditable(newType.getText().equals("new type"));
         });
         add(wayfindingType);
         
         newType = new JTextField(wayfindingType.getSelectedItem().toString());
+        newType.setEditable(false);
         add(newType);
         
         msg = new JTextArea("Enter a name for the export, then select what version of wayfinding this is for, then click 'export'");
+        msg.setEditable(false);
         add(msg);
         
         exportButton = new JButton("Export");
         exportButton.addActionListener((ae)->{
-            boolean good = true;
-            
             if(wayfindingType.getSelectedItem().equals("new type")){
                 v.addType(newType.getText());
             }
@@ -63,7 +64,6 @@ public class ExportBody extends Container {
                 //will throw an error if don't have google drive API
             } catch(ClassNotFoundException ex){
                 ex.printStackTrace();
-                good = false;
                 msg.setText(
                         "Looks like you forgot to include the lib folder \n"
                       + "1. Download lib.zip from the node manager Google drive \n"

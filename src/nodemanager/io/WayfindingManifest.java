@@ -1,7 +1,12 @@
 package nodemanager.io;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import static java.lang.System.out;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +32,20 @@ public class WayfindingManifest extends AbstractWayfindingFile{
         urls = new HashMap<>();
     }
     
+    /**
+     * Imports a manifest from the drive into the program,
+     * updating the program's data
+     * @param id the file id or url of the manifest
+     */
+    public static void importManifest(String id){
+        WayfindingManifest m = new WayfindingManifest("");
+        if(id.contains("id=")){
+            id = id.split("id=")[1];
+        }
+        m.readStream(GoogleDriveUploader.download(id));
+        m.unpack();
+    }
+    
     private final void populate(){
         com.google.api.services.drive.model.File googleFile = null;
         try{
@@ -50,6 +69,18 @@ public class WayfindingManifest extends AbstractWayfindingFile{
             ex.printStackTrace();
         }
     }
+   
+    /**
+     * Loads the data from this manifest into the program
+     */
+    private final void unpack(){
+        out.println("Unpacking...");
+        if(urls.containsKey("Node coordinates")){
+            new NodeCoordFile("").readStream(GoogleDriveUploader.download(urls.get("Node coordinates")));
+        } else {
+            System.err.println("Manifest missing 'Node coordinates'");
+        }
+    }
 
     @Override
     public String getContentsToWrite() {
@@ -67,6 +98,28 @@ public class WayfindingManifest extends AbstractWayfindingFile{
 
     @Override
     public void readStream(InputStream s) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        BufferedReader br;
+        String[] line = new String[0];
+        boolean firstLine = true;
+        try{
+            br = new BufferedReader(new InputStreamReader(s));
+            while(br.ready()){
+                try{
+                    line = br.readLine().split(",");
+                    if(!firstLine){
+                        urls.put(line[0], line[1]);
+                    }
+                } catch(Exception e){
+                    if(!firstLine){
+                        //don't print errors for first line, as it will always fail, being a header
+                        out.println("Line fail: " + Arrays.toString(line));
+                        e.printStackTrace();
+                    }
+                }
+                firstLine = false;
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }

@@ -33,6 +33,7 @@ public class ImportMenu extends JMenu{
         add(importNodeMenu());
         add(importConnMenu());
         add(importLabelMenu());
+        add(importFromDriveMenu());
     }
     
     private JMenuItem importMapMenu(){
@@ -104,6 +105,15 @@ public class ImportMenu extends JMenu{
     }
     private void importLabels(InputStream s){
         new NodeLabelFile().readStream(s);
+    }
+    
+    
+    private JMenuItem importFromDriveMenu(){
+        JMenuItem ret = new JMenuItem("Import from the drive");
+        ret.addActionListener((e)->{
+            new ImportDialog((JFrame)SwingUtilities.getRoot(this));
+        });
+        return ret;
     }
     
     
