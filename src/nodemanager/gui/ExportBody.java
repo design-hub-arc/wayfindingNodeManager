@@ -21,6 +21,7 @@ public class ExportBody extends Container {
     private JComboBox<String> wayfindingType;
     private JTextField newType;
     private JButton exportButton;
+    private final JTextArea msg;
     
     public ExportBody() {
         super();
@@ -46,48 +47,48 @@ public class ExportBody extends Container {
         newType = new JTextField(wayfindingType.getSelectedItem().toString());
         add(newType);
         
+        msg = new JTextArea("Enter a name for the export, then select what version of wayfinding this is for, then click 'export'");
+        add(msg);
+        
         exportButton = new JButton("Export");
         exportButton.addActionListener((ae)->{
+            boolean good = true;
+            
             if(wayfindingType.getSelectedItem().equals("new type")){
                 v.addType(newType.getText());
             }
             
             try{
-                Class.forName("com.google.api.client.http.HttpTransport"); //will throw if don't have google drive API
-                JOptionPane.showMessageDialog(this, "Beginning upload...");
-                new WayfindingManifest(name.getText()).upload(name.getText(), ()->{
-                    JOptionPane.showMessageDialog(this, "Upload complete!");
+                Class.forName("com.google.api.client.http.HttpTransport"); 
+                //will throw an error if don't have google drive API
+            } catch(ClassNotFoundException ex){
+                ex.printStackTrace();
+                good = false;
+                msg.setText(
+                        "Looks like you forgot to include the lib folder \n"
+                      + "1. Download lib.zip from the node manager Google drive \n"
+                      + "2. Extract the contents so that the lib folder is in the same folder as NodeManager.jar \n"
+                      + "3. Click export again"
+                );
+                return;
+            }
+            
+            msg.setText("Beginning upload...");
+            WayfindingManifest newMan = new WayfindingManifest(name.getText());
+            
+            try{
+                newMan.upload(name.getText(), ()->{
+                    msg.setText("Upload complete!");
                 });
                 GoogleDriveUploader.uploadFile(Session.map.saveImage(name.getText()), "image/png", name.getText());
                 Session.purgeActions();
-            } catch(ClassNotFoundException ex){
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(
-                        this, 
-                        "An error occured while uploading to the drive (did you remember the lib folder?), so you need to save a local copy", 
-                        "Not good!", 
-                        JOptionPane.ERROR_MESSAGE
-                );
-                System.err.println("not done with ExportMenu.exportManifest");
+                v.addUrl(newType.getText(), newMan.getUrl());
+                v.save();
+                
             } catch(IOException ex){
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(
-                        this,
-                        ex.getMessage(),
-                        "Not good!",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                msg.setText(ex.getMessage());
             }
-            
-            v.addUrl(newType.getText(), "how do I get the URL?");
-            
-            close();
         });
         add(exportButton);
     }
-    
-    private void close(){
-        ((JDialog)SwingUtilities.getRoot(this)).dispose();
-    }
-    
 }

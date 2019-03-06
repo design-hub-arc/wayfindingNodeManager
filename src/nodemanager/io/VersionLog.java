@@ -139,6 +139,14 @@ public class VersionLog extends AbstractWayfindingFile{
         }
     }
     
+    public void save() throws IOException{
+        GoogleDriveUploader.revise(this);
+    }
+    
+    public void displayData(){
+        System.out.println(getContentsToWrite());
+    }
+    
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
         v.download();

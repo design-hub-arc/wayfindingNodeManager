@@ -69,14 +69,24 @@ public abstract class AbstractWayfindingFile {
     }
     
     public final com.google.api.services.drive.model.File upload(String folderName, Runnable r) throws IOException{
-        return GoogleDriveUploader.uploadFile(createTemp(), type.getDriveType(), folderName, r);
+        driveCopy = GoogleDriveUploader.uploadFile(createTemp(), type.getDriveType(), folderName, r);
+        return driveCopy;
     }
     
     public final com.google.api.services.drive.model.File upload(String folderName) throws IOException{
         return upload(folderName, ()->{});
     }
     
-    
+    public String getUrl() throws NullPointerException{
+        String ret = "";
+        if(driveCopy == null){
+            throw new NullPointerException(name + " hasn't been uploaded to the drive yet, so I can't get its URL");
+        } else {
+            ret = "https://drive.google.com/uc?export=download&id=" + driveCopy.getId();
+        }
+        
+        return ret;
+    }
     
     /**
      * Gets the contents to write to this file
