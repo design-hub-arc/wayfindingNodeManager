@@ -90,6 +90,8 @@ public class MapImage extends JLabel{
         mouseClickActions = new HashMap<>();
         
         registerControls();
+        
+        Session.map = this;
     }
 
     

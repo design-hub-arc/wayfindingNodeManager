@@ -50,6 +50,10 @@ public class VersionLog extends AbstractWayfindingFile{
         urls.get(wayfindingVersion).add(url);
     }
     
+    public void addType(String type){
+        urls.put(type, new ArrayList<>());
+    }
+    
     public String[] getTypes(){
         return Arrays.copyOf(urls.keySet().toArray(), urls.size(), String[].class);
     }

@@ -1,8 +1,13 @@
 package nodemanager.gui;
 
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.io.IOException;
 import javax.swing.*;
+import nodemanager.Session;
+import nodemanager.io.GoogleDriveUploader;
 import nodemanager.io.VersionLog;
+import nodemanager.io.WayfindingManifest;
 
 /**
  * Acts as the body of the export dialog whenever the user clicks the export to drive button.
@@ -14,7 +19,8 @@ public class ExportBody extends Container {
     
     private JTextField name;
     private JComboBox<String> wayfindingType;
-    private JButton next;
+    private JTextField newType;
+    private JButton exportButton;
     
     public ExportBody() {
         super();
@@ -32,17 +38,56 @@ public class ExportBody extends Container {
         }
         options[options.length - 1] = "new type";
         wayfindingType = new JComboBox<>(options);
+        wayfindingType.addItemListener((ItemEvent e)->{
+            newType.setText(e.getItem().toString());
+        });
         add(wayfindingType);
         
-        next = new JButton("Next");
-        next.addActionListener((ae)->{
+        newType = new JTextField(wayfindingType.getSelectedItem().toString());
+        add(newType);
+        
+        exportButton = new JButton("Export");
+        exportButton.addActionListener((ae)->{
             if(wayfindingType.getSelectedItem().equals("new type")){
-                System.out.println("new type");
-            } else {
-                System.out.println("not new type");
+                v.addType(newType.getText());
             }
+            
+            try{
+                Class.forName("com.google.api.client.http.HttpTransport"); //will throw if don't have google drive API
+                JOptionPane.showMessageDialog(this, "Beginning upload...");
+                new WayfindingManifest(name.getText()).upload(name.getText(), ()->{
+                    JOptionPane.showMessageDialog(this, "Upload complete!");
+                });
+                GoogleDriveUploader.uploadFile(Session.map.saveImage(name.getText()), "image/png", name.getText());
+                Session.purgeActions();
+            } catch(ClassNotFoundException ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        this, 
+                        "An error occured while uploading to the drive (did you remember the lib folder?), so you need to save a local copy", 
+                        "Not good!", 
+                        JOptionPane.ERROR_MESSAGE
+                );
+                System.err.println("not done with ExportMenu.exportManifest");
+            } catch(IOException ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        this,
+                        ex.getMessage(),
+                        "Not good!",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+            
+            v.addUrl(newType.getText(), "how do I get the URL?");
+            
+            close();
         });
-        add(next);
+        add(exportButton);
+    }
+    
+    private void close(){
+        ((JDialog)SwingUtilities.getRoot(this)).dispose();
     }
     
 }

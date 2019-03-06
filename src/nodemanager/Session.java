@@ -34,6 +34,7 @@ public class Session {
     public static boolean isSaved = true;
     
     public static JPanel currentPanel = null;
+    public static MapImage map = null;
     
     
     //used to undo actions
