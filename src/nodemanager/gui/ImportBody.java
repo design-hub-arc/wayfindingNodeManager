@@ -21,14 +21,19 @@ import nodemanager.io.WayfindingManifest;
  */
 public class ImportBody extends Container{
     private JComboBox<String> version;
-    private JComboBox<String> exportName;
+    private JComboBox<String> exportSelector;
+    private String[] exportIds;
+    private String[] exportNames;
+    
+    private VersionLog v;
+    
     private final JButton importButton;
     private final JTextArea msg;
     
     public ImportBody(){
         super();
         
-        VersionLog v = new VersionLog();
+        v = new VersionLog();
         v.download();
         
         
@@ -41,16 +46,15 @@ public class ImportBody extends Container{
         gbc.weighty = 1;
         version = new JComboBox<>(v.getTypes());
         version.addItemListener((e)->{
-            exportName.removeAllItems();
-            for(String export : v.getExportsFor(version.getSelectedItem().toString())){
-                exportName.addItem(export);
-            }
+            updateExportSelector();
         });
         add(version, gbc);
         
         gbc.gridx = 1;
-        exportName = new JComboBox<>(v.getExportsFor(version.getSelectedItem().toString()));
-        add(exportName, gbc);
+        exportSelector = new JComboBox<>();
+        
+        
+        add(exportSelector, gbc);
         
         
         gbc.gridx = 0;
@@ -78,9 +82,19 @@ public class ImportBody extends Container{
             }
             
             msg.setText("Beginning download...");
-            WayfindingManifest.importManifest(exportName.getSelectedItem().toString());
+            WayfindingManifest.importManifest(exportIds[exportSelector.getSelectedIndex()]);
             msg.setText("Done!");
         });
         add(importButton, gbc);
+        updateExportSelector();
+    }
+    
+    private void updateExportSelector(){
+        exportIds = v.getExportIdsFor(version.getSelectedItem().toString());
+        exportNames = v.getExportNamesFor(version.getSelectedItem().toString());
+        exportSelector.removeAllItems();
+        for(String name : exportNames){
+            exportSelector.addItem(name);
+        }
     }
 }

@@ -20,9 +20,7 @@ import com.google.api.services.drive.model.Permission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import javax.swing.JOptionPane;
 
 import static java.lang.System.out;
@@ -35,6 +33,8 @@ import java.util.logging.Logger;
  */
 public class GoogleDriveUploader{
     private static final String FOLDER_ID = "1-HZrReHNM6szXfmZ1rNoG2HXf2ejal1o"; //the 'Matt, Implement These' folder
+    
+    private static HashMap<String, String> idToName = new HashMap<>();
     
     private static JacksonFactory JSON;
     private static HttpTransport HTTP;
@@ -116,11 +116,6 @@ public class GoogleDriveUploader{
     public static File uploadFile(java.io.File orig, String type, String subfolderName){
         return uploadFile(orig, type, subfolderName, ()->{});
     }
-    
-    
-    
-    
-    
     
     public static final com.google.api.services.drive.model.File revise(VersionLog vl) throws IOException{
         com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
@@ -205,7 +200,12 @@ public class GoogleDriveUploader{
         if(id.contains("id=")){
             id = id.split("id=")[1];
         }
-        return drive.files().get(id).execute().getName();
+        
+        if(!idToName.containsKey(id)){
+            idToName.put(id, drive.files().get(id).execute().getName());
+        }
+        
+        return idToName.get(id);
     }
     
     private static Credential authorize() throws Exception{

@@ -12,6 +12,10 @@ import java.io.InputStream;
  * This class provides the functions to
  * save or load to/from local files,
  * or upload or download files from Google Drive.
+ * 
+ * Will probably have to split this into separate CsvFile and ImageFile classes.
+ * Maybe make psuedo-static?
+ * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 public abstract class AbstractWayfindingFile {

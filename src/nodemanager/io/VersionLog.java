@@ -58,19 +58,30 @@ public class VersionLog extends AbstractWayfindingFile{
         return Arrays.copyOf(urls.keySet().toArray(), urls.size(), String[].class);
     }
     
-    public String[] getExportsFor(String type){
+    public String[] getExportIdsFor(String type){
+        ArrayList<String> exportIds = new ArrayList<>();
+        ArrayList<String> uploads = urls.get(type);
+        for(int i = 0; i < uploads.size(); i++){
+            try{
+                GoogleDriveUploader.getFileName(uploads.get(i)); //checks if file exists, else throws error
+                exportIds.add(uploads.get(i));
+            } catch(IOException e){
+                System.err.println("Not file id: " + uploads.get(i));
+            }
+        }
+        return Arrays.copyOf(exportIds.toArray(), exportIds.size(), String[].class);
+    }
+    
+    public String[] getExportNamesFor(String type){
         ArrayList<String> exportNames = new ArrayList<>();
         ArrayList<String> uploads = urls.get(type);
-        /*
         for(int i = 0; i < uploads.size(); i++){
             try{
                 exportNames.add(GoogleDriveUploader.getFileName(uploads.get(i)));
             } catch(IOException e){
                 System.err.println("Couldn't get the name of " + uploads.get(i));
             }
-        }*/
-        exportNames = uploads;
-        
+        }
         return Arrays.copyOf(exportNames.toArray(), exportNames.size(), String[].class);
     }
     
