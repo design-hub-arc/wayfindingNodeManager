@@ -8,9 +8,9 @@ import nodemanager.node.NodeParser;
  *
  * @author Matt Crow
  */
-public class NodeLabelFile extends AbstractWayfindingFile{
+public class NodeLabelFile extends AbstractCsvFile{
     public NodeLabelFile(String title){
-        super(title + "Labels", FileType.CSV);
+        super(title + "Labels");
     }
     
     public NodeLabelFile(){

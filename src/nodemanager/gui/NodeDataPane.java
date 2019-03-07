@@ -3,7 +3,6 @@ package nodemanager.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
@@ -34,6 +33,16 @@ public class NodeDataPane extends JComponent{
         nodeInfo = new JTextArea("No node selected");
         nodeInfo.setBackground(Color.red);
         nodeInfo.setEditable(false);
+        nodeInfo.setLineWrap(true);
+        /*
+        JScrollPane scroll = new JScrollPane(
+                nodeInfo,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
+        );
+        scroll.setMinimumSize(new Dimension(100, 100));
+        add(scroll, gbc);
+        */
         add(nodeInfo, gbc);
         
         addOption("Delete this node", () ->{
@@ -81,6 +90,22 @@ public class NodeDataPane extends JComponent{
             } else {
                 JOptionPane.showMessageDialog(null, "Label '" + ip + "' is already in use.");
             }
+        });
+        
+        addOption("Add a URL", ()->{
+            String url = JOptionPane.showInputDialog("Enter the URL to add: ");
+            String title = JOptionPane.showInputDialog("What do you want to call this URL?");
+            if(selectedNode.addLabel(url)){
+                Session.logAction(new LabelAddedEvent(selectedNode, url));
+                if(selectedNode.addLabel(title)){
+                    Session.logAction(new LabelAddedEvent(selectedNode, title));
+                } else {
+                    JOptionPane.showMessageDialog(null, "Label '" + title + "' is already in use.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Label '" + url + "' is already in use.");
+            }
+            selectNode(selectedNode); //reload node description
         });
         
         addOption("Remove a label", () -> {

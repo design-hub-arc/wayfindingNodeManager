@@ -9,9 +9,9 @@ import static nodemanager.io.AbstractWayfindingFile.NL;
  * Used to read/write the node connections file
  * @author Matt Crow
  */
-public class NodeConnFile extends AbstractWayfindingFile{
+public class NodeConnFile extends AbstractCsvFile{
     public NodeConnFile(String title){
-        super(title + "NodeConn", FileType.CSV);
+        super(title + "NodeConn");
     }
     
     public NodeConnFile(){

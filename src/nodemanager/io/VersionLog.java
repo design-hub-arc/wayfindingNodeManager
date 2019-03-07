@@ -18,13 +18,13 @@ import java.util.LinkedHashMap;
  * 
  * @author Matt Crow
  */
-public class VersionLog extends AbstractWayfindingFile{
+public class VersionLog extends AbstractCsvFile{
     public static final String ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
     public static final String URL = "https://drive.google.com/open?id=" + ID;
     private final LinkedHashMap<String, ArrayList<String>> urls; //Each column is a wayfinding type(artfinding, wayfinding, etc), and each cell in the column is the URL of a manifest
     
     public VersionLog(){
-        super("versions", FileType.CSV);
+        super("versions");
         urls = new LinkedHashMap<>();
     }
     

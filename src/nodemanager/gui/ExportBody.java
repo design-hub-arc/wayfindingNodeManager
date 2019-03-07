@@ -5,7 +5,6 @@ import java.awt.event.ItemEvent;
 import java.io.IOException;
 import javax.swing.*;
 import nodemanager.Session;
-import nodemanager.io.GoogleDriveUploader;
 import nodemanager.io.VersionLog;
 import nodemanager.io.WayfindingManifest;
 
@@ -80,7 +79,6 @@ public class ExportBody extends Container {
                 newMan.upload(name.getText(), ()->{
                     msg.setText("Upload complete!");
                 });
-                GoogleDriveUploader.uploadFile(Session.map.saveImage(name.getText()), "image/png", name.getText());
                 Session.purgeActions();
                 v.addUrl(newType.getText(), newMan.getUrl());
                 v.save();

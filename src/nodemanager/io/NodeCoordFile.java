@@ -13,9 +13,9 @@ import nodemanager.node.NodeParser;
  * TODO: make AbstractCsvFile class
  * @author Matt Crow
  */
-public class NodeCoordFile extends AbstractWayfindingFile{
+public class NodeCoordFile extends AbstractCsvFile{
     public NodeCoordFile(String title){
-        super(title + "NodeCoords", FileType.CSV);
+        super(title + "NodeCoords");
     }
     
     public NodeCoordFile(){

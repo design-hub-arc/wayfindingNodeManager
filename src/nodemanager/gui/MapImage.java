@@ -1,19 +1,11 @@
 package nodemanager.gui;
 
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.awt.event.*;
 import static java.lang.System.out;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.stream.ImageInputStream;
 import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.*;
@@ -385,66 +377,14 @@ public class MapImage extends JLabel{
     }
 
     /**
-     * exports the map image to a directory
-     * @param name what to append to the beginning of the file name: nameMapImage.png 
-     * @param path the directory to save the image to
-     * @return the newly created file
+     * 
+     * @return the current image this is displaying
      */
-    public File saveImage(String name, String path) {
-        File f = null;
-        try {
-            f = new File(path + File.separator + "MapImage.png");
-            ImageIO.write(buff, "png", f);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return f;
-    }
-    
-    /**
-     * Creates a temporary file with the given name 
-     * @param name appended to the beginning of the file name: nameMapImage.png
-     * @return the newly created file
-    */
-    public File saveImage(String name){
-        File f = null;
-        try {
-            f = new File(name + "MapImage.png");
-            f.deleteOnExit();
-            ImageIO.write(buff, "png", f);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return f;
+    public final BufferedImage getImage(){
+        return buff;
     }
     
     
-    
-    
-    
-    public String getImageAsString() throws IOException{
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ImageIO.write(buff, "png", bytes);
-        bytes.flush();
-        return Base64.getEncoder().encodeToString(bytes.toByteArray());
-    }
-    
-    //not working. How convert inputstream to something base64 can decode?
-    public void setImage(InputStream s){
-        /*
-        try{
-            System.out.println(ImageIO.read(new BufferedInputStream(s)));
-            byte[] bytes = Base64.getDecoder().decode(s));
-            ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
-            setImage(ImageIO.read(stream));//new ByteArrayInputStream(Base64.getDecoder().decode(s))));
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-        */
-    }
-    
-    
-
     /**
      * @throws NullPointerException if the mouse isn't over a node.
      * @return the NodeIcon the mouse is over

@@ -1,7 +1,5 @@
 package nodemanager.io;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -44,19 +42,9 @@ public abstract class AbstractWayfindingFile {
      * @param directory the directory to save the file to.
      * @return the file created, or null if it failed
      */
-    public final java.io.File save(String directory){
-        localCopy = null;
-        BufferedWriter out = null;
-        
-        try{
-            localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileType());
-            out = new BufferedWriter(new FileWriter(localCopy.getAbsolutePath()));
-            out.write(getContentsToWrite());
-            out.close();
-        } catch(IOException ex){
-            ex.printStackTrace();
-        }
-        
+    public java.io.File save(String directory){
+        localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileType());
+        writeToFile(localCopy);
         return localCopy;
     }
     
@@ -92,11 +80,7 @@ public abstract class AbstractWayfindingFile {
         return ret;
     }
     
-    /**
-     * Gets the contents to write to this file
-     * @return what should be written to this when it is saved or uploaded
-     */
-    public abstract String getContentsToWrite();
+    
     
     /**
      * Reads the contents of an InputStream,
@@ -104,4 +88,12 @@ public abstract class AbstractWayfindingFile {
      * @param s 
      */
     public abstract void readStream(InputStream s);
+    
+    /**
+     * Defined in each direct subclass (AbstractCsvFile, MapFile).
+     * Called by save() after a new file has been created. 
+     * See the aforementioned classes for more details. 
+     * @param f the file to write to.
+     */
+    public abstract void writeToFile(java.io.File f);
 }

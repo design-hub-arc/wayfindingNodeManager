@@ -1,7 +1,7 @@
 package nodemanager.io;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import javax.imageio.ImageIO;
 import nodemanager.Session;
 
 
@@ -13,7 +13,7 @@ import nodemanager.Session;
  */
 public class MapFile extends AbstractWayfindingFile{
     public MapFile(String title) {
-        super(title, FileType.PNG);
+        super(title + "MapImage", FileType.PNG);
     }
     
     public MapFile(){
@@ -21,19 +21,21 @@ public class MapFile extends AbstractWayfindingFile{
     }
 
     @Override
-    public String getContentsToWrite(){
-        String ret = "";
-        try{
-            ret = Session.map.getImageAsString();
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-        return ret;
-    }
-
-    @Override
     public void readStream(InputStream s) {
-        Session.map.setImage(s);
+        try {
+            Session.map.setImage(ImageIO.read(ImageIO.createImageInputStream(s)));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void writeToFile(File f){
+        try{
+            ImageIO.write(Session.map.getImage(), "png", f);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
 }

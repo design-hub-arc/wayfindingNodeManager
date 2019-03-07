@@ -20,13 +20,13 @@ import java.util.Map;
  * 
  * TODO: make this able to save a local copy?
  */
-public class WayfindingManifest extends AbstractWayfindingFile{
+public class WayfindingManifest extends AbstractCsvFile{
     private final String prefix;
     private final String inDriveFolder;
     private final HashMap<String, String> urls;
     
     public WayfindingManifest(String folderName){
-        super(folderName + "Manifest", FileType.CSV);
+        super(folderName + "Manifest");
         prefix = folderName;
         inDriveFolder = folderName;
         urls = new HashMap<>();
