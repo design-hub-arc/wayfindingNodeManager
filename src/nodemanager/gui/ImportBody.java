@@ -6,7 +6,8 @@
 package nodemanager.gui;
 
 import java.awt.Container;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import javax.swing.*;
 import nodemanager.io.VersionLog;
 import nodemanager.io.WayfindingManifest;
@@ -26,11 +27,18 @@ public class ImportBody extends Container{
     
     public ImportBody(){
         super();
-        setLayout(new FlowLayout());
         
         VersionLog v = new VersionLog();
         v.download();
         
+        
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         version = new JComboBox<>(v.getTypes());
         version.addItemListener((e)->{
             exportName.removeAllItems();
@@ -38,15 +46,21 @@ public class ImportBody extends Container{
                 exportName.addItem(export);
             }
         });
-        add(version);
+        add(version, gbc);
         
+        gbc.gridx = 1;
         exportName = new JComboBox<>(v.getExportsFor(version.getSelectedItem().toString()));
-        add(exportName);
+        add(exportName, gbc);
         
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         msg = new JTextArea();
         msg.setEditable(false);
-        add(msg);
+        add(msg, gbc);
         
+        gbc.gridx = 1;
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{
             try{
@@ -67,8 +81,6 @@ public class ImportBody extends Container{
             WayfindingManifest.importManifest(exportName.getSelectedItem().toString());
             msg.setText("Done!");
         });
-        add(importButton);
-        
-        
+        add(importButton, gbc);
     }
 }

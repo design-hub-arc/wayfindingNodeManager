@@ -7,9 +7,7 @@ import javax.swing.*;
 import nodemanager.*;
 import nodemanager.io.MapFile;
 import nodemanager.node.*;
-import nodemanager.io.NodeConnFile;
-import nodemanager.io.NodeCoordFile;
-import nodemanager.io.NodeLabelFile;
+import nodemanager.io.*;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
@@ -42,16 +40,17 @@ public class ImportMenu extends JMenu{
             new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
             (File f) -> {
                 try {
-                    new MapFile().readStream(new FileInputStream(f));
-                    //listener.setImage(ImageIO.read(f));
-                    repaint();
+                    importMap(new FileInputStream(f));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         );
     }
+    
+    //until we get MapFile working, we need to keep this
     private void importMap(InputStream s) throws IOException{
+        //new MapFile().readStream(new FileInputStream(f));
         listener.setImage(ImageIO.read(s));
     }
     

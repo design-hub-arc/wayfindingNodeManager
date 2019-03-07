@@ -46,6 +46,10 @@ public class WayfindingManifest extends AbstractWayfindingFile{
         m.unpack();
     }
     
+    /**
+     * Uploads the contents of the program to the drive,
+     * then populates this with the urls of those new files.
+     */
     private final void populate(){
         com.google.api.services.drive.model.File googleFile = null;
         try{

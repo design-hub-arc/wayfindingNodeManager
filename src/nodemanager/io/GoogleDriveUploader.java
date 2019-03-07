@@ -26,6 +26,8 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import static java.lang.System.out;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Used to upload files to the google drive
@@ -196,6 +198,14 @@ public class GoogleDriveUploader{
             JOptionPane.showMessageDialog(null, "Couldn't download " + id, "Faied to download", JOptionPane.ERROR_MESSAGE);
         }
         return ret;
+    }
+    
+    
+    public static String getFileName(String id) throws IOException{
+        if(id.contains("id=")){
+            id = id.split("id=")[1];
+        }
+        return drive.files().get(id).execute().getName();
     }
     
     private static Credential authorize() throws Exception{
