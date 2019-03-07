@@ -68,6 +68,13 @@ public class WayfindingManifest extends AbstractWayfindingFile{
         } catch(IOException ex){
             ex.printStackTrace();
         }
+        
+        try{
+            googleFile = new MapFile(prefix).upload(inDriveFolder);
+            urls.put("map image", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
    
     /**
@@ -75,11 +82,31 @@ public class WayfindingManifest extends AbstractWayfindingFile{
      */
     private final void unpack(){
         out.println("Unpacking...");
+        
+        if(urls.containsKey("map image")){
+            new MapFile("").readStream(GoogleDriveUploader.download(urls.get("map image")));
+        } else {
+            System.err.println("Manifest missing 'map image'");
+        }
+        
         if(urls.containsKey("Node coordinates")){
             new NodeCoordFile("").readStream(GoogleDriveUploader.download(urls.get("Node coordinates")));
         } else {
             System.err.println("Manifest missing 'Node coordinates'");
         }
+        
+        if(urls.containsKey("Node connections")){
+            new NodeConnFile("").readStream(GoogleDriveUploader.download(urls.get("Node connections")));
+        } else {
+            System.err.println("Manifest missing 'Node connections'");
+        }
+        
+        if(urls.containsKey("labels")){
+            new NodeLabelFile("").readStream(GoogleDriveUploader.download(urls.get("labels")));
+        } else {
+            System.err.println("Manifest missing 'labels'");
+        }
+        out.println("done");
     }
 
     @Override

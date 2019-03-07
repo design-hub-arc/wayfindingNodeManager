@@ -65,6 +65,7 @@ public class ImportBody extends Container{
             
             msg.setText("Beginning download...");
             WayfindingManifest.importManifest(exportName.getSelectedItem().toString());
+            msg.setText("Done!");
         });
         add(importButton);
         

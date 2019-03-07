@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
 import nodemanager.Session;
+import nodemanager.io.MapFile;
 
 
 /**
@@ -44,7 +45,8 @@ public class ExportMenu extends JMenu{
                     new NodeCoordFile(name).save(newDir.getAbsolutePath());
                     new NodeConnFile(name).save(newDir.getAbsolutePath());
                     new NodeLabelFile(name).save(newDir.getAbsolutePath());
-                    listener.saveImage(name, newDir.getAbsolutePath());
+                    new MapFile(name).save(newDir.getAbsolutePath());
+                    //listener.saveImage(name, newDir.getAbsolutePath());
                 }
         );
     }

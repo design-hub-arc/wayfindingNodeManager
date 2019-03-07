@@ -1,6 +1,7 @@
 package nodemanager.io;
 
 import java.io.InputStream;
+import nodemanager.Session;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
 
@@ -50,11 +51,12 @@ public class NodeCoordFile extends AbstractWayfindingFile{
     @Override
     public void readStream(InputStream s) {
         NodeParser.parseFile(s, (line)->{
-            new Node(
+            Session.map.addNode(new Node(
                     Integer.parseInt(line[0].trim()),
                     Integer.parseInt(line[1].trim()),
-                   Integer.parseInt(line[2].trim())
-            );
+                    Integer.parseInt(line[2].trim())
+            ));
         });
+        Session.map.refreshNodes();
     }
 }

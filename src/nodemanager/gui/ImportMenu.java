@@ -5,6 +5,7 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import nodemanager.*;
+import nodemanager.io.MapFile;
 import nodemanager.node.*;
 import nodemanager.io.NodeConnFile;
 import nodemanager.io.NodeCoordFile;
@@ -41,7 +42,8 @@ public class ImportMenu extends JMenu{
             new String[]{"Image file", "JPEG file", "jpg", "jpeg", "png"},
             (File f) -> {
                 try {
-                    listener.setImage(ImageIO.read(f));
+                    new MapFile().readStream(new FileInputStream(f));
+                    //listener.setImage(ImageIO.read(f));
                     repaint();
                 } catch (IOException ex) {
                     ex.printStackTrace();

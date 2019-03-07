@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.stream.ImageInputStream;
 import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.*;
@@ -416,6 +417,33 @@ public class MapImage extends JLabel{
         }
         return f;
     }
+    
+    
+    
+    
+    
+    public String getImageAsString() throws IOException{
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ImageIO.write(buff, "png", bytes);
+        bytes.flush();
+        return Base64.getEncoder().encodeToString(bytes.toByteArray());
+    }
+    
+    //not working. How convert inputstream to something base64 can decode?
+    public void setImage(InputStream s){
+        /*
+        try{
+            System.out.println(ImageIO.read(new BufferedInputStream(s)));
+            byte[] bytes = Base64.getDecoder().decode(s));
+            ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
+            setImage(ImageIO.read(stream));//new ByteArrayInputStream(Base64.getDecoder().decode(s))));
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+        */
+    }
+    
+    
 
     /**
      * @throws NullPointerException if the mouse isn't over a node.
