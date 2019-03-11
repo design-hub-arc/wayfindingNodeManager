@@ -2,6 +2,8 @@ package nodemanager.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import nodemanager.*;
@@ -112,7 +114,13 @@ public class ImportMenu extends JMenu{
     private JMenuItem importFromDriveMenu(){
         JMenuItem ret = new JMenuItem("Import from the drive");
         ret.addActionListener((e)->{
-            new ImportDialog((JFrame)SwingUtilities.getRoot(this));
+            try{
+                Class.forName("com.google.api.client.http.HttpTransport");
+                new ImportDialog((JFrame)SwingUtilities.getRoot(this));
+            } catch (ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "Looks like you forgot to include the lib folder! (See the guide for how to fix)");
+            }
+            
         });
         return ret;
     }

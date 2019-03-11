@@ -93,8 +93,8 @@ public class ImportBody extends Container{
         exportIds = v.getExportIdsFor(version.getSelectedItem().toString());
         exportNames = v.getExportNamesFor(version.getSelectedItem().toString());
         exportSelector.removeAllItems();
-        for(String name : exportNames){
-            exportSelector.addItem(name);
+        for(int i = exportNames.length -1; i >= 0; i--){
+            exportSelector.addItem(exportNames[i]);
         }
     }
 }

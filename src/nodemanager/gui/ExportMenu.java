@@ -8,6 +8,8 @@ import nodemanager.io.WayfindingManifest;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import nodemanager.Session;
 import nodemanager.io.MapFile;
@@ -53,7 +55,12 @@ public class ExportMenu extends JMenu{
     private JMenuItem exportManifest(){
         JMenuItem j = new JMenuItem("Export To The Drive");
         j.addActionListener((ActionEvent e) -> {
-            new ExportDialog((JFrame)SwingUtilities.getRoot(this));
+            try{
+                Class.forName("com.google.api.client.http.HttpTransport");
+                new ExportDialog((JFrame)SwingUtilities.getRoot(this));
+            } catch (ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "Looks like you forgot to include the lib folder! (See the guide for how to fix)");
+            }
         });
         return j;
     }
