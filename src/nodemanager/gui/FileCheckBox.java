@@ -2,6 +2,8 @@ package nodemanager.gui;
 
 import java.awt.GridLayout;
 import java.io.File;
+import java.io.IOException;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 /**
@@ -13,9 +15,12 @@ public class FileCheckBox extends JComponent{
     private final JTextField fileName;
     private final JButton select;
     private File selectedFile;
+    private Consumer<File> func;
     
-    public FileCheckBox(String text){
+    public FileCheckBox(String text, String[] types, Consumer<File> fileConsumer){
         setLayout(new GridLayout(1, 3));
+        
+        func = fileConsumer;
         
         selectedFile = null;
         
@@ -30,7 +35,7 @@ public class FileCheckBox extends JComponent{
         select.addActionListener((e)->{
             new FileSelector(
                     "Select " + text + " file",
-                    FileSelector.CSV,
+                    types,
                     (f)->{
                         selectFile(f);
                     }
@@ -47,5 +52,11 @@ public class FileCheckBox extends JComponent{
     public void selectFile(File f){
         selectedFile = f;
         fileName.setText(f.getAbsolutePath());
+    }
+    
+    public void importIfSelected(){
+        if(include.isSelected()){
+           func.accept(selectedFile);
+        }
     }
 }
