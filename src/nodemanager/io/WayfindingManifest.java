@@ -84,7 +84,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     /**
      * Loads the data from this manifest into the program
      */
-    private final void unpack(){
+    public final void unpack(){
         out.println("Unpacking...");
         
         if(urls.containsKey("map image")){
