@@ -3,7 +3,6 @@ package nodemanager.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Arrays;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -30,7 +29,7 @@ public class FileSelector extends JMenuItem implements ActionListener{
         super(text);
         chooser = new JFileChooser();
         chooser.setFileSelectionMode((types == DIR)? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
-        chooser.setFileFilter(new FileNameExtensionFilter(Arrays.toString(types), types));
+        chooser.setFileFilter(new FileNameExtensionFilter(text, types));
         action = act;
         addActionListener(this);
     }
