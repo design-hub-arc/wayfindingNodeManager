@@ -17,7 +17,7 @@ public class FileSelector extends JMenuItem implements ActionListener{
     
     public static final String[] CSV = new String[]{"Comma Separated Values", "csv"};
     public static final String[] DIR = new String[]{"Directory", "Folder"};
-    public static final String[] IMAGE = new String[]{"png", "jpeg"};
+    public static final String[] IMAGE = new String[]{"png", "jpeg", "gif"};
     
     /**
      * Creates a FileSelector, which is a menu item that allows the user to select a file,

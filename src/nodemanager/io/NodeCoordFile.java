@@ -50,6 +50,7 @@ public class NodeCoordFile extends AbstractCsvFile{
      */
     @Override
     public void readStream(InputStream s) {
+        Node.removeAll();
         NodeParser.parseFile(s, (line)->{
             Session.map.addNode(new Node(
                     Integer.parseInt(line[0].trim()),

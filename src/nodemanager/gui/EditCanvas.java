@@ -74,7 +74,7 @@ public class EditCanvas extends JPanel {
         map = new MapImage();
         body.add(map);
         
-        ImportMenu importMenu = new ImportMenu(map);
+        ImportMenu importMenu = new ImportMenu();
         menu.add(importMenu);
 
         menu.add(new ExportMenu(map));

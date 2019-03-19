@@ -48,7 +48,6 @@ public class LocalImportBody extends Container implements ActionListener{
             Node.removeAll();
             try {
                 new NodeCoordFile().readStream(new FileInputStream(f));
-                Session.map.refreshNodes();
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
             }
