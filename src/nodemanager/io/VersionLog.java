@@ -54,6 +54,10 @@ public class VersionLog extends AbstractCsvFile{
         urls.put(type, new ArrayList<>());
     }
     
+    public void deleteType(String type){
+        urls.remove(type);
+    }
+    
     public String[] getTypes(){
         return Arrays.copyOf(urls.keySet().toArray(), urls.size(), String[].class);
     }

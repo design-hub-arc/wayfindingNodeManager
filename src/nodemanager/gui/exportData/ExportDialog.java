@@ -1,6 +1,5 @@
 package nodemanager.gui.exportData;
 
-import nodemanager.gui.exportData.ExportBody;
 import java.awt.Frame;
 import javax.swing.JDialog;
 
