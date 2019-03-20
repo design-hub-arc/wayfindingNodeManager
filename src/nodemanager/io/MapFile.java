@@ -13,7 +13,7 @@ import nodemanager.Session;
  */
 public class MapFile extends AbstractWayfindingFile{
     public MapFile(String title) {
-        super(title + "MapImage", FileType.PNG);
+        super(title + "MapImage", FileType.MAP_IMAGE);
     }
     
     public MapFile(){

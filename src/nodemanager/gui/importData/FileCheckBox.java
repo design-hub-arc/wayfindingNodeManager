@@ -5,10 +5,11 @@ import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.io.Importer;
-import nodemanager.io.WayfindingFileType;
+import nodemanager.io.FileType;
 
 /**
- * Used by LocalImportBody to allow the user to choose what files to import
+ * Used by LocalImportBody to allow the user to choose what wayfinding files to import.
+ * 
  * @author Matt Crow
  */
 public class FileCheckBox extends JComponent{
@@ -16,9 +17,9 @@ public class FileCheckBox extends JComponent{
     private final JTextField fileName;
     private final JButton select;
     private File selectedFile;
-    private WayfindingFileType type;
+    private FileType type;
     
-    public FileCheckBox(WayfindingFileType t, String[] types){
+    public FileCheckBox(FileType t){
         setLayout(new GridLayout(1, 3));
         
         type = t;
@@ -36,7 +37,7 @@ public class FileCheckBox extends JComponent{
         select.addActionListener((e)->{
             new FileSelector(
                     "Select " + type.getTitle() + " file",
-                    types,
+                    new String[]{t.getFileExtention()},
                     (f)->{
                         selectFile(f);
                     }
@@ -50,7 +51,7 @@ public class FileCheckBox extends JComponent{
         });
     }
     
-    public WayfindingFileType getFileType(){
+    public FileType getFileType(){
         return type;
     }
     

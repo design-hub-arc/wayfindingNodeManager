@@ -11,7 +11,7 @@ import static nodemanager.io.AbstractWayfindingFile.NL;
  */
 public class NodeConnFile extends AbstractCsvFile{
     public NodeConnFile(String title){
-        super(title + "NodeConn");
+        super(title + "NodeConn", FileType.NODE_CONN);
     }
     
     public NodeConnFile(){

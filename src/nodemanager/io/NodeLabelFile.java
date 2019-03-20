@@ -10,7 +10,7 @@ import nodemanager.node.NodeParser;
  */
 public class NodeLabelFile extends AbstractCsvFile{
     public NodeLabelFile(String title){
-        super(title + "Labels");
+        super(title + "Labels", FileType.LABEL);
     }
     
     public NodeLabelFile(){

@@ -7,10 +7,10 @@ import javax.swing.JDialog;
  * Serves as the base for the import dialog box
  * @author Matt Crow
  */
-public class ImportDialog extends JDialog{
-    public ImportDialog(Frame f){
+public class DriveImportDialog extends JDialog{
+    public DriveImportDialog(Frame f){
         super(f, "Import");
-        setContentPane(new ImportBody());
+        setContentPane(new DriveImportBody());
         pack();
         setVisible(true);
     }

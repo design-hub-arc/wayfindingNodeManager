@@ -20,7 +20,6 @@ import nodemanager.io.*;
  * @author Matt Crow
  */
 public class LocalImportBody extends Container implements ActionListener{
-    private File folder;
     private final JButton selectFolder;
     private final JTextField selectedFolder;
     private final ArrayList<FileCheckBox> fileCheckBoxes;
@@ -29,8 +28,6 @@ public class LocalImportBody extends Container implements ActionListener{
         setLayout(new GridLayout(7, 1));
         
         fileCheckBoxes = new ArrayList<>();
-        
-        folder = null;
         
         selectFolder = new JButton("Select folder containing data");
         selectFolder.addActionListener(this);
@@ -42,26 +39,22 @@ public class LocalImportBody extends Container implements ActionListener{
         
         fileCheckBoxes.add( 
                 new FileCheckBox(
-                        WayfindingFileType.NODE_COORD, 
-                        FileSelector.CSV
+                        FileType.NODE_COORD
                 )
         );
         fileCheckBoxes.add( 
                 new FileCheckBox(
-                        WayfindingFileType.NODE_CONN, 
-                        FileSelector.CSV
+                        FileType.NODE_CONN
                 )
         );
         fileCheckBoxes.add( 
                 new FileCheckBox(
-                        WayfindingFileType.LABEL, 
-                        FileSelector.CSV
+                        FileType.LABEL
                 )
         );
         fileCheckBoxes.add( 
                 new FileCheckBox(
-                        WayfindingFileType.MAP_IMAGE, 
-                        FileSelector.IMAGE
+                        FileType.MAP_IMAGE
                 )
         );
         fileCheckBoxes.forEach((box)->add(box));
@@ -88,7 +81,6 @@ public class LocalImportBody extends Container implements ActionListener{
     }
     
     private void selectFolder(File f){
-        folder = f;
         selectedFolder.setText(f.getAbsolutePath());
         try {
             //find the most likely file that matches each type

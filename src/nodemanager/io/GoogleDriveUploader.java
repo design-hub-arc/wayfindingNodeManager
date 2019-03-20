@@ -23,12 +23,11 @@ import java.io.InputStreamReader;
 import java.util.*;
 import javax.swing.JOptionPane;
 
-import static java.lang.System.out;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * Used to upload files to the google drive
+ * Used to upload files to the google drive.
+ * We will replace this with database stuff once
+ * we actually get one.
+ * 
  * @author Matt Crow
  */
 public class GoogleDriveUploader{
@@ -106,9 +105,12 @@ public class GoogleDriveUploader{
             
         } catch (IOException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "If you received a 403 error, it could mean you tried to upload using your personal GMail account."
-                + " If you want to log in using your student email, delete the file " + STORE.getDataDirectory().getAbsolutePath()
-            );
+            JOptionPane.showMessageDialog(null, "If you received a 403 error, it could mean you tried to upload using your personal GMail account. Please log in using your student email.");
+            try {
+                java.nio.file.Files.deleteIfExists(STORE.getDataDirectory().toPath());
+            } catch (IOException ex1) {
+                ex1.printStackTrace();
+            }
         }
         return googleFile;
     }

@@ -1,7 +1,6 @@
 package nodemanager.io;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,7 +25,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     private final HashMap<String, String> urls;
     
     public WayfindingManifest(String folderName){
-        super(folderName + "Manifest");
+        super(folderName + "Manifest", FileType.MANIFEST);
         prefix = folderName;
         inDriveFolder = folderName;
         urls = new HashMap<>();

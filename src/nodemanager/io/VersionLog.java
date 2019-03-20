@@ -24,7 +24,7 @@ public class VersionLog extends AbstractCsvFile{
     private final LinkedHashMap<String, ArrayList<String>> urls; //Each column is a wayfinding type(artfinding, wayfinding, etc), and each cell in the column is the URL of a manifest
     
     public VersionLog(){
-        super("versions");
+        super("versions", FileType.VERSION_LOG);
         urls = new LinkedHashMap<>();
     }
     

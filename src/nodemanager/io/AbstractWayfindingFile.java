@@ -11,7 +11,6 @@ import java.io.InputStream;
  * save or load to/from local files,
  * or upload or download files from Google Drive.
  * 
- * Will probably have to split this into separate CsvFile and ImageFile classes.
  * Maybe make psuedo-static?
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -43,7 +42,7 @@ public abstract class AbstractWayfindingFile {
      * @return the file created, or null if it failed
      */
     public java.io.File save(String directory){
-        localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileType());
+        localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileExtention());
         writeToFile(localCopy);
         return localCopy;
     }
@@ -54,14 +53,14 @@ public abstract class AbstractWayfindingFile {
      * @throws IOException 
      */
     public final java.io.File createTemp() throws IOException{
-        java.io.File temp = java.io.File.createTempFile(name, type.getFileType());
+        java.io.File temp = java.io.File.createTempFile(name, type.getFileExtention());
         temp.deleteOnExit();
         temp = save(temp.getParent());
         return temp;
     }
     
     public final com.google.api.services.drive.model.File upload(String folderName, Runnable r) throws IOException{
-        driveCopy = GoogleDriveUploader.uploadFile(createTemp(), type.getDriveType(), folderName, r);
+        driveCopy = GoogleDriveUploader.uploadFile(createTemp(), type.getMimeType(), folderName, r);
         return driveCopy;
     }
     

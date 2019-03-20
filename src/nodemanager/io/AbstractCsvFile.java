@@ -16,8 +16,8 @@ import java.io.IOException;
  * @author Matt Crow
  */
 public abstract class AbstractCsvFile extends AbstractWayfindingFile{
-    public AbstractCsvFile(String title){
-        super(title, FileType.CSV);
+    public AbstractCsvFile(String title, FileType t){
+        super(title, t);
     }
     
     @Override

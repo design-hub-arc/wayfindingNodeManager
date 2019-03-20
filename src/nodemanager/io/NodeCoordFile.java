@@ -15,7 +15,7 @@ import nodemanager.node.NodeParser;
  */
 public class NodeCoordFile extends AbstractCsvFile{
     public NodeCoordFile(String title){
-        super(title + "NodeCoords");
+        super(title + "NodeCoords", FileType.NODE_COORD);
     }
     
     public NodeCoordFile(){

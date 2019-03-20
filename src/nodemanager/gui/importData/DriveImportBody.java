@@ -19,7 +19,7 @@ import nodemanager.io.WayfindingManifest;
  * TODO: combine this and ExportBody
  * @author Matt Crow
  */
-public class ImportBody extends Container{
+public class DriveImportBody extends Container{
     private JComboBox<String> version;
     private JComboBox<String> exportSelector;
     private String[] exportIds;
@@ -30,7 +30,7 @@ public class ImportBody extends Container{
     private final JButton importButton;
     private final JTextArea msg;
     
-    public ImportBody(){
+    public DriveImportBody(){
         super();
         
         v = new VersionLog();
@@ -52,10 +52,7 @@ public class ImportBody extends Container{
         
         gbc.gridx = 1;
         exportSelector = new JComboBox<>();
-        
-        
         add(exportSelector, gbc);
-        
         
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -93,8 +90,17 @@ public class ImportBody extends Container{
         exportIds = v.getExportIdsFor(version.getSelectedItem().toString());
         exportNames = v.getExportNamesFor(version.getSelectedItem().toString());
         exportSelector.removeAllItems();
+        
+        //we want to order it by newest to oldest, so we have to reverse both of them
         for(int i = exportNames.length -1; i >= 0; i--){
             exportSelector.addItem(exportNames[i]);
+        }
+        
+        String temp;
+        for(int i = 0; i < exportIds.length / 2; i++){
+            temp = exportIds[i];
+            exportIds[i] = exportIds[exportIds.length - 1 - i];
+            exportIds[exportIds.length - 1 - i] = temp;
         }
     }
 }

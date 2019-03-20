@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
  * @author Matt Crow
  */
 public class Importer {
-    public static boolean importFile(File f, WayfindingFileType type){
+    public static boolean importFile(File f, FileType type){
         boolean success = true;
         
         try{

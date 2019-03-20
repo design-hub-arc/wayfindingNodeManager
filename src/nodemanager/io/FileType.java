@@ -1,27 +1,45 @@
 package nodemanager.io;
 
 /**
- * Used by AbstractWayfindingFile to convert file extentions 
- * to MIME types used by Google Drive
+ * Used to keep track of 
+ * several things pertaining
+ * to the files used by wayfinding
+ * 
  * @author Matt Crow
  */
 public enum FileType {
-    CSV("csv", "text/csv"),
-    PNG("png", "image/png");
+    NODE_COORD( "Node coordinates", "NodeCoords", "csv", "text/csv"),
+    NODE_CONN(  "Node connections", "NodeConn",   "csv", "text/csv"),
+    LABEL(      "labels",           "Labels",     "csv", "text/csv"),
+    MAP_IMAGE(  "map image",        "MapImage",   "png", "image/png"),
+    MANIFEST(   "NONE",             "Manifest",   "csv", "text/csv"),
+    VERSION_LOG("NONE",             "NONE",       "csv", "text/csv");
     
-    private final String extention;
-    private final String driveType;
+    private final String TITLE;
+    private final String SUFFIX;
+    private final String FILE_EXTENTION;
+    private final String MIME_TYPE;
     
-    private FileType(String fileType, String mimeType){
-        extention = fileType;
-        driveType = mimeType;
+    private FileType(String title, String suffix, String extention, String mimeType){
+        TITLE = title;
+        SUFFIX = suffix;
+        FILE_EXTENTION = extention;
+        MIME_TYPE = mimeType;
     }
     
-    public String getFileType(){
-        return extention;
+    public String getTitle(){
+        return TITLE;
     }
     
-    public String getDriveType(){
-        return driveType;
+    public String getSuffix(){
+        return SUFFIX;
+    }
+    
+    public String getFileExtention(){
+        return FILE_EXTENTION;
+    }
+    
+    public String getMimeType(){
+        return MIME_TYPE;
     }
 }
