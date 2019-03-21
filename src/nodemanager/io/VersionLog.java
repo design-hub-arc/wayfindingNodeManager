@@ -50,6 +50,12 @@ public class VersionLog extends AbstractCsvFile{
         urls.get(wayfindingVersion).add(url);
     }
     
+    public boolean deleteUrl(String url){
+        boolean found = false;
+        
+        return found;
+    }
+    
     public void addType(String type){
         urls.put(type, new ArrayList<>());
     }
