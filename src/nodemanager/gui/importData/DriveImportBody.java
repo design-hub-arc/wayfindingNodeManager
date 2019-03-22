@@ -8,7 +8,9 @@ package nodemanager.gui.importData;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import javax.swing.*;
+import nodemanager.io.FileType;
 import nodemanager.io.VersionLog;
 import nodemanager.io.WayfindingManifest;
 
@@ -62,6 +64,20 @@ public class DriveImportBody extends Container{
         add(msg, gbc);
         
         gbc.gridx = 1;
+        
+        ArrayList<FileTypeCheckBox> cbs = new ArrayList<>();
+        FileTypeCheckBox temp;
+        for(FileType t : new FileType[]{
+            FileType.NODE_COORD,
+            FileType.NODE_COORD,
+            FileType.LABEL,
+            FileType.MAP_IMAGE
+        }){
+            temp = new FileTypeCheckBox(t);
+            cbs.add(temp);
+            add(temp, gbc);
+        }
+        
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{
             try{
