@@ -64,7 +64,7 @@ public class DriveImportBody extends Container{
         add(msg, gbc);
         
         gbc.gridx = 1;
-        
+        /*
         ArrayList<FileTypeCheckBox> cbs = new ArrayList<>();
         FileTypeCheckBox temp;
         for(FileType t : new FileType[]{
@@ -76,7 +76,7 @@ public class DriveImportBody extends Container{
             temp = new FileTypeCheckBox(t);
             cbs.add(temp);
             add(temp, gbc);
-        }
+        }*/
         
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{
