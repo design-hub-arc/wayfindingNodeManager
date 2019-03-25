@@ -36,13 +36,14 @@ public class WayfindingManifest extends AbstractCsvFile{
      * updating the program's data
      * @param id the file id or url of the manifest
      */
-    public static void importManifest(String id){
+    public static WayfindingManifest importManifest(String id){
         WayfindingManifest m = new WayfindingManifest("");
         if(id.contains("id=")){
             id = id.split("id=")[1];
         }
         m.readStream(GoogleDriveUploader.download(id));
         m.unpack();
+        return m;
     }
     
     /**
@@ -112,6 +113,12 @@ public class WayfindingManifest extends AbstractCsvFile{
         out.println("done");
     }
 
+    public boolean containsUrlFor(FileType fileType) {
+        return urls.containsKey(fileType.getTitle());
+    }
+    
+    
+    
     @Override
     public String getContentsToWrite() {
         populate();

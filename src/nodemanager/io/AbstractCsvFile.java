@@ -20,6 +20,10 @@ public abstract class AbstractCsvFile extends AbstractWayfindingFile{
         super(title, t);
     }
     
+    public AbstractCsvFile(File f, FileType t){
+        super(f, t);
+    }
+    
     @Override
     public final void writeToFile(File f){
         BufferedWriter out = null;

@@ -17,6 +17,10 @@ public class NodeConnFile extends AbstractCsvFile{
     public NodeConnFile(){
         this("temp");
     }
+    
+    public NodeConnFile(java.io.File f){
+        super(f, FileType.NODE_CONN);
+    }
 
     /**
      * generates the contents of a csv file containing the node connection data.

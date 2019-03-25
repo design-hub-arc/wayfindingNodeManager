@@ -19,6 +19,10 @@ public class MapFile extends AbstractWayfindingFile{
     public MapFile(){
         this("temp");
     }
+    
+    public MapFile(File f){
+        super(f, FileType.MAP_IMAGE);
+    }
 
     @Override
     public void readStream(InputStream s) {

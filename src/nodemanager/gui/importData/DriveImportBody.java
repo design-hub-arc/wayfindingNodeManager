@@ -5,9 +5,11 @@
  */
 package nodemanager.gui.importData;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
 import nodemanager.io.FileType;
@@ -34,37 +36,26 @@ public class DriveImportBody extends Container{
     
     public DriveImportBody(){
         super();
-        
+        setLayout(new GridLayout(1, 7));
         v = new VersionLog();
         v.download();
         
         
         setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
         
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
         version = new JComboBox<>(v.getTypes());
         version.addItemListener((e)->{
             updateExportSelector();
         });
-        add(version, gbc);
+        add(version);
         
-        gbc.gridx = 1;
         exportSelector = new JComboBox<>();
-        add(exportSelector, gbc);
+        add(exportSelector);
         
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.BOTH;
         msg = new JTextArea();
         msg.setEditable(false);
-        add(msg, gbc);
+        add(msg);
         
-        gbc.gridx = 1;
-        /*
         ArrayList<FileTypeCheckBox> cbs = new ArrayList<>();
         FileTypeCheckBox temp;
         for(FileType t : new FileType[]{
@@ -75,8 +66,8 @@ public class DriveImportBody extends Container{
         }){
             temp = new FileTypeCheckBox(t);
             cbs.add(temp);
-            add(temp, gbc);
-        }*/
+            add(temp);
+        }
         
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{
@@ -95,10 +86,15 @@ public class DriveImportBody extends Container{
             }
             
             msg.setText("Beginning download...");
-            WayfindingManifest.importManifest(exportIds[exportSelector.getSelectedIndex()]);
+            WayfindingManifest m = WayfindingManifest.importManifest(exportIds[exportSelector.getSelectedIndex()]);
+            cbs.forEach((cb)->{
+                if(m.containsUrlFor(cb.getFileType())){
+                    
+                }
+            });
             msg.setText("Done!");
         });
-        add(importButton, gbc);
+        add(importButton);
         updateExportSelector();
     }
     
@@ -118,5 +114,7 @@ public class DriveImportBody extends Container{
             exportIds[i] = exportIds[exportIds.length - 1 - i];
             exportIds[exportIds.length - 1 - i] = temp;
         }
+        revalidate();
+        repaint();
     }
 }

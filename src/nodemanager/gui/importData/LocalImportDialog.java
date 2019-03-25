@@ -1,6 +1,5 @@
 package nodemanager.gui.importData;
 
-import nodemanager.gui.importData.LocalImportBody;
 import java.awt.Frame;
 import javax.swing.JDialog;
 

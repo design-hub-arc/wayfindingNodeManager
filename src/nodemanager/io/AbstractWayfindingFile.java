@@ -1,5 +1,7 @@
 package nodemanager.io;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,6 +35,11 @@ public abstract class AbstractWayfindingFile {
         localCopy = null;
         driveCopy = null;
         type = t;
+    }
+    
+    public AbstractWayfindingFile(java.io.File f, FileType t){
+        this(f.getName(), t);
+        localCopy = f;
     }
     
     /**
@@ -77,6 +84,23 @@ public abstract class AbstractWayfindingFile {
         }
         
         return ret;
+    }
+    
+    /**
+     * Loads this' data into the program
+     */
+    public final void importData() throws Exception{
+        if(localCopy != null){
+            try {
+                readStream(new FileInputStream(localCopy));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        } else if(driveCopy != null){
+            readStream(GoogleDriveUploader.download(driveCopy.getId()));
+        } else {
+            throw new Exception("Cannot import if neither localCopy not driveCopy have been set!");
+        }
     }
     
     

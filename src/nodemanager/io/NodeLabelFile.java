@@ -16,6 +16,10 @@ public class NodeLabelFile extends AbstractCsvFile{
     public NodeLabelFile(){
         this("temp");
     }
+    
+    public NodeLabelFile(java.io.File f){
+        super(f, FileType.LABEL);
+    }
 
     /**
      * generates the contents of a csv file containing all the labels used by the program.
