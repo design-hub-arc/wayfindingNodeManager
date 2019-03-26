@@ -1,9 +1,5 @@
 package nodemanager.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 /**
  * May switch to using this in 
  * lieu of individual classes,
@@ -13,7 +9,7 @@ import java.io.FileNotFoundException;
  * 
  * @author Matt Crow
  */
-public class Importer {
+public class Converter {
     public static AbstractWayfindingFile convert(com.google.api.services.drive.model.File f, FileType t){
         AbstractWayfindingFile ret = null;
         

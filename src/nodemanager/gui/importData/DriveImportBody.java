@@ -5,10 +5,7 @@
  */
 package nodemanager.gui.importData;
 
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -37,12 +34,9 @@ public class DriveImportBody extends Container{
     
     public DriveImportBody(){
         super();
-        setLayout(new GridLayout(1, 7));
+        setLayout(new GridLayout(8, 1));
         v = new VersionLog();
         v.download();
-        
-        
-        setLayout(new GridBagLayout());
         
         version = new JComboBox<>(v.getTypes());
         version.addItemListener((e)->{
@@ -88,12 +82,9 @@ public class DriveImportBody extends Container{
             
             msg.setText("Beginning download...");
             WayfindingManifest m = WayfindingManifest.importManifest(exportIds[exportSelector.getSelectedIndex()]);
-            cbs.stream().filter((cb)->cb.isSelected()).forEach((cb)->{
-                System.out.println("checking " + cb.getFileType().getTitle());
-                if(m.containsUrlFor(cb.getFileType())){
-                    cb.selectFile(m.getFileFor(cb.getFileType()));
-                    cb.importIfSelected();
-                }
+            cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
+                cb.selectFile(m.getFileFor(cb.getFileType()));
+                cb.importIfSelected();
             });
             msg.setText("Done!");
         });

@@ -5,7 +5,7 @@ import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.io.FileType;
-import nodemanager.io.Importer;
+import nodemanager.io.Converter;
 
 /**
  * Used by LocalImportBody to allow the user to choose what wayfinding files to import.
@@ -38,7 +38,7 @@ public class FileCheckBox extends AbstractFileCheckbox{
     }
     
     public void selectFile(File f){
-        super.selectFile(Importer.convert(f, getFileType()));
+        super.selectFile(Converter.convert(f, getFileType()));
         fileName.setText(f.getAbsolutePath());
     }
 }

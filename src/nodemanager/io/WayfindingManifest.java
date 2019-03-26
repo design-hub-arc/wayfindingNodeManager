@@ -88,7 +88,7 @@ public class WayfindingManifest extends AbstractCsvFile{
         AbstractWayfindingFile ret = null;
         
         if(containsUrlFor(fileType)){
-            ret = Importer.convert(GoogleDriveUploader.getFile(urls.get(fileType.getTitle())), fileType);
+            ret = Converter.convert(GoogleDriveUploader.getFile(urls.get(fileType.getTitle())), fileType);
         }
         
         return ret;
