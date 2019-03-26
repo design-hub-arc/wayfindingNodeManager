@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
+import nodemanager.io.AbstractWayfindingFile;
 import nodemanager.io.FileType;
 import nodemanager.io.VersionLog;
 import nodemanager.io.WayfindingManifest;
@@ -60,7 +61,7 @@ public class DriveImportBody extends Container{
         FileTypeCheckBox temp;
         for(FileType t : new FileType[]{
             FileType.NODE_COORD,
-            FileType.NODE_COORD,
+            FileType.NODE_CONN,
             FileType.LABEL,
             FileType.MAP_IMAGE
         }){
@@ -87,9 +88,11 @@ public class DriveImportBody extends Container{
             
             msg.setText("Beginning download...");
             WayfindingManifest m = WayfindingManifest.importManifest(exportIds[exportSelector.getSelectedIndex()]);
-            cbs.forEach((cb)->{
+            cbs.stream().filter((cb)->cb.isSelected()).forEach((cb)->{
+                System.out.println("checking " + cb.getFileType().getTitle());
                 if(m.containsUrlFor(cb.getFileType())){
-                    
+                    cb.selectFile(m.getFileFor(cb.getFileType()));
+                    cb.importIfSelected();
                 }
             });
             msg.setText("Done!");

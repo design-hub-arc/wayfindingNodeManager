@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -174,6 +176,20 @@ public class GoogleDriveUploader{
         p.setAllowFileDiscovery(true);
         p.setRole("reader");
         drive.permissions().create(f.getId(), p).execute();
+    }
+    
+    public static com.google.api.services.drive.model.File getFile(String id){
+        com.google.api.services.drive.model.File ret = null;
+        if(id.contains("id=")){
+            id = id.split("id=")[1];
+        }
+        try{
+            ret = drive.files().get(id).execute();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        return ret;
     }
     
     /**

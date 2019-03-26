@@ -25,6 +25,10 @@ public class NodeCoordFile extends AbstractCsvFile{
     public NodeCoordFile(java.io.File f){
         super(f, FileType.NODE_COORD);
     }
+    
+    public NodeCoordFile(com.google.api.services.drive.model.File f){
+        super(f, FileType.NODE_COORD);
+    }
 
     /**
      * generates the contents of a csv file containing the data of all the nodes used by the program.

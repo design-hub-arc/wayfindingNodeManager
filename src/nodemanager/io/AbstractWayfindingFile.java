@@ -42,6 +42,11 @@ public abstract class AbstractWayfindingFile {
         localCopy = f;
     }
     
+    public AbstractWayfindingFile(com.google.api.services.drive.model.File f, FileType t){
+        this(f.getName(), t);
+        driveCopy = f;
+    }
+    
     /**
      * Creates a new file on the local system in the given directory.
      * The contents of the file are given by this.getContentsToWrite()
@@ -67,7 +72,11 @@ public abstract class AbstractWayfindingFile {
     }
     
     public final com.google.api.services.drive.model.File upload(String folderName, Runnable r) throws IOException{
-        driveCopy = GoogleDriveUploader.uploadFile(createTemp(), type.getMimeType(), folderName, r);
+        java.io.File upload = localCopy;
+        if(upload == null){
+            upload = createTemp();
+        }
+        driveCopy = GoogleDriveUploader.uploadFile(upload, type.getMimeType(), folderName, r);
         return driveCopy;
     }
     
@@ -88,6 +97,8 @@ public abstract class AbstractWayfindingFile {
     
     /**
      * Loads this' data into the program
+     * @throws java.lang.Exception if neither 
+     * this' local nor drive copies have been set
      */
     public final void importData() throws Exception{
         if(localCopy != null){

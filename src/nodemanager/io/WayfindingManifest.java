@@ -42,7 +42,7 @@ public class WayfindingManifest extends AbstractCsvFile{
             id = id.split("id=")[1];
         }
         m.readStream(GoogleDriveUploader.download(id));
-        m.unpack();
+        //m.unpack();
         return m;
     }
     
@@ -113,10 +113,19 @@ public class WayfindingManifest extends AbstractCsvFile{
         out.println("done");
     }
 
-    public boolean containsUrlFor(FileType fileType) {
+    public final boolean containsUrlFor(FileType fileType) {
         return urls.containsKey(fileType.getTitle());
     }
     
+    public final AbstractWayfindingFile getFileFor(FileType fileType){
+        AbstractWayfindingFile ret = null;
+        
+        if(containsUrlFor(fileType)){
+            ret = Importer.convert(GoogleDriveUploader.getFile(urls.get(fileType.getTitle())), fileType);
+        }
+        
+        return ret;
+    }
     
     
     @Override

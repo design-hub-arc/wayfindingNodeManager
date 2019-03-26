@@ -20,6 +20,10 @@ public class NodeLabelFile extends AbstractCsvFile{
     public NodeLabelFile(java.io.File f){
         super(f, FileType.LABEL);
     }
+    
+    public NodeLabelFile(com.google.api.services.drive.model.File f){
+        super(f, FileType.LABEL);
+    }
 
     /**
      * generates the contents of a csv file containing all the labels used by the program.

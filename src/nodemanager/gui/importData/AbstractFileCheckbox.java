@@ -49,6 +49,10 @@ public abstract class AbstractFileCheckbox extends JComponent{
         selectedFile = f;
     }
     
+    public final boolean isSelected(){
+        return include.isSelected();
+    }
+    
     public final void importIfSelected(){
         if(include.isSelected()){
             Importer.importFile(selectedFile, fileType);

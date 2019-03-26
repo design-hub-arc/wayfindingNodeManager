@@ -69,6 +69,30 @@ public class Importer {
         return success;
     }
     
+    public static AbstractWayfindingFile convert(com.google.api.services.drive.model.File f, FileType t){
+        AbstractWayfindingFile ret = null;
+        
+        switch(t){
+            case NODE_COORD:
+                ret = new NodeCoordFile(f);
+                break;
+            case NODE_CONN:
+                ret = new NodeConnFile(f);
+                break;
+            case LABEL:
+                ret = new NodeLabelFile(f);
+                break;
+            case MAP_IMAGE:
+                ret = new MapFile(f);
+                break;
+            default:
+                System.out.println("Not supported in Importer.convert: " + t.getTitle());
+                break;
+        }
+        
+        return ret;
+    }
+    
     public static AbstractWayfindingFile convert(java.io.File f, FileType t){
         AbstractWayfindingFile ret = null;
         
