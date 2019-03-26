@@ -8,9 +8,6 @@ import nodemanager.node.NodeParser;
 /**
  * Used as an interface to easily save the Node connection data
  * to either the computer or the google drive
- * 
- * 
- * TODO: make AbstractCsvFile class
  * @author Matt Crow
  */
 public class NodeCoordFile extends AbstractCsvFile{
@@ -20,14 +17,6 @@ public class NodeCoordFile extends AbstractCsvFile{
     
     public NodeCoordFile(){
         this("temp");
-    }
-    
-    public NodeCoordFile(java.io.File f){
-        super(f, FileType.NODE_COORD);
-    }
-    
-    public NodeCoordFile(com.google.api.services.drive.model.File f){
-        super(f, FileType.NODE_COORD);
     }
 
     /**

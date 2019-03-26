@@ -14,80 +14,29 @@ import java.io.FileNotFoundException;
  * @author Matt Crow
  */
 public class Importer {
-    public static boolean importFile(File f, FileType type){
-        boolean success = true;
-        System.out.println("importing " + f.getAbsolutePath());
-        try{
-            switch(type){
-                case NODE_COORD:
-                    new NodeCoordFile().readStream(new FileInputStream(f));
-                    break;
-                case NODE_CONN:
-                    new NodeConnFile().readStream(new FileInputStream(f));
-                    break;
-                case LABEL:
-                    new NodeLabelFile().readStream(new FileInputStream(f));
-                    break;
-                case MAP_IMAGE:
-                    new MapFile().readStream(new FileInputStream(f));
-                    break;
-                case MANIFEST:
-                    WayfindingManifest m = new WayfindingManifest("");
-                    m.readStream(new FileInputStream(f));
-                    m.unpack();
-                    break;
-                default:
-                    System.err.println("Type not supported in Importer.importFile: " + type.name());
-                    success = false;
-                    break;
-            }
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            success = false;
-        }
-        
-        return success;
-    }
-    
-    /**
-     * Loads a wayfinding file into the program.
-     * 
-     * @param f
-     * @param type
-     * @return 
-     */
-    public static boolean importFile(AbstractWayfindingFile f, FileType type){
-        boolean success = true;
-        
-        try{
-            f.importData();
-        } catch(Exception e){
-            success = false;
-            e.printStackTrace();
-        }
-        
-        return success;
-    }
-    
     public static AbstractWayfindingFile convert(com.google.api.services.drive.model.File f, FileType t){
         AbstractWayfindingFile ret = null;
         
         switch(t){
             case NODE_COORD:
-                ret = new NodeCoordFile(f);
+                ret = new NodeCoordFile();
                 break;
             case NODE_CONN:
-                ret = new NodeConnFile(f);
+                ret = new NodeConnFile();
                 break;
             case LABEL:
-                ret = new NodeLabelFile(f);
+                ret = new NodeLabelFile();
                 break;
             case MAP_IMAGE:
-                ret = new MapFile(f);
+                ret = new MapFile();
                 break;
             default:
                 System.out.println("Not supported in Importer.convert: " + t.getTitle());
                 break;
+        }
+        
+        if(ret != null){
+            ret.setDriveCopy(f);
         }
         
         return ret;
@@ -98,20 +47,24 @@ public class Importer {
         
         switch(t){
             case NODE_COORD:
-                ret = new NodeCoordFile(f);
+                ret = new NodeCoordFile();
                 break;
             case NODE_CONN:
-                ret = new NodeConnFile(f);
+                ret = new NodeConnFile();
                 break;
             case LABEL:
-                ret = new NodeLabelFile(f);
+                ret = new NodeLabelFile();
                 break;
             case MAP_IMAGE:
-                ret = new MapFile(f);
+                ret = new MapFile();
                 break;
             default:
                 System.out.println("Not supported in Importer.convert: " + t.getTitle());
                 break;
+        }
+        
+        if(ret != null){
+            ret.setLocalCopy(f);
         }
         
         return ret;

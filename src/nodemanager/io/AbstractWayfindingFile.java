@@ -18,7 +18,7 @@ import java.io.InputStream;
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 public abstract class AbstractWayfindingFile {
-    private final String name;
+    private String name;
     private java.io.File localCopy; // The local version of this file
     private com.google.api.services.drive.model.File driveCopy;
     private final FileType type; 
@@ -37,24 +37,37 @@ public abstract class AbstractWayfindingFile {
         type = t;
     }
     
-    public AbstractWayfindingFile(java.io.File f, FileType t){
-        this(f.getName(), t);
+    /**
+     * Associates a local file as the local copy of this file.
+     * @param f the file to associate with this.
+     */
+    public final void setLocalCopy(java.io.File f){
         localCopy = f;
-    }
-    
-    public AbstractWayfindingFile(com.google.api.services.drive.model.File f, FileType t){
-        this(f.getName(), t);
-        driveCopy = f;
+        name = f.getName();
     }
     
     /**
-     * Creates a new file on the local system in the given directory.
+     * Associates a drive file as the drive copy of this file.
+     * @param f the file to associate with this.
+     */
+    public final void setDriveCopy(com.google.api.services.drive.model.File f){
+        driveCopy = f;
+        name = f.getName();
+    }
+    
+    /**
+     * Saves this' contents to the local file system.
+     * If this has a local file associated with it,
+     * writes to that file,
+     * otherwise, creates a new file on the local system in the given directory and writes to it.
      * The contents of the file are given by this.getContentsToWrite()
      * @param directory the directory to save the file to.
-     * @return the file created, or null if it failed
+     * @return the file created or updated
      */
     public java.io.File save(String directory){
-        localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileExtention());
+        if(localCopy == null){
+            localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileExtention());
+        }
         writeToFile(localCopy);
         return localCopy;
     }
@@ -71,6 +84,17 @@ public abstract class AbstractWayfindingFile {
         return temp;
     }
     
+    /**
+     * Uploads this' local copy to the drive. 
+     * If a local copy isn't set, 
+     * creates a temporary file to hold the data from the program,
+     * then uploads that temporary file.
+     * 
+     * @param folderName the name of the folder on the google drive to upload to.
+     * @param r a callback function to run after the file is uploaded
+     * @return the google drive file variant of the uploaded file
+     * @throws IOException if the upload fails
+     */
     public final com.google.api.services.drive.model.File upload(String folderName, Runnable r) throws IOException{
         java.io.File upload = localCopy;
         if(upload == null){

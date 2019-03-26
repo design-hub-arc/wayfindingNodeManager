@@ -42,7 +42,6 @@ public class WayfindingManifest extends AbstractCsvFile{
             id = id.split("id=")[1];
         }
         m.readStream(GoogleDriveUploader.download(id));
-        //m.unpack();
         return m;
     }
     
@@ -80,39 +79,7 @@ public class WayfindingManifest extends AbstractCsvFile{
             ex.printStackTrace();
         }
     }
-   
-    /**
-     * Loads the data from this manifest into the program
-     */
-    public final void unpack(){
-        out.println("Unpacking...");
-        
-        if(urls.containsKey("map image")){
-            new MapFile("").readStream(GoogleDriveUploader.download(urls.get("map image")));
-        } else {
-            System.err.println("Manifest missing 'map image'");
-        }
-        
-        if(urls.containsKey("Node coordinates")){
-            new NodeCoordFile("").readStream(GoogleDriveUploader.download(urls.get("Node coordinates")));
-        } else {
-            System.err.println("Manifest missing 'Node coordinates'");
-        }
-        
-        if(urls.containsKey("Node connections")){
-            new NodeConnFile("").readStream(GoogleDriveUploader.download(urls.get("Node connections")));
-        } else {
-            System.err.println("Manifest missing 'Node connections'");
-        }
-        
-        if(urls.containsKey("labels")){
-            new NodeLabelFile("").readStream(GoogleDriveUploader.download(urls.get("labels")));
-        } else {
-            System.err.println("Manifest missing 'labels'");
-        }
-        out.println("done");
-    }
-
+    
     public final boolean containsUrlFor(FileType fileType) {
         return urls.containsKey(fileType.getTitle());
     }
