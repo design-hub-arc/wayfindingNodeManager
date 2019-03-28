@@ -176,8 +176,12 @@ public class VersionLog extends AbstractCsvFile{
         }
     }
     
-    public void save() throws IOException{
-        GoogleDriveUploader.revise(this);
+    public void save(){
+        try{
+            GoogleDriveUploader.revise(this);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
     
     public void displayData(){

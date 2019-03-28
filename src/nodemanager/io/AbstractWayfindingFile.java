@@ -37,6 +37,32 @@ public abstract class AbstractWayfindingFile {
         type = t;
     }
     
+    public final FileType getType(){
+        return type;
+    }
+    
+    /**
+     * Gets the File to upload.
+     * Returns this' local copy, if it exists,
+     * otherwise, returns a temporary file.
+     * @return 
+     */
+    public final java.io.File getUpload(){
+        java.io.File upload = localCopy;
+        if(upload == null){
+            try{
+                upload = createTemp();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+        return upload;
+    }
+    
+    public final String getDriveId() throws NullPointerException{
+        return driveCopy.getId();
+    }
+    
     /**
      * Associates a local file as the local copy of this file.
      * @param f the file to associate with this.
@@ -92,20 +118,21 @@ public abstract class AbstractWayfindingFile {
      * 
      * @param folderName the name of the folder on the google drive to upload to.
      * @param r a callback function to run after the file is uploaded
-     * @return the google drive file variant of the uploaded file
      * @throws IOException if the upload fails
      */
-    public final com.google.api.services.drive.model.File upload(String folderName, Runnable r) throws IOException{
+    public final void upload(String folderName, Runnable r) throws IOException{
         java.io.File upload = localCopy;
         if(upload == null){
             upload = createTemp();
         }
-        driveCopy = GoogleDriveUploader.uploadFile(upload, type.getMimeType(), folderName, r);
-        return driveCopy;
+        GoogleDriveUploader.uploadFile(this, folderName, (f)->{
+            setDriveCopy(f);
+            r.run();
+        });
     }
     
-    public final com.google.api.services.drive.model.File upload(String folderName) throws IOException{
-        return upload(folderName, ()->{});
+    public final void upload(String folderName) throws IOException{
+        upload(folderName, ()->{});
     }
     
     public String getUrl() throws NullPointerException{

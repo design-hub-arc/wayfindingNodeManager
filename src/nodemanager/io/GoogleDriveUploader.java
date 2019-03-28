@@ -20,9 +20,9 @@ import com.google.api.services.drive.model.Permission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import static java.lang.System.out;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 
 /**
@@ -70,55 +70,44 @@ public class GoogleDriveUploader{
     }
     
     /**
-     * Uploads a file to the google drive
-     * @param orig the local file to upload
-     * @param type the type of the file (text/csv, image/png)
-     * @param subfolderName the name of the folder to put the data in. The program creates this for you
-     * @param onUploadComplete what to run once the upload is complete
-     * @return the file after it has been uploaded to the google drive
+     * Asynchronously uploads a file to the google drive
+     * @param f the wayfinding file to upload to the drive
+     * @param folderName the folder to upload to
+     * @param onUploadComplete a method that is called once the new file is uploaded, accepting the newly uploaded drive file as a parameter
      */
-    public static File uploadFile(java.io.File orig, String type, String subfolderName, Runnable onUploadComplete){
-        File googleFile = null;
-        
-        try {
-            googleFile = new File();
-            FileContent content = new FileContent(type, orig);
-            
-            
-            ArrayList<String> parents = new ArrayList<>();
-            parents.add(getFolderByName(subfolderName).getId());
-            googleFile.setParents(parents);
-            
-            
-            
-            Drive.Files.Create insert = drive.files().create(googleFile, content);
-            
-            googleFile.setName(orig.getName());
-            
-            MediaHttpUploader uploader = insert.getMediaHttpUploader();
-            uploader.setProgressListener((up) -> {
-                if(up.getUploadState() == UploadState.MEDIA_COMPLETE){
-                    onUploadComplete.run();
+    public static void uploadFile(AbstractWayfindingFile f, String folderName, Consumer<File> onUploadComplete){
+        new Thread(){
+            @Override
+            public void run(){
+                try{
+                    File googleFile = new File();
+                    FileContent content = new FileContent(f.getType().getMimeType(), f.getUpload());
+
+                    ArrayList<String> parents = new ArrayList<>();
+                    parents.add(getFolderByName(folderName).getId());
+                    googleFile.setParents(parents);
+
+                    Drive.Files.Create insert = drive.files().create(googleFile, content);
+
+                    googleFile.setName(f.getUpload().getName());
+
+                    //since all of this google stuff is blocking code (O...K...)
+                    //it will execute in whatever order we put it in.
+                    //no need to worry about them executing out of order
+                    googleFile = insert.execute();
+                    publishToWeb(googleFile);
+                    onUploadComplete.accept(googleFile);
+                } catch(IOException e){
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "If you received a 403 error, it could mean you tried to upload using your personal GMail account. Please log in using your student email.");
+                    try {
+                        java.nio.file.Files.deleteIfExists(STORE.getDataDirectory().toPath());
+                    } catch (IOException ex1) {
+                        ex1.printStackTrace();
+                    }
                 }
-            });
-            
-            googleFile = insert.execute();
-            publishToWeb(googleFile);
-            
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "If you received a 403 error, it could mean you tried to upload using your personal GMail account. Please log in using your student email.");
-            try {
-                java.nio.file.Files.deleteIfExists(STORE.getDataDirectory().toPath());
-            } catch (IOException ex1) {
-                ex1.printStackTrace();
             }
-        }
-        return googleFile;
-    }
-    
-    public static File uploadFile(java.io.File orig, String type, String subfolderName){
-        return uploadFile(orig, type, subfolderName, ()->{});
+        }.start();
     }
     
     public static final com.google.api.services.drive.model.File revise(VersionLog vl) throws IOException{
@@ -127,14 +116,9 @@ public class GoogleDriveUploader{
         return file;
     }
     
-    
-    
     private static File getFolderByName(String name){
         File folder = null;
         try {
-            drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false").execute().getFiles().forEach((file) -> {
-                System.out.println(file.getName());
-            });
             
             List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + name + "'").execute().getFiles();
             folders.forEach(n -> System.out.println(n));
@@ -144,7 +128,6 @@ public class GoogleDriveUploader{
                 
             }
             folder = drive.files().get(folders.stream().findFirst().get().getId()).execute();
-            System.out.println(folder);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -246,14 +229,5 @@ public class GoogleDriveUploader{
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP, JSON, clientInfo, Collections.singleton(DriveScopes.DRIVE))
                 .setDataStoreFactory(STORE).build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-    }
-    
-    
-    
-    public static void main(String[] args) throws IOException{
-        InputStreamReader r = new InputStreamReader(download("https://drive.google.com/open?id=1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5"));
-        while(r.ready()){
-            System.out.println((char)r.read());
-        }
     }
 }

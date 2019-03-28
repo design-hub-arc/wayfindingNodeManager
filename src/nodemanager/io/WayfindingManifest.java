@@ -8,6 +8,8 @@ import static java.lang.System.out;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * creates a manifest file containing all the currently active data,
@@ -49,35 +51,49 @@ public class WayfindingManifest extends AbstractCsvFile{
      * Uploads the contents of the program to the drive,
      * then populates this with the urls of those new files.
      */
-    private final void populate(){
-        com.google.api.services.drive.model.File googleFile = null;
-        try{
-            googleFile = new NodeCoordFile(prefix).upload(inDriveFolder);
-            urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
-        } catch(IOException ex){
-            ex.printStackTrace();
-        }
-        
-        try{
-            googleFile = new NodeConnFile(prefix).upload(inDriveFolder);
-            urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
-        } catch(IOException ex){
-            ex.printStackTrace();
-        }
-        
-        try{
-            googleFile = new NodeLabelFile(prefix).upload(inDriveFolder);
-            urls.put("labels", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
-        } catch(IOException ex){
-            ex.printStackTrace();
-        }
-        
-        try{
-            googleFile = new MapFile(prefix).upload(inDriveFolder);
-            urls.put("map image", "https://drive.google.com/uc?export=download&id=" + googleFile.getId());
-        }catch(IOException ex){
-            ex.printStackTrace();
-        }
+    private final Thread populate(){
+        Thread t = new Thread(){
+            @Override
+            public void run(){
+                try{
+                    NodeCoordFile n = new NodeCoordFile(prefix);
+                    n.upload(inDriveFolder, ()->{
+                        urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + n.getDriveId());
+                    });
+                } catch(IOException ex){
+                    ex.printStackTrace();
+                }
+
+                try{
+                    NodeConnFile n = new NodeConnFile(prefix);
+                    n.upload(inDriveFolder, ()->{
+                        urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + n.getDriveId());
+                    });
+                } catch(IOException ex){
+                    ex.printStackTrace();
+                }
+
+                try{
+                    NodeLabelFile n = new NodeLabelFile(prefix);
+                    n.upload(inDriveFolder, ()->{
+                        urls.put("labels", "https://drive.google.com/uc?export=download&id=" + n.getDriveId());
+                    });
+                } catch(IOException ex){
+                    ex.printStackTrace();
+                }
+
+                try{
+                    MapFile f = new MapFile(prefix);
+                    f.upload(inDriveFolder, ()->{
+                        urls.put("map image", "https://drive.google.com/uc?export=download&id=" + f.getDriveId());
+                    });
+                }catch(IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+        };
+        t.start();
+        return t;
     }
     
     public final boolean containsUrlFor(FileType fileType) {
@@ -97,7 +113,11 @@ public class WayfindingManifest extends AbstractCsvFile{
     
     @Override
     public String getContentsToWrite() {
-        populate();
+        try {
+            populate().join();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         StringBuilder sb = new StringBuilder("Data, URL");
         for(Map.Entry<String, String> entry : urls.entrySet()){
                 sb

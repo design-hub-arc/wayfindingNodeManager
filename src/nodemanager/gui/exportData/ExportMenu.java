@@ -1,20 +1,12 @@
 package nodemanager.gui.exportData;
 
-import nodemanager.gui.exportData.ExportDialog;
 import nodemanager.io.NodeConnFile;
 import nodemanager.io.NodeLabelFile;
 import nodemanager.io.NodeCoordFile;
-import nodemanager.io.GoogleDriveUploader;
-import nodemanager.io.WayfindingManifest;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
-import nodemanager.Session;
 import nodemanager.gui.FileSelector;
-import nodemanager.gui.MapImage;
 import nodemanager.io.MapFile;
 
 
@@ -23,17 +15,11 @@ import nodemanager.io.MapFile;
  * @author Matt Crow
  */
 public class ExportMenu extends JMenu{
-    private final MapImage listener;
-    
     /**
-     * Creates a new ExportMenu, then associates a MapImage with it.
-     * @param notify the MapImage to save the image from when the user selects the 
-     * "Export map" option.
+     * Creates a new ExportMenu
      */
-    public ExportMenu(MapImage notify){
+    public ExportMenu(){
         super("Export");
-        
-        listener = notify;
         
         add(saveLocal());
         add(exportManifest());
@@ -51,7 +37,6 @@ public class ExportMenu extends JMenu{
                     new NodeConnFile(name).save(newDir.getAbsolutePath());
                     new NodeLabelFile(name).save(newDir.getAbsolutePath());
                     new MapFile(name).save(newDir.getAbsolutePath());
-                    //listener.saveImage(name, newDir.getAbsolutePath());
                 }
         );
     }

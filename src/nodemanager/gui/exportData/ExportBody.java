@@ -12,7 +12,6 @@ import nodemanager.io.WayfindingManifest;
  * Acts as the body of the export dialog whenever the user clicks the export to drive button.
  * Allows the user to specify which version of wayfinding they are uploading to, as well as what to name the export.
  * 
- * TODO: combine this and ImportBody
  * @author Matt Crow
  */
 public class ExportBody extends Container {
@@ -25,7 +24,7 @@ public class ExportBody extends Container {
     
     public ExportBody() {
         super();
-        setLayout(new FlowLayout());
+        setLayout(new GridLayout(5, 1));
         name = new JTextField("Enter the name for this export");
         add(name);
         
@@ -78,11 +77,10 @@ public class ExportBody extends Container {
             try{
                 newMan.upload(name.getText(), ()->{
                     msg.setText("Upload complete!");
+                    Session.purgeActions();
+                    v.addUrl(newType.getText(), newMan.getUrl());
+                    v.save();
                 });
-                Session.purgeActions();
-                v.addUrl(newType.getText(), newMan.getUrl());
-                v.save();
-                
             } catch(IOException ex){
                 msg.setText(ex.getMessage());
             }
