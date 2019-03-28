@@ -6,8 +6,6 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.googleapis.media.MediaHttpUploader;
-import com.google.api.client.googleapis.media.MediaHttpUploader.UploadState;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -20,10 +18,10 @@ import com.google.api.services.drive.model.Permission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import static java.lang.System.out;
 import java.util.*;
 import java.util.function.Consumer;
 import javax.swing.JOptionPane;
+import nodemanager.exceptions.NoPermissionException;
 
 /**
  * Used to upload files to the google drive.
@@ -69,14 +67,28 @@ public class GoogleDriveUploader{
         }
     }
     
+    private static void deleteFileStore(){
+        deleteDir(STORE.getDataDirectory());
+    }
+    
+    private static void deleteDir(java.io.File f){
+        java.io.File[] contents = f.listFiles();
+        if(contents != null){
+            for(java.io.File file : contents){
+                file.delete();
+            }
+        }
+        f.delete();
+    }
+    
     /**
      * Asynchronously uploads a file to the google drive
      * @param f the wayfinding file to upload to the drive
      * @param folderName the folder to upload to
      * @param onUploadComplete a method that is called once the new file is uploaded, accepting the newly uploaded drive file as a parameter
      */
-    public static void uploadFile(AbstractWayfindingFile f, String folderName, Consumer<File> onUploadComplete){
-        new Thread(){
+    public static void uploadFile(AbstractWayfindingFile f, String folderName, Consumer<File> onUploadComplete) throws NoPermissionException{
+        new Thread() {
             @Override
             public void run(){
                 try{
@@ -97,59 +109,62 @@ public class GoogleDriveUploader{
                     googleFile = insert.execute();
                     publishToWeb(googleFile);
                     onUploadComplete.accept(googleFile);
-                } catch(IOException e){
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "If you received a 403 error, it could mean you tried to upload using your personal GMail account. Please log in using your student email.");
-                    try {
-                        java.nio.file.Files.deleteIfExists(STORE.getDataDirectory().toPath());
-                    } catch (IOException ex1) {
-                        ex1.printStackTrace();
+                } catch(com.google.api.client.googleapis.json.GoogleJsonResponseException e){
+                    int code = e.getDetails().getCode();
+                    if(code == 404){
+                        deleteFileStore();
+                        //throw new NoPermissionException(FOLDER_ID);
+                    } else {
+                        e.printStackTrace();
                     }
+                }catch(IOException e){
+                    e.printStackTrace();
                 }
             }
         }.start();
     }
     
-    public static final com.google.api.services.drive.model.File revise(VersionLog vl) throws IOException{
-        com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
-        drive.files().update(file.getId(), new File(), new FileContent("text/csv", vl.createTemp())).execute();
-        return file;
+    public static final void revise(VersionLog vl) throws NoPermissionException{
+        try{
+            com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
+            drive.files().update(file.getId(), new File(), new FileContent("text/csv", vl.createTemp())).execute();
+        } catch(com.google.api.client.googleapis.json.GoogleJsonResponseException e){
+            int code = Integer.parseInt(e.getDetails().getOrDefault("code", 0).toString());
+            if(code == 403){
+                throw new NoPermissionException(vl.getDriveId());
+            } else {
+                e.printStackTrace();
+            }
+        } catch(IOException ie){
+            ie.printStackTrace();
+        }
     }
     
-    private static File getFolderByName(String name){
+    private static File getFolderByName(String name) throws IOException{
         File folder = null;
-        try {
-            
-            List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + name + "'").execute().getFiles();
-            folders.forEach(n -> System.out.println(n));
-            
-            if(folders.isEmpty()){
-                folders.add(createFolder(name));
-                
-            }
-            folder = drive.files().get(folders.stream().findFirst().get().getId()).execute();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + name + "'").execute().getFiles();
+        folders.forEach(n -> System.out.println(n));
+
+        if(folders.isEmpty()){
+            folders.add(createFolder(name));
+
         }
+        folder = drive.files().get(folders.stream().findFirst().get().getId()).execute();
+        
         return folder;
     }
     
-    private static File createFolder(String title){
-        File folder = null;
-        try {
-            folder = new File();
-            
-            folder.setName(title);
-            folder.setMimeType("application/vnd.google-apps.folder");
-            ArrayList<String> parents = new ArrayList<>();
-            parents.add(FOLDER_ID);
-            folder.setParents(parents);
-            
-            folder = drive.files().create(folder).setFields("id").execute();
-            
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    private static File createFolder(String title) throws IOException{
+        File folder = new File();
+
+        folder.setName(title);
+        folder.setMimeType("application/vnd.google-apps.folder");
+        ArrayList<String> parents = new ArrayList<>();
+        parents.add(FOLDER_ID);
+        folder.setParents(parents);
+
+        folder = drive.files().create(folder).setFields("id").execute();
+        
         return folder;
     }
     
@@ -229,5 +244,17 @@ public class GoogleDriveUploader{
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP, JSON, clientInfo, Collections.singleton(DriveScopes.DRIVE))
                 .setDataStoreFactory(STORE).build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+    }
+
+    public static void main(String[] args) throws IOException{
+        /*
+        try{
+            drive.files().update("1HdesCi9x5rD5r7qDNHDp_78ZcI547HFl", new File(), new FileContent("text/csv", new java.io.File("C:\\Users\\w1599227\\Desktop\\test.txt.txt"))).execute();
+        } catch(com.google.api.client.googleapis.json.GoogleJsonResponseException e){
+            System.out.println(e.getDetails().get("code"));
+        }*/
+        VersionLog v = new VersionLog();
+        v.download();
+        v.save();
     }
 }
