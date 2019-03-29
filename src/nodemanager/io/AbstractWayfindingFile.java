@@ -1,9 +1,12 @@
 package nodemanager.io;
 
+import com.google.api.services.drive.model.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides a base for the classes used to interface
@@ -117,22 +120,21 @@ public abstract class AbstractWayfindingFile {
      * then uploads that temporary file.
      * 
      * @param folderName the name of the folder on the google drive to upload to.
-     * @param r a callback function to run after the file is uploaded
-     * @throws IOException if the upload fails
+     * @return a DriveIOOp. See its file to see what it does
      */
-    public final void upload(String folderName, Runnable r) throws IOException{
+    public final DriveIOOp upload(String folderName){
         java.io.File upload = localCopy;
         if(upload == null){
-            upload = createTemp();
+            try {
+                upload = createTemp();
+                localCopy = upload;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
-        GoogleDriveUploader.uploadFile(this, folderName, (f)->{
-            setDriveCopy(f);
-            r.run();
+        return GoogleDriveUploader.uploadFile(this, folderName).addOnSucceed((f)->{
+            setDriveCopy((File)f);
         });
-    }
-    
-    public final void upload(String folderName) throws IOException{
-        upload(folderName, ()->{});
     }
     
     public String getUrl() throws NullPointerException{

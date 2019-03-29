@@ -6,6 +6,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -19,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 import nodemanager.exceptions.NoPermissionException;
 
@@ -85,14 +85,15 @@ public class GoogleDriveUploader{
      * Asynchronously uploads a file to the google drive
      * @param f the wayfinding file to upload to the drive
      * @param folderName the folder to upload to
-     * @param onUploadComplete a method that is called once the new file is uploaded, accepting the newly uploaded drive file as a parameter
+     * @return a DriveIOOp. See DriveIOOp for how to use this
      */
-    public static void uploadFile(AbstractWayfindingFile f, String folderName, Consumer<File> onUploadComplete) throws NoPermissionException{
-        new Thread() {
+    public static DriveIOOp uploadFile(AbstractWayfindingFile f, String folderName){
+        DriveIOOp upload = new DriveIOOp(){
             @Override
-            public void run(){
+            public Object perform() throws Exception {
+                File googleFile = null;
                 try{
-                    File googleFile = new File();
+                    googleFile = new File();
                     FileContent content = new FileContent(f.getType().getMimeType(), f.getUpload());
 
                     ArrayList<String> parents = new ArrayList<>();
@@ -108,20 +109,22 @@ public class GoogleDriveUploader{
                     //no need to worry about them executing out of order
                     googleFile = insert.execute();
                     publishToWeb(googleFile);
-                    onUploadComplete.accept(googleFile);
-                } catch(com.google.api.client.googleapis.json.GoogleJsonResponseException e){
-                    int code = e.getDetails().getCode();
-                    if(code == 404){
+                } catch(GoogleJsonResponseException gex){
+                    int code = gex.getDetails().getCode();
+                    if(code == 403){
                         deleteFileStore();
-                        //throw new NoPermissionException(FOLDER_ID);
+                        throw new NoPermissionException(FOLDER_ID);
                     } else {
-                        e.printStackTrace();
+                        throw gex;
                     }
-                }catch(IOException e){
-                    e.printStackTrace();
                 }
+                return googleFile;
             }
-        }.start();
+        };
+        
+        upload.execute();
+        
+        return upload;
     }
     
     public static final void revise(VersionLog vl) throws NoPermissionException{

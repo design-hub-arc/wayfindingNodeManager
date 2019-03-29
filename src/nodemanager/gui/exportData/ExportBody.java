@@ -75,13 +75,13 @@ public class ExportBody extends Container {
             WayfindingManifest newMan = new WayfindingManifest(name.getText());
             
             try{
-                newMan.upload(name.getText(), ()->{
+                newMan.upload(name.getText()).addOnSucceed((f)->{
                     msg.setText("Upload complete!");
                     Session.purgeActions();
                     v.addUrl(newType.getText(), newMan.getUrl());
                     v.save();
                 });
-            } catch(IOException ex){
+            } catch(Exception ex){
                 msg.setText(ex.getMessage());
             }
         });
