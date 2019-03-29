@@ -2,7 +2,6 @@ package nodemanager.gui.exportData;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.io.IOException;
 import javax.swing.*;
 import nodemanager.Session;
 import nodemanager.io.VersionLog;
@@ -74,16 +73,13 @@ public class ExportBody extends Container {
             msg.setText("Beginning upload...");
             WayfindingManifest newMan = new WayfindingManifest(name.getText());
             
-            try{
-                newMan.upload(name.getText()).addOnSucceed((f)->{
-                    msg.setText("Upload complete!");
-                    Session.purgeActions();
-                    v.addUrl(newType.getText(), newMan.getUrl());
-                    v.save();
-                });
-            } catch(Exception ex){
-                msg.setText(ex.getMessage());
-            }
+            newMan.upload(name.getText()).addOnSucceed((f)->{
+                msg.setText("Upload complete!");
+                Session.purgeActions();
+                v.addUrl(newType.getText(), newMan.getUrl());
+                v.save();
+            }).addOnFail((ex)->msg.setText(ex.getMessage()));
+            
         });
         add(exportButton);
     }
