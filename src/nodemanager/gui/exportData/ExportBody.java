@@ -48,7 +48,12 @@ public class ExportBody extends Container {
         
         msg = new JTextArea("Enter a name for the export, then select what version of wayfinding this is for, then click 'export'");
         msg.setEditable(false);
-        add(msg);
+        msg.setLineWrap(true);
+        msg.setWrapStyleWord(true);
+        
+        JScrollPane scroll = new JScrollPane(msg);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        add(scroll);
         
         exportButton = new JButton("Export");
         exportButton.addActionListener((ae)->{
@@ -71,6 +76,9 @@ public class ExportBody extends Container {
             }
             
             msg.setText("Beginning upload...");
+            revalidate();
+            repaint();
+            
             WayfindingManifest newMan = new WayfindingManifest(name.getText());
             
             newMan.upload(name.getText()).addOnSucceed((f)->{

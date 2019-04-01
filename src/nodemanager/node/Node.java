@@ -277,7 +277,7 @@ public class Node{
         for(int i : adjacentIds){
             ret.append("* ").append(i).append(n);
         }
-        
+        ret.append("Labels: ").append(n);
         labels.stream().forEach(l -> ret.append("* ").append(l).append(n));
         
         return ret.toString();

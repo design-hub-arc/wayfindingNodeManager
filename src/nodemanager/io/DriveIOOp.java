@@ -14,12 +14,13 @@ import java.util.function.Consumer;
  * if it fails, passes the Exception to each onFail function.
  * 
  * @author Matt Crow
+ * @param <T> The type returned by perform and fed into onSucceed
  */
-public abstract class DriveIOOp {
+public abstract class DriveIOOp <T>{
     private final ArrayList<Consumer<Exception>> onFail;
-    private final ArrayList<Consumer<Object>> onSucceed;
+    private final ArrayList<Consumer<T>> onSucceed;
     private Exception alreadyFailed; //just in case the thread is already done
-    private Object alreadySucceeded;
+    private T alreadySucceeded;
     private Thread t;
     
     public DriveIOOp(){
@@ -59,7 +60,7 @@ public abstract class DriveIOOp {
      * @param func a function to run upon successfully running perform()
      * @return this, for chaining purposes
      */
-    public final DriveIOOp addOnSucceed(Consumer<Object> func){
+    public final DriveIOOp<T> addOnSucceed(Consumer<T> func){
         onSucceed.add(func);
         if(alreadySucceeded != null){
             func.accept(alreadySucceeded);
@@ -73,7 +74,7 @@ public abstract class DriveIOOp {
      * @param func a function to run upon successfully running perform()
      * @return this, for chaining purposes
      */
-    public final DriveIOOp addOnFail(Consumer<Exception> func){
+    public final DriveIOOp<T> addOnFail(Consumer<Exception> func){
         onFail.add(func);
         if(alreadyFailed != null){
             func.accept(alreadyFailed);
@@ -86,5 +87,5 @@ public abstract class DriveIOOp {
      * @return what you want to pass to success functions
      * @throws Exception what you want to pass to failure functions
      */
-    public abstract Object perform() throws Exception;
+    public abstract T perform() throws Exception;
 }

@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Provides a base for the classes used to interface
@@ -122,7 +120,7 @@ public abstract class AbstractWayfindingFile {
      * @param folderName the name of the folder on the google drive to upload to.
      * @return a DriveIOOp. See its file to see what it does
      */
-    public final DriveIOOp upload(String folderName){
+    public final DriveIOOp<File> upload(String folderName){
         java.io.File upload = localCopy;
         if(upload == null){
             try {

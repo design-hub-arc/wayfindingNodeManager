@@ -1,5 +1,6 @@
 package nodemanager.io;
 
+import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,8 +9,6 @@ import static java.lang.System.out;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * creates a manifest file containing all the currently active data,
@@ -51,10 +50,10 @@ public class WayfindingManifest extends AbstractCsvFile{
      * Uploads the contents of the program to the drive,
      * then populates this with the urls of those new files.
      */
-    private DriveIOOp populate(){
-        DriveIOOp populate = new DriveIOOp(){
+    private DriveIOOp<Boolean> populate(){
+        DriveIOOp populate = new DriveIOOp<Boolean>(){
             @Override
-            public Object perform() throws Exception {
+            public Boolean perform() throws Exception {
                 new NodeCoordFile(prefix).upload(inDriveFolder).addOnSucceed((f)->{
                     urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).execute().join();

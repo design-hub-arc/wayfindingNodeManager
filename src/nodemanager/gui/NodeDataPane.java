@@ -19,6 +19,7 @@ public class NodeDataPane extends JComponent{
     private Node selectedNode;
     private boolean hasNodeSelected;
     private final JTextArea nodeInfo;
+    private final JScrollPane infoView;
     private GridBagConstraints gbc;
     
     public NodeDataPane(){
@@ -34,16 +35,14 @@ public class NodeDataPane extends JComponent{
         nodeInfo.setBackground(Color.red);
         nodeInfo.setEditable(false);
         nodeInfo.setLineWrap(true);
-        /*
-        JScrollPane scroll = new JScrollPane(
+        infoView = new JScrollPane(
                 nodeInfo,
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         );
-        scroll.setMinimumSize(new Dimension(100, 100));
-        add(scroll, gbc);
-        */
-        add(nodeInfo, gbc);
+        gbc.ipady = 100;
+        add(infoView, gbc);
+        gbc.ipady = 0;
         
         addOption("Delete this node", () ->{
             if(selectedNode.id < 0){
@@ -156,6 +155,11 @@ public class NodeDataPane extends JComponent{
         hasNodeSelected = true;
         selectedNode = n;
         nodeInfo.setText(n.getDesc());
+        
+        //isn't doing anything, both print 0 regardless of where the bar is
+        //System.out.println(infoView.getVerticalScrollBar().getModel().getValue());
+        infoView.getVerticalScrollBar().getModel().setValue(0);
+        //System.out.println(infoView.getVerticalScrollBar().getModel().getValue());
         n.getIcon().setDrawLinks(true);
         n.getIcon().getHost().repaint();
     }

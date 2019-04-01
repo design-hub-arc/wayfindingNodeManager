@@ -87,10 +87,10 @@ public class GoogleDriveUploader{
      * @param folderName the folder to upload to
      * @return a DriveIOOp. See DriveIOOp for how to use this
      */
-    public static DriveIOOp uploadFile(AbstractWayfindingFile f, String folderName){
-        DriveIOOp upload = new DriveIOOp(){
+    public static DriveIOOp<File> uploadFile(AbstractWayfindingFile f, String folderName){
+        DriveIOOp upload = new DriveIOOp<File>(){
             @Override
-            public Object perform() throws Exception {
+            public File perform() throws Exception {
                 File googleFile = null;
                 try{
                     googleFile = new File();
@@ -111,7 +111,7 @@ public class GoogleDriveUploader{
                     publishToWeb(googleFile);
                 } catch(GoogleJsonResponseException gex){
                     int code = gex.getDetails().getCode();
-                    if(code == 403){
+                    if(code == 403 || code == 404){
                         deleteFileStore();
                         throw new NoPermissionException(FOLDER_ID);
                     } else {
