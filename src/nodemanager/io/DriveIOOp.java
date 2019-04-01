@@ -9,7 +9,6 @@ import java.util.function.Consumer;
  * 
  * A DriveIOOp allows us to keep track of an interaction with the Google Drive.
  * This interaction is defined in the perform() method. 
- * execute() returns a thread which runs the perform() method.
  * If perform() succeeds, passes the value returned from it to each onSucceed function
  * if it fails, passes the Exception to each onFail function.
  * 
@@ -21,36 +20,33 @@ public abstract class DriveIOOp <T>{
     private final ArrayList<Consumer<T>> onSucceed;
     private Exception alreadyFailed; //just in case the thread is already done
     private T alreadySucceeded;
-    private Thread t;
+    private final Thread t;
     
     public DriveIOOp(){
         onFail = new ArrayList<>();
         onSucceed = new ArrayList<>();
         onFail.add((e)->e.printStackTrace());
+        
+        t = new Thread(){
+            @Override
+            public void run(){
+                try {
+                    alreadySucceeded = perform();
+                    onSucceed.forEach((func)->func.accept(alreadySucceeded));
+                } catch (Exception ex) {
+                    alreadyFailed = ex;
+                    onFail.forEach((func)->func.accept(ex));
+                }
+            }
+        };
+        t.start();
     }
     
     
     /**
-     * Make sure you call this part!
-     * If execute hasn't been called yet, starts a new thread, which runs this' perform() method
      * @return the thread running this' perform() method
      */
-    public final Thread execute(){
-        if(t == null){
-            t = new Thread(){
-                @Override
-                public void run(){
-                    try {
-                        alreadySucceeded = perform();
-                        onSucceed.forEach((func)->func.accept(alreadySucceeded));
-                    } catch (Exception ex) {
-                        alreadyFailed = ex;
-                        onFail.forEach((func)->func.accept(ex));
-                    }
-                }
-            };
-            t.start();
-        }
+    public final Thread getExcecutingThread(){
         return t;
     }
     

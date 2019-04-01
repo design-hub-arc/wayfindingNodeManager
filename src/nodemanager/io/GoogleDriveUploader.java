@@ -122,8 +122,6 @@ public class GoogleDriveUploader{
             }
         };
         
-        upload.execute();
-        
         return upload;
     }
     

@@ -56,24 +56,23 @@ public class WayfindingManifest extends AbstractCsvFile{
             public Boolean perform() throws Exception {
                 new NodeCoordFile(prefix).upload(inDriveFolder).addOnSucceed((f)->{
                     urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
-                }).execute().join();
+                }).getExcecutingThread().join();
                 
                 new NodeConnFile(prefix).upload(inDriveFolder).addOnSucceed((f)->{
                     urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
-                }).execute().join();
+                }).getExcecutingThread().join();
                 
                 new NodeLabelFile(prefix).upload(inDriveFolder).addOnSucceed((f)->{
                     urls.put("labels", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
-                }).execute().join();
+                }).getExcecutingThread().join();
                 
                 new MapFile(prefix).upload(inDriveFolder).addOnSucceed((f)->{
                     urls.put("map image", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
-                }).execute().join();
+                }).getExcecutingThread().join();
                 
                 return true;
             }
         };
-        populate.execute();
         return populate;
     }
     
@@ -95,7 +94,8 @@ public class WayfindingManifest extends AbstractCsvFile{
     @Override
     public String getContentsToWrite() {
         try {
-            populate().execute().join();
+            System.out.println(Thread.currentThread().getId() + " in manifest get contents to write");
+            populate().getExcecutingThread().join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }

@@ -78,7 +78,7 @@ public class ExportBody extends Container {
             msg.setText("Beginning upload...");
             revalidate();
             repaint();
-            
+            System.out.println(Thread.currentThread().getId() + " in export body line 81");
             WayfindingManifest newMan = new WayfindingManifest(name.getText());
             
             newMan.upload(name.getText()).addOnSucceed((f)->{
@@ -87,7 +87,6 @@ public class ExportBody extends Container {
                 v.addUrl(newType.getText(), newMan.getUrl());
                 v.save();
             }).addOnFail((ex)->msg.setText(ex.getMessage()));
-            
         });
         add(exportButton);
     }

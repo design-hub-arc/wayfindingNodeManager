@@ -14,8 +14,6 @@ import java.io.InputStream;
  * save or load to/from local files,
  * or upload or download files from Google Drive.
  * 
- * Maybe make psuedo-static?
- * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 public abstract class AbstractWayfindingFile {
