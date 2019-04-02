@@ -81,11 +81,16 @@ public class DriveImportBody extends Container{
             }
             
             msg.setText("Beginning download...");
-            WayfindingManifest m = WayfindingManifest.importManifest(exportIds[exportSelector.getSelectedIndex()]);
-            cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
-                cb.selectFile(m.getFileFor(cb.getFileType()));
-                cb.importIfSelected();
-            });
+            WayfindingManifest
+                    .importManifest(exportIds[exportSelector.getSelectedIndex()])
+                    .addOnSucceed((m)->{
+                        cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
+                            cb.selectFile(m.getFileFor(cb.getFileType()));
+                            cb.importIfSelected();
+                        });
+                    }).addOnFail((err)->{
+                        msg.setText(err.getMessage());
+                    });
             msg.setText("Done!");
         });
         add(importButton);

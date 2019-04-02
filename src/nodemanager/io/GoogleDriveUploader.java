@@ -33,7 +33,8 @@ import nodemanager.exceptions.NoPermissionException;
 public class GoogleDriveUploader{
     private static final String FOLDER_ID = "1-HZrReHNM6szXfmZ1rNoG2HXf2ejal1o"; //the 'Matt, Implement These' folder
     
-    private static HashMap<String, String> idToName = new HashMap<>();
+    //used to make it easier to reference files
+    private static final HashMap<String, String> ID_TO_NAME = new HashMap<>();
     
     private static JacksonFactory JSON;
     private static HttpTransport HTTP;
@@ -67,18 +68,26 @@ public class GoogleDriveUploader{
         }
     }
     
-    private static void deleteFileStore(){
-        deleteDir(STORE.getDataDirectory());
-    }
-    
-    private static void deleteDir(java.io.File f){
-        java.io.File[] contents = f.listFiles();
-        if(contents != null){
-            for(java.io.File file : contents){
-                file.delete();
-            }
+    /**
+     * Gets the contents of a file in the Google Drive with the given ID
+     * @param id either the id of a file, or a url to that file
+     * @return a DriveIOOp containing an inputstream containing the data of the file
+     */
+    public static DriveIOOp<InputStream> download(String id){
+        
+        if(id.contains("id=")){
+            //need to do this, as anonnymous class requires that id is final
+            return download(id.split("id=")[1]);
         }
-        f.delete();
+        //########################### Ends here and recurs if id was invalid
+        
+        return new DriveIOOp<InputStream>(){
+            @Override
+            public InputStream perform() throws Exception {
+                ID_TO_NAME.put(id, drive.files().get(id).execute().getName());
+                return drive.files().get(id).executeMediaAsInputStream();
+            }  
+        };
     }
     
     /**
@@ -144,7 +153,6 @@ public class GoogleDriveUploader{
     private static File getFolderByName(String name) throws IOException{
         File folder = null;
         List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + name + "'").execute().getFiles();
-        folders.forEach(n -> System.out.println(n));
 
         if(folders.isEmpty()){
             folders.add(createFolder(name));
@@ -191,26 +199,10 @@ public class GoogleDriveUploader{
         return ret;
     }
     
-    /**
-     * Gets the contents of a file in the Google Drive with the given ID
-     * @param id either the id of a file, or a url to that file
-     * @return and inputstream containing the data of the file, or null if it wasn't found
-     */
-    public static InputStream download(String id){
-        InputStream ret = null;
-        
-        if(id.contains("id=")){
-            id = id.split("id=")[1];
-        }
-        
-        try{
-            ret = drive.files().get(id).executeMediaAsInputStream();
-        } catch(IOException e){
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Couldn't download " + id, "Faied to download", JOptionPane.ERROR_MESSAGE);
-        }
-        return ret;
-    }
+    
+    
+    
+    
     
     
     public static String getFileName(String id) throws IOException{
@@ -218,11 +210,30 @@ public class GoogleDriveUploader{
             id = id.split("id=")[1];
         }
         
-        if(!idToName.containsKey(id)){
-            idToName.put(id, drive.files().get(id).execute().getName());
+        if(!ID_TO_NAME.containsKey(id)){
+            ID_TO_NAME.put(id, drive.files().get(id).execute().getName());
         }
         
-        return idToName.get(id);
+        return ID_TO_NAME.get(id);
+    }
+    
+    /**
+     * These two are used whenever uploadFile 
+     * detects a 403 or 404 error, allowing the
+     * user to sign in using a different google 
+     * account.
+     */
+    private static void deleteFileStore(){
+        deleteDir(STORE.getDataDirectory());
+    }
+    private static void deleteDir(java.io.File f){
+        java.io.File[] contents = f.listFiles();
+        if(contents != null){
+            for(java.io.File file : contents){
+                file.delete();
+            }
+        }
+        f.delete();
     }
     
     private static Credential authorize() throws Exception{

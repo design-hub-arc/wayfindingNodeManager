@@ -37,13 +37,23 @@ public class WayfindingManifest extends AbstractCsvFile{
      * updating the program's data
      * @param id the file id or url of the manifest
      */
-    public static WayfindingManifest importManifest(String id){
-        WayfindingManifest m = new WayfindingManifest("");
+    public static DriveIOOp<WayfindingManifest> importManifest(String id){
         if(id.contains("id=")){
-            id = id.split("id=")[1];
+            return importManifest(id.split("id=")[1]);
         }
-        m.readStream(GoogleDriveUploader.download(id));
-        return m;
+        DriveIOOp<WayfindingManifest> ret = new DriveIOOp<WayfindingManifest>(){
+            @Override
+            public WayfindingManifest perform() throws Exception {
+                WayfindingManifest m = new WayfindingManifest("");
+                
+                //download the file from the drive
+                GoogleDriveUploader.download(id).addOnSucceed((stream)->{
+                    m.readStream(stream); //populate
+                }).getExcecutingThread().join(); //wait until it's done
+                return m;
+            }
+        };
+        return ret;
     }
     
     /**
@@ -94,7 +104,6 @@ public class WayfindingManifest extends AbstractCsvFile{
     @Override
     public String getContentsToWrite() {
         try {
-            System.out.println(Thread.currentThread().getId() + " in manifest get contents to write");
             populate().getExcecutingThread().join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();

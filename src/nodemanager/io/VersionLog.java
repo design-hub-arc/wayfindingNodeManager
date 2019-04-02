@@ -32,11 +32,10 @@ public class VersionLog extends AbstractCsvFile{
     /**
      * Downloads versions.csv, then populates urls to match its data
      */
-    public void download(){
-        InputStream is = GoogleDriveUploader.download(URL);
-        if(is != null){
-            readStream(is);
-        }
+    public DriveIOOp<InputStream> download(){
+        return GoogleDriveUploader
+                .download(URL)
+                .addOnSucceed((stream)->readStream(stream));
     }
     
     /**

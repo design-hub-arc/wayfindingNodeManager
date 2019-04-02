@@ -119,6 +119,7 @@ public abstract class AbstractWayfindingFile {
      * @return a DriveIOOp. See its file to see what it does
      */
     public final DriveIOOp<File> upload(String folderName){
+        /*
         java.io.File upload = localCopy;
         if(upload == null){
             try {
@@ -127,7 +128,7 @@ public abstract class AbstractWayfindingFile {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
+        }*/
         return GoogleDriveUploader.uploadFile(this, folderName).addOnSucceed((f)->{
             setDriveCopy((File)f);
         });
@@ -146,10 +147,12 @@ public abstract class AbstractWayfindingFile {
     
     /**
      * Loads this' data into the program
+     * @return a DriveIOOp containing this' data. 
      * @throws java.lang.Exception if neither 
      * this' local nor drive copies have been set
      */
-    public final void importData() throws Exception{
+    public final DriveIOOp<InputStream> importData() throws Exception{
+        DriveIOOp<InputStream> ret = null;
         if(localCopy != null){
             try {
                 readStream(new FileInputStream(localCopy));
@@ -157,10 +160,13 @@ public abstract class AbstractWayfindingFile {
                 ex.printStackTrace();
             }
         } else if(driveCopy != null){
-            readStream(GoogleDriveUploader.download(driveCopy.getId()));
+            ret = GoogleDriveUploader
+                    .download(driveCopy.getId())
+                    .addOnSucceed((stream)->readStream(stream));
         } else {
             throw new Exception("Cannot import if neither localCopy not driveCopy have been set!");
         }
+        return ret;
     }
     
     
