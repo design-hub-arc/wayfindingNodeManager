@@ -12,6 +12,35 @@ import java.util.function.Consumer;
  * If perform() succeeds, passes the value returned from it to each onSucceed function
  * if it fails, passes the Exception to each onFail function.
  * 
+ * Since DriveIOOps are not blocking, 
+ * you have to put any code requiring the results of the operation
+ * in an onSucceed function, or else wait until the operation's thread terminates
+ * <div>
+ * <h2> Examples </h2>
+ * <hr>
+ * <pre>{@code
+ *  File f = GoogleDriveUploader.uploadFile(...);
+ *  //do stuff with file
+ * }</pre>
+ * <b> BAD! </b>
+ * <hr>
+ * <pre>{@code
+ *  GoogleDriveUploader.uploadFile(...).addOnSucceed((File f)->{
+ *    //do stuff with file
+ *  });
+ * }</pre>
+ * <b> GOOD! </b>
+ * <hr>
+ * <pre>{@code
+ *  File localF = null;
+ *  GoogleDriveUploader.uploadFile(...).addOnSucceed((File f)->{
+ *    localF = f;
+ *  }).getExecutingThread().join();
+ *  //do stuff with localF
+ * }</pre>
+ * <b> OK! </b>
+ * <hr>
+ * </div>
  * @author Matt Crow
  * @param <T> The type returned by perform and fed into onSucceed
  */

@@ -1,6 +1,5 @@
 package nodemanager.io;
 
-import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,6 @@ import java.util.Map;
  * and paste their URLs into the manifest
  * @author Matt Crow
  * 
- * 
  * TODO: make this able to save a local copy?
  */
 public class WayfindingManifest extends AbstractCsvFile{
@@ -33,9 +31,10 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     /**
-     * Imports a manifest from the drive into the program,
+     * Asynchronously imports a manifest from the drive into the program,
      * updating the program's data
      * @param id the file id or url of the manifest
+     * @return the DriveIIOp downloading the manifest
      */
     public static DriveIOOp<WayfindingManifest> importManifest(String id){
         if(id.contains("id=")){
@@ -59,6 +58,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     /**
      * Uploads the contents of the program to the drive,
      * then populates this with the urls of those new files.
+     * @return the DriveIOOp populating the manifest. The boolean is just a dummy value, it means nothing
      */
     private DriveIOOp<Boolean> populate(){
         DriveIOOp populate = new DriveIOOp<Boolean>(){

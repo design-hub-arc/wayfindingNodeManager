@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import javax.swing.JOptionPane;
 import nodemanager.exceptions.NoPermissionException;
+import nodemanager.exceptions.VersionLogAccessException;
 
 /**
  * Used to upload files to the google drive.
@@ -134,20 +135,26 @@ public class GoogleDriveUploader{
         return upload;
     }
     
-    public static final void revise(VersionLog vl) throws NoPermissionException{
-        try{
-            com.google.api.services.drive.model.File file = drive.files().get(VersionLog.ID).execute();
-            drive.files().update(file.getId(), new File(), new FileContent("text/csv", vl.createTemp())).execute();
-        } catch(com.google.api.client.googleapis.json.GoogleJsonResponseException e){
-            int code = Integer.parseInt(e.getDetails().getOrDefault("code", 0).toString());
-            if(code == 403){
-                throw new NoPermissionException(vl.getDriveId());
-            } else {
-                e.printStackTrace();
+    public static final DriveIOOp<File> revise(VersionLog vl){
+        return new DriveIOOp<File>(){
+            @Override
+            public File perform() throws Exception {
+                File ret = null;
+                try{
+                    ret = drive.files().get(VersionLog.ID).execute();
+                    drive.files().update(ret.getId(), new File(), new FileContent("text/csv", vl.createTemp())).execute();
+                } catch(IOException e){
+                    if(e instanceof GoogleJsonResponseException){
+                        int code = ((GoogleJsonResponseException) e).getDetails().getCode();
+                        if(code == 403 || code == 404){
+                            throw new VersionLogAccessException();
+                        }
+                    }
+                }
+                
+                return ret;
             }
-        } catch(IOException ie){
-            ie.printStackTrace();
-        }
+        };
     }
     
     private static File getFolderByName(String name) throws IOException{

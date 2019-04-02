@@ -9,7 +9,6 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
-import nodemanager.io.AbstractWayfindingFile;
 import nodemanager.io.FileType;
 import nodemanager.io.VersionLog;
 import nodemanager.io.WayfindingManifest;
@@ -35,10 +34,9 @@ public class DriveImportBody extends Container{
     public DriveImportBody(){
         super();
         setLayout(new GridLayout(8, 1));
-        v = new VersionLog();
-        v.download();
         
-        version = new JComboBox<>(v.getTypes());
+        
+        version = new JComboBox<>();
         version.addItemListener((e)->{
             updateExportSelector();
         });
@@ -49,6 +47,7 @@ public class DriveImportBody extends Container{
         
         msg = new JTextArea();
         msg.setEditable(false);
+        msg.setText("Please hold while I download the version log...");
         add(msg);
         
         ArrayList<FileTypeCheckBox> cbs = new ArrayList<>();
@@ -94,10 +93,22 @@ public class DriveImportBody extends Container{
             msg.setText("Done!");
         });
         add(importButton);
+        
+        v = new VersionLog();
+        v.download().addOnSucceed((stream)->{
+            for(String type : v.getTypes()){
+                version.addItem(type);
+            }
+            msg.setText("Ready to import!");
+        });
+        
         updateExportSelector();
     }
     
     private void updateExportSelector(){
+        if(!v.isDownloaded()){
+            return;
+        }
         exportIds = v.getExportIdsFor(version.getSelectedItem().toString());
         exportNames = v.getExportNamesFor(version.getSelectedItem().toString());
         exportSelector.removeAllItems();

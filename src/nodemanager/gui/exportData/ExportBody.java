@@ -20,6 +20,7 @@ public class ExportBody extends Container {
     private JTextField newType;
     private JButton exportButton;
     private final JTextArea msg;
+    private final VersionLog v;
     
     public ExportBody() {
         super();
@@ -27,26 +28,23 @@ public class ExportBody extends Container {
         name = new JTextField("Enter the name for this export");
         add(name);
         
-        VersionLog v = new VersionLog();
-        v.download();
-        String[] types = v.getTypes();
-        String[] options = new String[types.length + 1];
-        for(int i = 0; i < types.length; i++){
-            options[i] = types[i];
-        }
-        options[options.length - 1] = "new type";
-        wayfindingType = new JComboBox<>(options);
+        v = new VersionLog();
+        v.download().addOnSucceed((stream)->{
+            logDownloaded();
+        });
+        
+        wayfindingType = new JComboBox<>();
         wayfindingType.addItemListener((ItemEvent e)->{
             newType.setText(e.getItem().toString());
             newType.setEditable(newType.getText().equals("new type"));
         });
         add(wayfindingType);
         
-        newType = new JTextField(wayfindingType.getSelectedItem().toString());
+        newType = new JTextField();
         newType.setEditable(false);
         add(newType);
         
-        msg = new JTextArea("Enter a name for the export, then select what version of wayfinding this is for, then click 'export'");
+        msg = new JTextArea("Please hold while I download the version log...");
         msg.setEditable(false);
         msg.setLineWrap(true);
         msg.setWrapStyleWord(true);
@@ -84,9 +82,26 @@ public class ExportBody extends Container {
                 msg.setText("Upload complete!");
                 Session.purgeActions();
                 v.addUrl(newType.getText(), newMan.getUrl());
-                v.save();
+                v.save().addOnFail((err)->{
+                    msg.setText(err.getMessage());
+                });
             }).addOnFail((ex)->msg.setText(ex.getMessage()));
         });
         add(exportButton);
+    }
+    
+    private void logDownloaded(){
+        String[] types = v.getTypes();
+        String[] options = new String[types.length + 1];
+        for(int i = 0; i < types.length; i++){
+            options[i] = types[i];
+        }
+        options[options.length - 1] = "new type";
+        for(String option : options){
+            wayfindingType.addItem(option);
+        }
+        
+        newType.setText(wayfindingType.getSelectedItem().toString());
+        msg.setText("Enter a name for the export, then select what version of wayfinding this is for, then click 'export'");
     }
 }

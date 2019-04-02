@@ -1,5 +1,6 @@
 package nodemanager.io;
 
+import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,20 +23,26 @@ import nodemanager.exceptions.NoPermissionException;
 public class VersionLog extends AbstractCsvFile{
     public static final String ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
     public static final String URL = "https://drive.google.com/open?id=" + ID;
+    private boolean downloaded;
     private final LinkedHashMap<String, ArrayList<String>> urls; //Each column is a wayfinding type(artfinding, wayfinding, etc), and each cell in the column is the URL of a manifest
     
     public VersionLog(){
         super("versions", FileType.VERSION_LOG);
         urls = new LinkedHashMap<>();
+        downloaded = false;
     }
     
     /**
      * Downloads versions.csv, then populates urls to match its data
+     * @return the DriveIOOp downloading this
      */
     public DriveIOOp<InputStream> download(){
         return GoogleDriveUploader
                 .download(URL)
-                .addOnSucceed((stream)->readStream(stream));
+                .addOnSucceed((stream)->{
+                    readStream(stream);
+                    downloaded = true;
+                });
     }
     
     /**
@@ -176,12 +183,8 @@ public class VersionLog extends AbstractCsvFile{
         }
     }
     
-    public void save(){
-        try{
-            GoogleDriveUploader.revise(this);
-        } catch (NoPermissionException ex) {
-            ex.printStackTrace();
-        }
+    public DriveIOOp<File> save(){
+        return GoogleDriveUploader.revise(this);
     }
     
     public void displayData(){
@@ -192,5 +195,13 @@ public class VersionLog extends AbstractCsvFile{
         VersionLog v = new VersionLog();
         v.download();
         //GoogleDriveUploader.revise(v);
+    }
+
+    /**
+     * 
+     * @return whether or not the call to this.download has completed
+     */
+    public boolean isDownloaded() {
+        return downloaded;
     }
 }
