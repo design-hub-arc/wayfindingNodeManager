@@ -80,6 +80,10 @@ public abstract class AbstractWayfindingFile {
         name = f.getName();
     }
     
+    public final File getDriveCopy(){
+        return driveCopy;
+    }
+    
     /**
      * Saves this' contents to the local file system.
      * If this has a local file associated with it,
@@ -115,21 +119,11 @@ public abstract class AbstractWayfindingFile {
      * creates a temporary file to hold the data from the program,
      * then uploads that temporary file.
      * 
-     * @param folderName the name of the folder on the google drive to upload to.
+     * @param folderId the id of the folder on the google drive to upload to.
      * @return a DriveIOOp. See its file to see what it does
      */
-    public final DriveIOOp<File> upload(String folderName){
-        /*
-        java.io.File upload = localCopy;
-        if(upload == null){
-            try {
-                upload = createTemp();
-                localCopy = upload;
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }*/
-        return GoogleDriveUploader.uploadFile(this, folderName).addOnSucceed((f)->{
+    public DriveIOOp<File> upload(String folderId){
+        return GoogleDriveUploader.uploadFile(this, folderId).addOnSucceed((f)->{
             setDriveCopy((File)f);
         });
     }

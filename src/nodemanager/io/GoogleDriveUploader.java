@@ -19,6 +19,7 @@ import com.google.api.services.drive.model.Permission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import static java.lang.System.out;
 import java.util.*;
 import javax.swing.JOptionPane;
 import nodemanager.exceptions.NoPermissionException;
@@ -32,7 +33,7 @@ import nodemanager.exceptions.VersionLogAccessException;
  * @author Matt Crow
  */
 public class GoogleDriveUploader{
-    private static final String FOLDER_ID = "1-HZrReHNM6szXfmZ1rNoG2HXf2ejal1o"; //the 'Matt, Implement These' folder
+    public static final String DEFAULT_FOLDER_ID = "1-HZrReHNM6szXfmZ1rNoG2HXf2ejal1o"; //the 'Matt, Implement These' folder
     
     //used to make it easier to reference files
     private static final HashMap<String, String> ID_TO_NAME = new HashMap<>();
@@ -94,10 +95,10 @@ public class GoogleDriveUploader{
     /**
      * Asynchronously uploads a file to the google drive
      * @param f the wayfinding file to upload to the drive
-     * @param folderName the folder to upload to
+     * @param folderId the id of the folder to upload to
      * @return a DriveIOOp. See DriveIOOp for how to use this
      */
-    public static DriveIOOp<File> uploadFile(AbstractWayfindingFile f, String folderName){
+    public static DriveIOOp<File> uploadFile(AbstractWayfindingFile f, String folderId){
         DriveIOOp upload = new DriveIOOp<File>(){
             @Override
             public File perform() throws Exception {
@@ -107,7 +108,7 @@ public class GoogleDriveUploader{
                     FileContent content = new FileContent(f.getType().getMimeType(), f.getUpload());
 
                     ArrayList<String> parents = new ArrayList<>();
-                    parents.add(getFolderByName(folderName).getId());
+                    parents.add(folderId);
                     googleFile.setParents(parents);
 
                     Drive.Files.Create insert = drive.files().create(googleFile, content);
@@ -123,7 +124,7 @@ public class GoogleDriveUploader{
                     int code = gex.getDetails().getCode();
                     if(code == 403 || code == 404){
                         deleteFileStore();
-                        throw new NoPermissionException(FOLDER_ID);
+                        throw new NoPermissionException(DEFAULT_FOLDER_ID);
                     } else {
                         throw gex;
                     }
@@ -157,31 +158,26 @@ public class GoogleDriveUploader{
         };
     }
     
-    private static File getFolderByName(String name) throws IOException{
-        File folder = null;
-        List<File> folders = drive.files().list().setQ("parents in '" + FOLDER_ID + "' and trashed = false and name='" + name + "'").execute().getFiles();
-
-        if(folders.isEmpty()){
-            folders.add(createFolder(name));
-
-        }
-        folder = drive.files().get(folders.stream().findFirst().get().getId()).execute();
-        
-        return folder;
-    }
-    
-    private static File createFolder(String title) throws IOException{
-        File folder = new File();
-
-        folder.setName(title);
-        folder.setMimeType("application/vnd.google-apps.folder");
-        ArrayList<String> parents = new ArrayList<>();
-        parents.add(FOLDER_ID);
-        folder.setParents(parents);
-
-        folder = drive.files().create(folder).setFields("id").execute();
-        
-        return folder;
+    /**
+     * Creates a new folder on the google drive
+     * @param id the id of the folder containing this new folder
+     * @param name the name of this new folder
+     * @return the DriveIOOp creating the new folder, then returns the folder afterwards
+     */
+    public static DriveIOOp<File> createSubfolder(String id, String name){
+        return new DriveIOOp<File>(){
+            @Override
+            public File perform() throws Exception {
+                File folder = new File();
+                folder.setName(name);
+                folder.setMimeType("application/vnd.google-apps.folder");
+                ArrayList<String> parents = new ArrayList<>();
+                parents.add(id);
+                folder.setParents(parents);
+                folder = drive.files().create(folder).setFields("id").execute();
+                return folder;
+            }
+        };
     }
     
     private static void publishToWeb(File f) throws IOException{
