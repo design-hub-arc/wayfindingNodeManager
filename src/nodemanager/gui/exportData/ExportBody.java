@@ -17,7 +17,7 @@ import nodemanager.io.WayfindingManifest;
 public class ExportBody extends Container {
     
     private final JTextField name;
-    private final JTextField toFolder;
+    private JTextField toFolder;
     private final JComboBox<String> wayfindingType;
     private final JTextField newType;
     private final JButton exportButton;
@@ -35,15 +35,7 @@ public class ExportBody extends Container {
             logDownloaded();
         });
         
-        
-        
-        
-        //TODO: make this verify that the ID works
-        toFolder = new JTextField(GoogleDriveUploader.DEFAULT_FOLDER_ID);
-        add(toFolder);
-        
-        
-        
+        add(createFolderButton());
         
         newType = new JTextField();
         newType.setEditable(false);
@@ -66,6 +58,31 @@ public class ExportBody extends Container {
         
         exportButton = createExportButton();
         add(exportButton);
+    }
+    
+    private Container createFolderButton(){
+        Container ret = new Container();
+        
+        ret.setLayout(new BorderLayout());
+        ret.add(new JLabel("Enter which folder to upload to"), BorderLayout.PAGE_START);
+        toFolder = new JTextField(GoogleDriveUploader.DEFAULT_FOLDER_ID);
+        ret.add(toFolder, BorderLayout.LINE_START);
+        JButton verify = new JButton("Verify this folder works");
+        verify.addActionListener((e)->{
+            msg.setText("Hold on a second...");
+            GoogleDriveUploader.isFolder(toFolder.getText())
+                    .addOnFail((ex)->msg.setText("Hmm... looks like that file doesn't exist. Could you double check to make sure you have access?"))
+                    .addOnSucceed((bool)->{
+                        if(bool){
+                            msg.setText("Looks like that's a folder! Ready to upload!");
+                        } else {
+                            msg.setText("Nope, not a folder.");
+                        }
+                    });
+        });
+        ret.add(verify, BorderLayout.LINE_END);
+        
+        return ret;
     }
     
     private JButton createExportButton(){

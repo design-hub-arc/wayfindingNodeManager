@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import static java.lang.System.out;
 import java.util.*;
-import javax.swing.JOptionPane;
 import nodemanager.exceptions.NoPermissionException;
 import nodemanager.exceptions.VersionLogAccessException;
 
@@ -202,9 +201,45 @@ public class GoogleDriveUploader{
         return ret;
     }
     
+    /**
+     * Verifies that a file exists.
+     * @param id the id of the file to check. This can be either a URL or just the file ID
+     * @return a DriveIOOp which will return true if it succeeds, or throw an error if it fails
+     */
+    public static DriveIOOp<Boolean> checkExists(String id){
+        if(id.contains("id=")){
+            return checkExists(id.split("id=")[1]);
+        }
+        
+        return new DriveIOOp<Boolean>(){
+            @Override
+            public Boolean perform() throws Exception {
+                File f = drive.files().get(id).execute();
+                ID_TO_NAME.put(id, f.getName());
+                return true;
+            }
+        };
+    }
     
-    
-    
+    /**
+     * Checks if a file is a folder
+     * @param id the id of the file to check
+     * @return a DriveIOOp, which, when successful, returns whether or not the file is a folder
+     */
+    public static DriveIOOp<Boolean> isFolder(String id){
+        if(id.contains("id=")){
+            return isFolder(id.split("id=")[1]);
+        }
+        
+        return new DriveIOOp<Boolean>(){
+            @Override
+            public Boolean perform() throws Exception {
+                File f = drive.files().get(id).execute();
+                ID_TO_NAME.put(id, f.getName());
+                return f.getMimeType().equals("application/vnd.google-apps.folder");
+            }
+        };
+    }
     
     
     
