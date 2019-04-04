@@ -47,13 +47,13 @@ public class NodeCoordFile extends AbstractCsvFile{
      */
     @Override
     public void readStream(InputStream s) {
-        Node.removeAll();
         NodeParser.parseFile(s, (line)->{
-            Session.map.addNode(new Node(
-                    Integer.parseInt(line[0].trim()),
-                    Integer.parseInt(line[1].trim()),
-                    Integer.parseInt(line[2].trim())
-            ));
+            new Node(
+                Integer.parseInt(line[0].trim()),
+                Integer.parseInt(line[1].trim()),
+                Integer.parseInt(line[2].trim())
+            );
+            Session.map.addNode(Node.get(Integer.parseInt(line[0].trim())));
         });
         Session.map.refreshNodes();
     }

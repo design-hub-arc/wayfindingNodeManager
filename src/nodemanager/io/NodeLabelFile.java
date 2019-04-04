@@ -40,7 +40,11 @@ public class NodeLabelFile extends AbstractCsvFile{
     @Override
     public void readStream(InputStream s) {
         NodeParser.parseFile(s, (line)->{
-            Node.get(Integer.parseInt(line[1].trim())).addLabel(line[0].trim());
+            int id = Integer.parseInt(line[1].trim());
+            if(Node.get(id) == null){
+                new Node(id);
+            }
+            Node.get(id).addLabel(line[0].trim());
         });
     }
 }

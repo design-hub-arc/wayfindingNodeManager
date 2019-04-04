@@ -26,12 +26,42 @@ public class Node{
     
     private HashSet<Integer> adjacentIds;
     private ArrayList<String> labels; //rooms, buildings, etc.
+    private boolean isProtoNode;      
+    /*
+    protoNodes are nodes that lack coordinates
+    since the files may be imported out of order,
+    node connections and labels may come in before 
+    their node coordinates.
+    */
     private NodeIcon icon;
+    
+    
     
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
     private static HashMap<String, Node> labelToNode = new HashMap<>(); //stores as uppercase label
     
     private static int nextId = 0;
+    
+    /**
+     * Creates a "protoNode",
+     * which means all of its
+     * data hasn't yet been imported
+     * @param id the node's id
+     */
+    public Node(int id){
+        this.id = id;
+        rawX = 0;
+        rawY = 0;
+        adjacentIds = new HashSet<>();
+        labels = new ArrayList<>();
+        icon = new NodeIcon(this);
+        isProtoNode = true;
+        
+        addNode(this);
+        if(id >= nextId){
+            nextId = id + 1;
+        }
+    }
     
     /**
      * 
@@ -40,19 +70,10 @@ public class Node{
      * @param y the vertical component of this Node's position on its source plane
      */
     public Node(int id, int x, int y){
-        this.id = id;
+        this(id);
         rawX = x;
         rawY = y;
-        
-        adjacentIds = new HashSet<>();
-        labels = new ArrayList<>();
-        icon = new NodeIcon(this);
-        
-        
-        addNode(this);
-        if(id >= nextId){
-            nextId = id + 1;
-        }
+        icon.setPos(x, y);
     }
     
     /**
@@ -71,7 +92,20 @@ public class Node{
      * @param n the node to add. If a node with that ID already exists, erases the existing node
      */
     public static void addNode(Node n){
-        allNodes.put(n.id, n);
+        if(allNodes.containsKey(n.id)){
+            //Update the node
+            Node old = allNodes.get(n.id);
+            old.rawX = n.getX();
+            old.rawY = n.getY();
+            n.getAdjIds().forEach((adjId)->old.addAdjId(adjId));
+            for(String label : n.getLabels()){
+                old.addLabel(label);
+            }
+            System.out.println(n.getX() + " " + n.getY());
+            old.getIcon().nodePosUpdated();
+        } else {
+            allNodes.put(n.id, n);
+        }
     }
     
     /**
@@ -145,19 +179,20 @@ public class Node{
     }
     
     /**
-     * Creates a connection between this Node and another
+     * Creates a connection between this Node and another.
+     * If a node with that id doesn't exist yet,
+     * creates a protoNode to hold the data
      * @param i the ID of the Node to connect to
      */
     public void addAdjId(int i){
         if(Node.get(i) == null){
-            out.println(String.format("Node with ID %d does not exist.", i));
-        } else {
-            if(!isAdjTo(i)){
-               adjacentIds.add(i);
-            }
-            if(!Node.get(i).isAdjTo(id)){
-                Node.get(i).addAdjId(id);
-            }
+            addNode(new Node(i));
+        }
+        if(!isAdjTo(i)){
+           adjacentIds.add(i);
+        }
+        if(!Node.get(i).isAdjTo(id)){
+            Node.get(i).addAdjId(id);
         }
     }
     

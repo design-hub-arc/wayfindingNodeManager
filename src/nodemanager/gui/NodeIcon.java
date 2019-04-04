@@ -97,7 +97,6 @@ public class NodeIcon{
         return node;
     }
     
-    
     /**
      * Gets the scale this is resized to
      * @return this' scale
@@ -120,6 +119,17 @@ public class NodeIcon{
      */
     public int getY(){
         return y;
+    }
+    
+    /**
+     * Notifies this that it's node
+     * was just imported into the 
+     * program, so this needs to update
+     * this' coordinates
+     */
+    public void nodePosUpdated(){
+        x = node.getX();
+        y = node.getY();
     }
     
     /**

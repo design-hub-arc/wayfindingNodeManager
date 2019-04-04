@@ -46,7 +46,15 @@ public class NodeConnFile extends AbstractCsvFile{
     @Override
     public void readStream(InputStream s) {
         NodeParser.parseFile(s, (line)->{
-            Node.get(Integer.parseInt(line[0].trim())).addAdjId(Integer.parseInt(line[1].trim()));
+            int id1 = Integer.parseInt(line[0].trim());
+            int id2 = Integer.parseInt(line[1].trim());
+            if(Node.get(id1) == null){
+                new Node(id1);
+            }
+            if(Node.get(id2) == null){
+                new Node(id2);
+            }
+            Node.get(id1).addAdjId(id2);
         });
     }
 }
