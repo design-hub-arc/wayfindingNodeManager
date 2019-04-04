@@ -109,10 +109,13 @@ public class MapImage extends JLabel{
         
         mouseClickActions.put(Mode.ADD, (me) -> {
             //adds a Node where the user clicks
-            Node n = new Node(
+            Node n = new Node();
+            Node.updateNode(
+                    n.id, 
                     (int) scaler.inverseX(translateClickX(me.getX())),
                     (int) scaler.inverseY(translateClickY(me.getY()))
             );
+            
             addNode(n);
             Session.logAction(new NodeCreateEvent(n, this));
             repaint();

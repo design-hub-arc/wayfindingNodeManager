@@ -26,16 +26,7 @@ public class Node{
     
     private HashSet<Integer> adjacentIds;
     private ArrayList<String> labels; //rooms, buildings, etc.
-    private boolean isProtoNode;      
-    /*
-    protoNodes are nodes that lack coordinates
-    since the files may be imported out of order,
-    node connections and labels may come in before 
-    their node coordinates.
-    */
     private NodeIcon icon;
-    
-    
     
     private static HashMap<Integer, Node> allNodes = new HashMap<>();
     private static HashMap<String, Node> labelToNode = new HashMap<>(); //stores as uppercase label
@@ -55,7 +46,6 @@ public class Node{
         adjacentIds = new HashSet<>();
         labels = new ArrayList<>();
         icon = new NodeIcon(this);
-        isProtoNode = true;
         
         addNode(this);
         if(id >= nextId){
@@ -63,27 +53,37 @@ public class Node{
         }
     }
     
-    /**
-     * 
-     * @param id the id of this Node
-     * @param x the horizontal component of this Node's position on its source plane
-     * @param y the vertical component of this Node's position on its source plane
-     */
-    public Node(int id, int x, int y){
-        this(id);
-        rawX = x;
-        rawY = y;
-        icon.setPos(x, y);
+    public Node(){
+        this(nextId);
     }
     
+    
     /**
-     * Generates a new Node at the given coordinates, with a unique ID.
-     * @param x the horizontal component of this Node's position on its source plane
-     * @param y the vertical component of this Node's position on its source plane
+     * Use this in lieu of a constructor to avoid creating
+     * an excessive amount of nodes.
+     * If a node with the given ID doesn't exist, creates one.
+     * Updates the Node with the given x and y coordinates
+     * @param id the id of the node to update, or the node to create
+     * @param x the x coordinate of the node
+     * @param y y coordinate
+     * @return the node updated or created
      */
-    public Node(int x, int y){
-        this(nextId, x, y);
+    public static Node updateNode(int id, int x, int y){
+        Node ret = null;
+        if(allNodes.containsKey(id)){
+            ret = allNodes.get(id);
+        }
+        if(ret == null){
+            ret = new Node(id);
+        }
+        ret.rawX = x;
+        ret.rawY = y;
+        ret.getIcon().setPos(x, y);
+        
+        return ret;
     }
+    
+    
     
     /**
      * Adds a node to allNodes.
@@ -95,13 +95,11 @@ public class Node{
         if(allNodes.containsKey(n.id)){
             //Update the node
             Node old = allNodes.get(n.id);
-            old.rawX = n.getX();
-            old.rawY = n.getY();
+            updateNode(old.id, n.getX(), n.getY());
             n.getAdjIds().forEach((adjId)->old.addAdjId(adjId));
             for(String label : n.getLabels()){
                 old.addLabel(label);
             }
-            System.out.println(n.getX() + " " + n.getY());
             old.getIcon().nodePosUpdated();
         } else {
             allNodes.put(n.id, n);
@@ -160,7 +158,6 @@ public class Node{
     public static Collection<Node> getAll(){
         return allNodes.values();
     }
-    
     
     /**
      * the x coordinate of this Node on the source plane

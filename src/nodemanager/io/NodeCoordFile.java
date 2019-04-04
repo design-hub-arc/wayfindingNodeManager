@@ -48,7 +48,7 @@ public class NodeCoordFile extends AbstractCsvFile{
     @Override
     public void readStream(InputStream s) {
         NodeParser.parseFile(s, (line)->{
-            new Node(
+            Node.updateNode(
                 Integer.parseInt(line[0].trim()),
                 Integer.parseInt(line[1].trim()),
                 Integer.parseInt(line[2].trim())
