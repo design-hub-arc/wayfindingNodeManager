@@ -1,7 +1,6 @@
 package nodemanager.gui.exportData;
 
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import javax.swing.*;
 import nodemanager.Session;
 import nodemanager.io.*;
@@ -16,38 +15,28 @@ public class ExportBody extends Container {
     
     private final JTextField name;
     private final DriveFolderSelector folder;
-    private final JComboBox<String> wayfindingType;
-    private final JTextField newType;
+    private final VersionSelector selectType;
     private final JButton exportButton;
     private final JTextArea msg;
-    private final VersionLog v;
+    private static final VersionLog v;
+    static {
+        v = new VersionLog();
+        v.download();
+    }
     
     public ExportBody() {
         super();
-        setLayout(new GridLayout(3, 2));
+        setLayout(new GridLayout(5, 1, 10, 10));
         name = new JTextField("Enter the name for this export");
         add(name);
-        
-        v = new VersionLog();
-        v.download().addOnSucceed((stream)->{
-            logDownloaded();
-        });
         
         folder = new DriveFolderSelector();
         add(folder);
         
-        newType = new JTextField();
-        newType.setEditable(false);
+        selectType = new VersionSelector();
+        add(selectType);
         
-        wayfindingType = new JComboBox<>();
-        wayfindingType.addItemListener((ItemEvent e)->{
-            newType.setText(e.getItem().toString());
-            newType.setEditable(newType.getText().equals("new type"));
-        });
-        add(wayfindingType);
-        add(newType);
-        
-        msg = new JTextArea("Please hold while I download the version log...");
+        msg = new JTextArea("");
         msg.setEditable(false);
         msg.setLineWrap(true);
         msg.setWrapStyleWord(true);
@@ -58,38 +47,13 @@ public class ExportBody extends Container {
         exportButton = createExportButton();
         add(exportButton);
     }
-    /*
-    private Container createFolderButton(){
-        Container ret = new Container();
-        
-        ret.setLayout(new BorderLayout());
-        ret.add(new JLabel("Enter which folder to upload to"), BorderLayout.PAGE_START);
-        toFolder = new JTextField(GoogleDriveUploader.DEFAULT_FOLDER_ID);
-        ret.add(toFolder, BorderLayout.LINE_START);
-        JButton verify = new JButton("Verify this folder works");
-        verify.addActionListener((e)->{
-            msg.setText("Hold on a second...");
-            GoogleDriveUploader.isFolder(toFolder.getText())
-                    .addOnFail((ex)->msg.setText("Hmm... looks like that file doesn't exist. Could you double check to make sure you have access?"))
-                    .addOnSucceed((bool)->{
-                        if(bool){
-                            msg.setText("Looks like that's a folder! Ready to upload!");
-                        } else {
-                            msg.setText("Nope, not a folder.");
-                        }
-                    });
-        });
-        ret.add(verify, BorderLayout.LINE_END);
-        
-        return ret;
-    }*/
     
     private JButton createExportButton(){
         JButton ret = new JButton("Export");
         
         ret.addActionListener((ae)->{
-            if(wayfindingType.getSelectedItem().equals("new type")){
-                v.addType(newType.getText());
+            if(selectType.getSelectedType().equals(VersionSelector.NEW_TYPE)){
+                v.addType(selectType.getSelectedType());
             }
             
             try{
@@ -114,7 +78,7 @@ public class ExportBody extends Container {
             newMan.upload(folder.getSelectedFolder()).addOnSucceed((f)->{
                 msg.setText("Upload complete!");
                 Session.purgeActions();
-                v.addUrl(newType.getText(), newMan.getUrl());
+                v.addUrl(selectType.getSelectedType(), newMan.getUrl());
                 v.save().addOnFail((err)->{
                     msg.setText(err.getMessage());
                 });
@@ -122,20 +86,5 @@ public class ExportBody extends Container {
         });
         
         return ret;
-    }
-    
-    private void logDownloaded(){
-        String[] types = v.getTypes();
-        String[] options = new String[types.length + 1];
-        for(int i = 0; i < types.length; i++){
-            options[i] = types[i];
-        }
-        options[options.length - 1] = "new type";
-        for(String option : options){
-            wayfindingType.addItem(option);
-        }
-        
-        newType.setText(wayfindingType.getSelectedItem().toString());
-        msg.setText("Enter a name for the export, then select what version of wayfinding this is for, then click 'export'");
     }
 }
