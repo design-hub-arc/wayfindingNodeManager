@@ -4,9 +4,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import javax.swing.*;
 import nodemanager.Session;
-import nodemanager.io.GoogleDriveUploader;
-import nodemanager.io.VersionLog;
-import nodemanager.io.WayfindingManifest;
+import nodemanager.io.*;
 
 /**
  * Acts as the body of the export dialog whenever the user clicks the export to drive button.
@@ -17,7 +15,7 @@ import nodemanager.io.WayfindingManifest;
 public class ExportBody extends Container {
     
     private final JTextField name;
-    private JTextField toFolder;
+    private final DriveFolderSelector folder;
     private final JComboBox<String> wayfindingType;
     private final JTextField newType;
     private final JButton exportButton;
@@ -35,7 +33,8 @@ public class ExportBody extends Container {
             logDownloaded();
         });
         
-        add(createFolderButton());
+        folder = new DriveFolderSelector();
+        add(folder);
         
         newType = new JTextField();
         newType.setEditable(false);
@@ -59,7 +58,7 @@ public class ExportBody extends Container {
         exportButton = createExportButton();
         add(exportButton);
     }
-    
+    /*
     private Container createFolderButton(){
         Container ret = new Container();
         
@@ -83,7 +82,7 @@ public class ExportBody extends Container {
         ret.add(verify, BorderLayout.LINE_END);
         
         return ret;
-    }
+    }*/
     
     private JButton createExportButton(){
         JButton ret = new JButton("Export");
@@ -112,7 +111,7 @@ public class ExportBody extends Container {
             repaint();
             WayfindingManifest newMan = new WayfindingManifest(name.getText());
             
-            newMan.upload(toFolder.getText()).addOnSucceed((f)->{
+            newMan.upload(folder.getSelectedFolder()).addOnSucceed((f)->{
                 msg.setText("Upload complete!");
                 Session.purgeActions();
                 v.addUrl(newType.getText(), newMan.getUrl());
