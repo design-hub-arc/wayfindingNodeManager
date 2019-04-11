@@ -261,7 +261,7 @@ public class GoogleDriveUploader{
      * user to sign in using a different google 
      * account.
      */
-    private static void deleteFileStore(){
+    public static void deleteFileStore(){
         deleteDir(STORE.getDataDirectory());
     }
     private static void deleteDir(java.io.File f){

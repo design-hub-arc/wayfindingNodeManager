@@ -12,7 +12,7 @@ import nodemanager.io.*;
  * 
  * @author Matt Crow
  */
-public class ExportBody extends Container {
+public final class ExportBody extends Container {
     public static final String NEW_TYPE = "New type";
     private final JTextField name;
     private final JTextField folder;
@@ -31,14 +31,13 @@ public class ExportBody extends Container {
         selectType = new JComboBox<>();
         selectType.addItemListener((ItemEvent e)->{
             if(selectType.getSelectedItem().equals(NEW_TYPE)){
-                System.out.println("firing");
-                String name = JOptionPane.showInputDialog("Enter the name of this new version:");
+                String versionName = JOptionPane.showInputDialog("Enter the name of this new version:");
                 
                 if(selectType.getItemCount() > 1){
                     selectType.setSelectedIndex(0);
                 }
-                selectType.insertItemAt(name, selectType.getItemCount() - 1);
-                selectType.setSelectedItem(name);
+                selectType.insertItemAt(versionName, selectType.getItemCount() - 1);
+                selectType.setSelectedItem(versionName);
                 revalidate();
                 repaint();
             }
@@ -63,6 +62,10 @@ public class ExportBody extends Container {
         add(exportButton);
         
         v = new VersionLog();
+        downloadVersionLog();
+    }
+    
+    private void downloadVersionLog(){
         v.download().addOnSucceed((stream)->{
             for(String option : v.getTypes()){
                 selectType.addItem(option);
@@ -73,11 +76,34 @@ public class ExportBody extends Container {
         });
     }
     
+    /**
+     * Called by the export button
+     */
+    private void upload(){
+        msg.setText("Beginning upload...");
+        revalidate();
+        repaint();
+        WayfindingManifest newMan = new WayfindingManifest(name.getText());
+        newMan.upload(folder.getText()).addOnSucceed((f)->{
+            msg.setText("Upload complete!");
+            Session.purgeActions();
+            v.addUrl((String)selectType.getSelectedItem(), newMan.getUrl());
+            v.save().addOnFail((err)->{
+                msg.setText(err.getMessage());
+            });
+        }).addOnFail((ex)->msg.setText(ex.getMessage()));
+    }
+    
     private JButton createExportButton(){
         JButton ret = new JButton("Export");
         
         ret.addActionListener((ae)->{
-            //change this to DriveIOOp?
+            msg.setText("Verifying this upload will work...");
+            revalidate();
+            repaint();
+            
+            
+            // First, makes sure the Drive API is available
             try{
                 Class.forName("com.google.api.client.http.HttpTransport"); 
                 //will throw an error if don't have google drive API
@@ -91,43 +117,19 @@ public class ExportBody extends Container {
                 );
                 return;
             }
-            //################################ Ends here if lib folder was missing
-            
-            if(selectType.getSelectedItem().equals(NEW_TYPE)){
-                v.addType((String)selectType.getSelectedItem());
-            }
-            
-            msg.setText("Beginning upload...");
-            revalidate();
-            repaint();
-            WayfindingManifest newMan = new WayfindingManifest(name.getText());
-            
-            try{
-                GoogleDriveUploader.isFolder(folder.getText())
-                    .addOnFail((ex)->{
-                        msg.setText("Hmm... looks like that file doesn't exist. Could you double check to make sure you have access?");
-                        //make upload stop
-                    })
-                    .addOnSucceed((bool)->{
-                        if(bool){
-                            msg.setText("Looks like that's a folder! uploading...");
-                        } else {
-                            msg.setText("Nope, not a folder.");
-                            //make upload stop
-                        }
-                    }).getExcecutingThread().join();
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
-            
-            newMan.upload(folder.getText()).addOnSucceed((f)->{
-                msg.setText("Upload complete!");
-                Session.purgeActions();
-                v.addUrl((String)selectType.getSelectedItem(), newMan.getUrl());
-                v.save().addOnFail((err)->{
-                    msg.setText(err.getMessage());
+            // Second, make sure the user is trying to upload to a folder
+            GoogleDriveUploader.isFolder(folder.getText())
+                .addOnFail((ex)->{
+                    msg.setText("Hmm... looks like that file doesn't exist. Could you double check to make sure you have access?");
+                })
+                .addOnSucceed((bool)->{
+                    if(bool){
+                        msg.setText("Looks like that's a folder! uploading...");
+                        upload(); //uploads here
+                    } else {
+                        msg.setText("Nope, not a folder.");
+                    }
                 });
-            }).addOnFail((ex)->msg.setText(ex.getMessage()));
         });
         
         return ret;
