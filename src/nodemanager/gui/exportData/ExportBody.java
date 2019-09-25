@@ -20,9 +20,12 @@ public final class ExportBody extends Container {
     private final JButton exportButton;
     private final JTextArea msg;
     private final VersionLog v;
+    private volatile boolean updating;
     
     public ExportBody() {
         super();
+        updating = false;
+        
         setLayout(new GridLayout(4, 2));
         name = new JTextField("Enter the name for this export");
         
@@ -30,8 +33,10 @@ public final class ExportBody extends Container {
         
         selectType = new JComboBox<>();
         selectType.addItemListener((ItemEvent e)->{
-            if(selectType.getSelectedItem().equals(NEW_TYPE)){
+            if(selectType.getSelectedItem().equals(NEW_TYPE) && !updating){
                 String versionName = JOptionPane.showInputDialog("Enter the name of this new version:");
+                
+                updating = true;
                 
                 if(selectType.getItemCount() > 1){
                     selectType.setSelectedIndex(0);
@@ -40,6 +45,8 @@ public final class ExportBody extends Container {
                 selectType.setSelectedItem(versionName);
                 revalidate();
                 repaint();
+                
+                updating = false;
             }
         });
         
