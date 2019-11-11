@@ -2,9 +2,13 @@
 
 A data management program for the Wayfinding project
 
+## Important Notice
+
+The application will not allow you to download or upload data if you log in using a Google account without access to the Wayfinding folder on Google Drive.
+
 ## Google Slides presentation
 
-A detailed guide to the project can be found [here](https://docs.google.com/presentation/d/1xR_FmCgcqRirlRckI1GQ5tRe3W5-rQg5GFW9UXm-Nbk/edit?usp=sharing)
+A detailed guide to the project can be found [here](https://docs.google.com/presentation/d/1xR_FmCgcqRirlRckI1GQ5tRe3W5-rQg5GFW9UXm-Nbk/edit?usp=sharing).
 
 ## Prerequisites
 
