@@ -35,14 +35,14 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     /**
-     * Asynchronously imports a manifest from the drive into the program,
-     * updating the program's data
+     * Asynchronously downloads a manifest from the drive
+     * 
      * @param id the file id or url of the manifest
      * @return the DriveIIOp downloading the manifest
      */
-    public static DriveIOOp<WayfindingManifest> importManifest(String id){
+    public static DriveIOOp<WayfindingManifest> downloadManifest(String id){
         if(id.contains("id=")){
-            return importManifest(id.split("id=")[1]);
+            return downloadManifest(id.split("id=")[1]);
         }
         DriveIOOp<WayfindingManifest> ret = new DriveIOOp<WayfindingManifest>(){
             @Override
@@ -53,7 +53,6 @@ public class WayfindingManifest extends AbstractCsvFile{
                 GoogleDriveUploader.download(id).addOnSucceed((stream)->{
                     try {
                         m.readStream(stream); //populate
-                        m.importData();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }

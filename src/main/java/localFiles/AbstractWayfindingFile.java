@@ -59,7 +59,7 @@ public abstract class AbstractWayfindingFile {
                 ret = new VersionLog();
                 break;
             default:
-                throw new UnsupportedOperationException("Cannot decode file from type " + t.getTitle());
+                throw new UnsupportedOperationException("Cannot decode file from type " + t);
         }
         return ret;
     }
