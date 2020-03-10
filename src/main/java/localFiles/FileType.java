@@ -42,4 +42,18 @@ public enum FileType {
     public String getMimeType(){
         return MIME_TYPE;
     }
+    
+    public static FileType fromTitle(String title){
+        FileType ret = null;
+        for(FileType type : FileType.values()){
+            if(type.getTitle().equals(title)){
+                ret = type;
+                break;
+            }
+        }
+        if(ret == null){
+            throw new IllegalArgumentException(String.format("No FileType has title '%s'", title));
+        }
+        return ret;
+    }
 }

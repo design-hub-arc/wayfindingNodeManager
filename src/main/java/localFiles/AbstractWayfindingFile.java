@@ -46,7 +46,7 @@ public abstract class AbstractWayfindingFile {
      * otherwise, returns a temporary file.
      * @return 
      */
-    public final java.io.File getUpload(){
+    public final java.io.File getFileToUpload(){
         java.io.File upload = localCopy;
         if(upload == null){
             try{
@@ -115,6 +115,7 @@ public abstract class AbstractWayfindingFile {
      * @throws java.lang.Exception if neither 
      * this' local nor drive copies have been set
      */
+    /*
     public final DriveIOOp<InputStream> importData() throws Exception{
         DriveIOOp<InputStream> ret = null;
         if(localCopy != null){
@@ -131,6 +132,10 @@ public abstract class AbstractWayfindingFile {
             throw new Exception("Cannot import if neither localCopy not driveCopy have been set!");
         }
         return ret;
+    }*/
+    
+    public void importData(){
+        //subclasses will override this to import their data into the program
     }
     
     

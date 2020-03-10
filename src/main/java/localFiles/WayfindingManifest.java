@@ -21,7 +21,6 @@ import nodemanager.io.GoogleDriveUploader;
  * @author Matt Crow
  */
 public class WayfindingManifest extends AbstractCsvFile{
-    private final String prefix;
     private final String title;
     private String driveFolder;
     private final HashMap<FileType, String> urls;
@@ -29,7 +28,6 @@ public class WayfindingManifest extends AbstractCsvFile{
     
     public WayfindingManifest(String folderName){
         super(folderName + "Manifest", FileType.MANIFEST);
-        prefix = folderName;
         title = folderName;
         driveFolder = null;
         urls = new HashMap<>();
@@ -69,19 +67,19 @@ public class WayfindingManifest extends AbstractCsvFile{
         DriveIOOp populate = new DriveIOOp<Boolean>(){
             @Override
             public Boolean perform() throws Exception {
-                new NodeCoordFile(prefix).upload(driveFolder).addOnSucceed((f)->{
+                new NodeCoordFile(title).upload(driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.NODE_COORD, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                new NodeConnFile(prefix).upload(driveFolder).addOnSucceed((f)->{
+                new NodeConnFile(title).upload(driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.NODE_CONN, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                new NodeLabelFile(prefix).upload(driveFolder).addOnSucceed((f)->{
+                new NodeLabelFile(title).upload(driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.LABEL, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                new MapFile(prefix).upload(driveFolder).addOnSucceed((f)->{
+                new MapFile(title).upload(driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.MAP_IMAGE, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
@@ -108,6 +106,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     public final String getUrlFor(FileType type){
         return urls.get(type);
     }
+    
     
     @Override
     public DriveIOOp<File> upload(String folderId){
@@ -158,7 +157,7 @@ public class WayfindingManifest extends AbstractCsvFile{
                 try{
                     line = br.readLine().split(",");
                     if(!firstLine){
-                        urls.put(line[0], line[1]);
+                        urls.put(FileType.fromTitle(line[0]), line[1]);
                     }
                 } catch(Exception e){
                     if(!firstLine){

@@ -1,5 +1,6 @@
 package localFiles;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
 import nodemanager.Session;
@@ -12,6 +13,8 @@ import nodemanager.Session;
  * @author Matt Crow
  */
 public class MapFile extends AbstractWayfindingFile{
+    private BufferedImage content;
+    
     public MapFile(String title) {
         super(title + "MapImage", FileType.MAP_IMAGE);
     }
@@ -23,10 +26,18 @@ public class MapFile extends AbstractWayfindingFile{
     @Override
     public void readStream(InputStream s) {
         try {
-            Session.map.setImage(ImageIO.read(ImageIO.createImageInputStream(s)));
+            content = ImageIO.read(ImageIO.createImageInputStream(s));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+    
+    @Override
+    public void importData(){
+        if(content == null){
+            throw new NullPointerException("Content must be set before importing");
+        }
+        Session.map.setImage(content);
     }
     
     @Override

@@ -56,7 +56,9 @@ public class ImportMenu extends JMenu{
      * Imports the default data used by the program
      */
     public void loadDefaults() {
-        new MapFile().readStream(getClass().getResourceAsStream("/map.png"));
+        MapFile defaultMap = new MapFile();
+        defaultMap.readStream(getClass().getResourceAsStream("/map.png"));
+        defaultMap.importData();
         
         try {
             new NodeCoordFile().readStream(getClass().getResourceAsStream("/nodeData.csv"));

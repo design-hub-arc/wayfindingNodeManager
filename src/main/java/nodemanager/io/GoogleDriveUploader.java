@@ -105,7 +105,7 @@ public class GoogleDriveUploader{
                 File googleFile = null;
                 try{
                     googleFile = new File();
-                    FileContent content = new FileContent(f.getType().getMimeType(), f.getUpload());
+                    FileContent content = new FileContent(f.getType().getMimeType(), f.getFileToUpload());
 
                     ArrayList<String> parents = new ArrayList<>();
                     parents.add(folderId);
@@ -113,7 +113,7 @@ public class GoogleDriveUploader{
 
                     Drive.Files.Create insert = drive.files().create(googleFile, content);
 
-                    googleFile.setName(f.getUpload().getName());
+                    googleFile.setName(f.getFileToUpload().getName());
 
                     //since all of this google stuff is blocking code (O...K...)
                     //it will execute in whatever order we put it in.
