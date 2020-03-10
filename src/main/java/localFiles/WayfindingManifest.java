@@ -1,12 +1,5 @@
 package localFiles;
 
-import localFiles.NodeLabelFile;
-import localFiles.NodeCoordFile;
-import localFiles.NodeConnFile;
-import localFiles.MapFile;
-import localFiles.FileType;
-import localFiles.AbstractWayfindingFile;
-import localFiles.AbstractCsvFile;
 import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
 import java.io.IOException;
