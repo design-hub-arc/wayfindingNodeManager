@@ -1,5 +1,12 @@
 package nodemanager.io;
 
+import localFiles.NodeLabelFile;
+import localFiles.NodeCoordFile;
+import localFiles.NodeConnFile;
+import localFiles.MapFile;
+import localFiles.FileType;
+import localFiles.AbstractWayfindingFile;
+
 /**
  * May switch to using this in 
  * lieu of individual classes,

@@ -1,5 +1,12 @@
-package nodemanager.io;
+package localFiles;
 
+import localFiles.NodeLabelFile;
+import localFiles.NodeCoordFile;
+import localFiles.NodeConnFile;
+import localFiles.MapFile;
+import localFiles.FileType;
+import localFiles.AbstractWayfindingFile;
+import localFiles.AbstractCsvFile;
 import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +16,9 @@ import static java.lang.System.out;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import nodemanager.io.Converter;
+import nodemanager.io.DriveIOOp;
+import nodemanager.io.GoogleDriveUploader;
 
 /**
  * creates a manifest file containing all the currently active data,

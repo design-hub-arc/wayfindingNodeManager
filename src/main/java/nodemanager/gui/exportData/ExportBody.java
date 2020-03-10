@@ -1,5 +1,6 @@
 package nodemanager.gui.exportData;
 
+import localFiles.WayfindingManifest;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import javax.swing.*;

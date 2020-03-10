@@ -9,9 +9,9 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
-import nodemanager.io.FileType;
+import localFiles.FileType;
 import nodemanager.io.VersionLog;
-import nodemanager.io.WayfindingManifest;
+import localFiles.WayfindingManifest;
 
 /**
  * Acts as the body of the import dialog whenever the user clicks the import from drive button.

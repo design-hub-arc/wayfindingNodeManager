@@ -1,5 +1,6 @@
 package nodemanager.gui.importData;
 
+import localFiles.FileType;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;

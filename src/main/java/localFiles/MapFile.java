@@ -1,5 +1,7 @@
-package nodemanager.io;
+package localFiles;
 
+import localFiles.FileType;
+import localFiles.AbstractWayfindingFile;
 import java.io.*;
 import javax.imageio.ImageIO;
 import nodemanager.Session;

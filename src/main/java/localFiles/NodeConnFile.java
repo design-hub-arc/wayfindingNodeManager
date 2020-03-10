@@ -1,9 +1,11 @@
-package nodemanager.io;
+package localFiles;
 
+import localFiles.FileType;
+import localFiles.AbstractCsvFile;
 import java.io.InputStream;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
-import static nodemanager.io.AbstractWayfindingFile.NL;
+import static localFiles.AbstractWayfindingFile.NL;
 
 /**
  * Used to read/write the node connections file

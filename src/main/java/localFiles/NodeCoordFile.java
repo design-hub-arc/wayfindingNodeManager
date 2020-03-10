@@ -1,5 +1,7 @@
-package nodemanager.io;
+package localFiles;
 
+import localFiles.FileType;
+import localFiles.AbstractCsvFile;
 import java.io.InputStream;
 import nodemanager.Session;
 import nodemanager.node.Node;

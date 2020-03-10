@@ -1,6 +1,6 @@
 package nodemanager.gui.importData;
 
-import nodemanager.io.FileType;
+import localFiles.FileType;
 
 /**
  * Well this is kinda pointless
