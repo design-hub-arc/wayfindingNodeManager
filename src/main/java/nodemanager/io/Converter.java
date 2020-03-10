@@ -38,10 +38,6 @@ public class Converter {
                 break;
         }
         
-        if(ret != null){
-            ret.setDriveCopy(f);
-        }
-        
         return ret;
     }
     

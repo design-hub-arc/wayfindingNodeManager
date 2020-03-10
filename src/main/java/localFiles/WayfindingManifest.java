@@ -107,23 +107,26 @@ public class WayfindingManifest extends AbstractCsvFile{
         return ret;
     }
     
+    public final String getUrlFor(FileType type){
+        return urls.get(type.getTitle());
+    }
+    
     @Override
     public DriveIOOp<File> upload(String folderId){
         WayfindingManifest m = this;
         return new DriveIOOp<File>(){
             @Override
-            public File perform() throws Exception {
-                File ret = null;
-                
+            public File perform() throws Exception {                
                 GoogleDriveUploader
                         .createSubfolder(folderId, title)
                         .addOnSucceed((folder)->{
                             m.driveFolder = folder.getId();
                         }).getExcecutingThread().join();
-                GoogleDriveUploader.uploadFile(m, m.driveFolder).addOnSucceed((f)->{
-                    setDriveCopy((File)f);
-                }).getExcecutingThread().join();
-                return m.getDriveCopy();
+                GoogleDriveUploader
+                    .uploadFile(m, m.driveFolder)
+                    .getExcecutingThread()
+                    .join();
+                return null;
             }
         };
     }

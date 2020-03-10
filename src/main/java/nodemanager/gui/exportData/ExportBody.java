@@ -95,7 +95,7 @@ public final class ExportBody extends Container {
         newMan.upload(folder.getText()).addOnSucceed((f)->{
             msg.setText("Upload complete!");
             Session.purgeActions();
-            v.addUrl((String)selectType.getSelectedItem(), newMan.getUrl());
+            v.addUrl((String)selectType.getSelectedItem(), "https://drive.google.com/uc?export=download&id=" + f.getId());
             v.save().addOnFail((err)->{
                 msg.setText(err.getMessage());
             });

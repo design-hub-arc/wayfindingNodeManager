@@ -21,7 +21,6 @@ import nodemanager.io.GoogleDriveUploader;
 public abstract class AbstractWayfindingFile {
     private String name;
     private java.io.File localCopy; // The local version of this file
-    private com.google.api.services.drive.model.File driveCopy;
     private final FileType type; 
     
     public static String NL = System.getProperty("line.separator");
@@ -34,7 +33,6 @@ public abstract class AbstractWayfindingFile {
     public AbstractWayfindingFile(String title, FileType t){
         name = title;
         localCopy = null;
-        driveCopy = null;
         type = t;
     }
     
@@ -60,10 +58,6 @@ public abstract class AbstractWayfindingFile {
         return upload;
     }
     
-    public final String getDriveId() throws NullPointerException{
-        return driveCopy.getId();
-    }
-    
     /**
      * Associates a local file as the local copy of this file.
      * @param f the file to associate with this.
@@ -71,19 +65,6 @@ public abstract class AbstractWayfindingFile {
     public final void setLocalCopy(java.io.File f){
         localCopy = f;
         name = f.getName();
-    }
-    
-    /**
-     * Associates a drive file as the drive copy of this file.
-     * @param f the file to associate with this.
-     */
-    public final void setDriveCopy(com.google.api.services.drive.model.File f){
-        driveCopy = f;
-        name = f.getName();
-    }
-    
-    public final File getDriveCopy(){
-        return driveCopy;
     }
     
     /**
@@ -125,20 +106,7 @@ public abstract class AbstractWayfindingFile {
      * @return a DriveIOOp. See its file to see what it does
      */
     public DriveIOOp<File> upload(String folderId){
-        return GoogleDriveUploader.uploadFile(this, folderId).addOnSucceed((f)->{
-            setDriveCopy((File)f);
-        });
-    }
-    
-    public String getUrl() throws NullPointerException{
-        String ret = "";
-        if(driveCopy == null){
-            throw new NullPointerException(name + " hasn't been uploaded to the drive yet, so I can't get its URL");
-        } else {
-            ret = "https://drive.google.com/uc?export=download&id=" + driveCopy.getId();
-        }
-        
-        return ret;
+        return GoogleDriveUploader.uploadFile(this, folderId);
     }
     
     /**
