@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
+import nodemanager.io.VersionLog;
 
 /**
  * Provides a base for the classes used to interface
@@ -34,6 +35,33 @@ public abstract class AbstractWayfindingFile {
         name = title;
         localCopy = null;
         type = t;
+    }
+    
+    public static AbstractWayfindingFile fromType(String title, FileType t){
+        AbstractWayfindingFile ret = null;
+        switch(t){
+            case NODE_COORD:
+                ret = new NodeCoordFile(title);
+                break;
+            case NODE_CONN:
+                ret = new NodeConnFile(title);
+                break;
+            case LABEL:
+                ret = new NodeLabelFile(title);
+                break;
+            case MAP_IMAGE:
+                ret = new MapFile(title);
+                break;
+            case MANIFEST:
+                ret = new WayfindingManifest(title);
+                break;
+            case VERSION_LOG:
+                ret = new VersionLog();
+                break;
+            default:
+                throw new UnsupportedOperationException("Cannot decode file from type " + t.getTitle());
+        }
+        return ret;
     }
     
     public final FileType getType(){
@@ -144,7 +172,7 @@ public abstract class AbstractWayfindingFile {
      * then decides what to do with the content
      * @param s 
      */
-    public abstract void readStream(InputStream s);
+    public abstract void readStream(InputStream s) throws IOException;
     
     /**
      * Defined in each direct subclass (AbstractCsvFile, MapFile).

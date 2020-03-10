@@ -84,8 +84,10 @@ public class DriveImportBody extends Container{
                     .importManifest(exportIds[exportSelector.getSelectedIndex()])
                     .addOnSucceed((m)->{
                         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
-                            cb.selectFile(m.getFileFor(cb.getFileType()));
-                            cb.importIfSelected();
+                            m.getFileFor(cb.getFileType()).addOnSucceed((file)->{
+                                cb.selectFile(file);
+                                cb.importIfSelected();
+                            });
                         });
                     }).addOnFail((err)->{
                         msg.setText(err.getMessage());

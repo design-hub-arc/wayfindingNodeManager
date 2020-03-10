@@ -24,6 +24,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     private final String title;
     private String driveFolder;
     private final HashMap<FileType, String> urls;
+    private static final String DOWNLOAD_URL_PREFIX = "https://drive.google.com/uc?export=download&id=";
     
     
     public WayfindingManifest(String folderName){
@@ -50,7 +51,12 @@ public class WayfindingManifest extends AbstractCsvFile{
                 
                 //download the file from the drive
                 GoogleDriveUploader.download(id).addOnSucceed((stream)->{
-                    m.readStream(stream); //populate
+                    try {
+                        m.readStream(stream); //populate
+                        m.importData();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }).getExcecutingThread().join(); //wait until it's done
                 return m;
             }
@@ -68,19 +74,19 @@ public class WayfindingManifest extends AbstractCsvFile{
             @Override
             public Boolean perform() throws Exception {
                 new NodeCoordFile(title).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.NODE_COORD, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.NODE_COORD, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 new NodeConnFile(title).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.NODE_CONN, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.NODE_CONN, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 new NodeLabelFile(title).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.LABEL, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.LABEL, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 new MapFile(title).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.MAP_IMAGE, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.MAP_IMAGE, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 return true;
@@ -93,12 +99,28 @@ public class WayfindingManifest extends AbstractCsvFile{
         return urls.containsKey(fileType);
     }
     
-    public final AbstractWayfindingFile getFileFor(FileType fileType){
-        AbstractWayfindingFile ret = null;
+    public final DriveIOOp<AbstractWayfindingFile> getFileFor(FileType fileType){
+        if(!containsUrlFor(fileType)){
+            throw new NullPointerException(String.format("No file set for type '%s'", fileType.getTitle()));
+        } 
         
-        if(containsUrlFor(fileType)){
-            ret = Converter.convert(GoogleDriveUploader.getFile(urls.get(fileType)), fileType);
-        }
+        DriveIOOp<AbstractWayfindingFile> ret = new DriveIOOp<AbstractWayfindingFile>() {
+            @Override
+            public AbstractWayfindingFile perform() throws Exception {
+                AbstractWayfindingFile file = AbstractWayfindingFile.fromType("", fileType);
+                String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
+                
+                GoogleDriveUploader.download(id).addOnSucceed((in)->{
+                    try {
+                        file.readStream(in);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }).getExcecutingThread().join();
+                
+                return file;
+            }
+        };
         
         return ret;
     }
@@ -129,6 +151,29 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     @Override
+    public void readStream(InputStream s) throws IOException {
+        BufferedReader br;
+        String[] line = new String[0];
+        boolean firstLine = true;
+        br = new BufferedReader(new InputStreamReader(s));
+        while(br.ready()){
+            try{
+                line = br.readLine().split(",");
+                if(!firstLine){
+                    urls.put(FileType.fromTitle(line[0]), line[1]);
+                }
+            } catch(Exception e){
+                if(!firstLine){
+                    //don't print errors for first line, as it will always fail, being a header
+                    out.println("Line fail: " + Arrays.toString(line));
+                    e.printStackTrace();
+                }
+            }
+            firstLine = false;
+        }
+    }
+    
+    @Override
     public String getContentsToWrite() {
         try {
             populate().getExcecutingThread().join();
@@ -144,32 +189,5 @@ public class WayfindingManifest extends AbstractCsvFile{
                 .append(entry.getValue());
         });
         return sb.toString();
-    }
-
-    @Override
-    public void readStream(InputStream s) {
-        BufferedReader br;
-        String[] line = new String[0];
-        boolean firstLine = true;
-        try{
-            br = new BufferedReader(new InputStreamReader(s));
-            while(br.ready()){
-                try{
-                    line = br.readLine().split(",");
-                    if(!firstLine){
-                        urls.put(FileType.fromTitle(line[0]), line[1]);
-                    }
-                } catch(Exception e){
-                    if(!firstLine){
-                        //don't print errors for first line, as it will always fail, being a header
-                        out.println("Line fail: " + Arrays.toString(line));
-                        e.printStackTrace();
-                    }
-                }
-                firstLine = false;
-            }
-        } catch (IOException e){
-            e.printStackTrace();
-        }
     }
 }
