@@ -19,14 +19,12 @@ import nodemanager.io.GoogleDriveUploader;
  * export them to the web,
  * and paste their URLs into the manifest
  * @author Matt Crow
- * 
- * TODO: make this able to save a local copy?
  */
 public class WayfindingManifest extends AbstractCsvFile{
     private final String prefix;
     private final String title;
     private String driveFolder;
-    private final HashMap<String, String> urls;
+    private final HashMap<FileType, String> urls;
     
     
     public WayfindingManifest(String folderName){
@@ -72,19 +70,19 @@ public class WayfindingManifest extends AbstractCsvFile{
             @Override
             public Boolean perform() throws Exception {
                 new NodeCoordFile(prefix).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put("Node coordinates", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.NODE_COORD, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 new NodeConnFile(prefix).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put("Node connections", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.NODE_CONN, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 new NodeLabelFile(prefix).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put("labels", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.LABEL, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 new MapFile(prefix).upload(driveFolder).addOnSucceed((f)->{
-                    urls.put("map image", "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
+                    urls.put(FileType.MAP_IMAGE, "https://drive.google.com/uc?export=download&id=" + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
                 return true;
@@ -94,21 +92,21 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     public final boolean containsUrlFor(FileType fileType) {
-        return urls.containsKey(fileType.getTitle());
+        return urls.containsKey(fileType);
     }
     
     public final AbstractWayfindingFile getFileFor(FileType fileType){
         AbstractWayfindingFile ret = null;
         
         if(containsUrlFor(fileType)){
-            ret = Converter.convert(GoogleDriveUploader.getFile(urls.get(fileType.getTitle())), fileType);
+            ret = Converter.convert(GoogleDriveUploader.getFile(urls.get(fileType)), fileType);
         }
         
         return ret;
     }
     
     public final String getUrlFor(FileType type){
-        return urls.get(type.getTitle());
+        return urls.get(type);
     }
     
     @Override
@@ -139,13 +137,13 @@ public class WayfindingManifest extends AbstractCsvFile{
             ex.printStackTrace();
         }
         StringBuilder sb = new StringBuilder("Data, URL");
-        for(Map.Entry<String, String> entry : urls.entrySet()){
-                sb
-                        .append(NL)
-                        .append(entry.getKey())
-                        .append(", ")
-                        .append(entry.getValue());
-            }
+        urls.entrySet().forEach((entry) -> {
+            sb
+                .append(NL)
+                .append(entry.getKey().getTitle())
+                .append(", ")
+                .append(entry.getValue());
+        });
         return sb.toString();
     }
 

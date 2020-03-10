@@ -134,7 +134,6 @@ public abstract class AbstractWayfindingFile {
     }
     
     
-    
     /**
      * Reads the contents of an InputStream,
      * then decides what to do with the content
