@@ -14,6 +14,19 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = 'nodemanager.NodeManager'
 }
 
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'nodemanager.NodeManager'
+    }
+    
+    //include dependencies in JAR file
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
 repositories {
     mavenCentral()
     // You may define additional repositories, or even remove "mavenCentral()".
