@@ -16,6 +16,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
+import io.LocalFileWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,8 +105,10 @@ public class GoogleDriveUploader{
             public File perform() throws Exception {
                 File googleFile = null;
                 try{
+                    java.io.File localFileToUpload = LocalFileWriter.createTempFileFor(f);
+                    
                     googleFile = new File();
-                    FileContent content = new FileContent(f.getType().getMimeType(), f.getFileToUpload());
+                    FileContent content = new FileContent(f.getType().getMimeType(), localFileToUpload);
 
                     ArrayList<String> parents = new ArrayList<>();
                     parents.add(folderId);
@@ -113,7 +116,7 @@ public class GoogleDriveUploader{
 
                     Drive.Files.Create insert = drive.files().create(googleFile, content);
 
-                    googleFile.setName(f.getFileToUpload().getName());
+                    googleFile.setName(localFileToUpload.getName());
 
                     //since all of this google stuff is blocking code (O...K...)
                     //it will execute in whatever order we put it in.
@@ -143,7 +146,8 @@ public class GoogleDriveUploader{
                 File ret = null;
                 try{
                     ret = drive.files().get(VersionLog.ID).execute();
-                    drive.files().update(ret.getId(), new File(), new FileContent("text/csv", vl.createTemp())).execute();
+                    java.io.File localFileToUpdate = LocalFileWriter.createTempFileFor(vl);
+                    drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
                 } catch(IOException e){
                     if(e instanceof GoogleJsonResponseException){
                         int code = ((GoogleJsonResponseException) e).getDetails().getCode();

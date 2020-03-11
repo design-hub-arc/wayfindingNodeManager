@@ -45,7 +45,7 @@ public class FileCheckBox extends AbstractFileCheckbox{
     }
     
     public void selectFile(File f) throws IOException{
-        AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(getFileType());
+        AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(f.getName(), getFileType());
         wayfindingFile.readStream(new FileInputStream(f));
         super.selectFile(wayfindingFile);
         fileName.setText(f.getAbsolutePath());

@@ -8,6 +8,8 @@ import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import files.MapFile;
+import io.LocalFileWriter;
+import java.io.IOException;
 
 
 /**
@@ -33,13 +35,45 @@ public class ExportMenu extends JMenu{
                     String name = JOptionPane.showInputDialog(this, "What do you want to call this save?");
                     File newDir = new File(f.getAbsoluteFile() + File.separator + name);
                     newDir.mkdir();
-                    new NodeCoordFile().save(newDir.getAbsolutePath(), name);
-                    new NodeConnFile().save(newDir.getAbsolutePath(), name);
-                    new NodeLabelFile().save(newDir.getAbsolutePath(), name);
-                    new MapFile().save(newDir.getAbsolutePath(), name);
+                    saveCurrentDataset(name, newDir.getAbsolutePath());
                 }
         );
     }
+    
+    private void saveCurrentDataset(String exportName, String parentDir){
+        NodeCoordFile coords = new NodeCoordFile(exportName);
+        //populate coords
+        try {
+            LocalFileWriter.createFileFor(coords, parentDir);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        NodeConnFile conns = new NodeConnFile(exportName);
+        //populate conns
+        try {
+            LocalFileWriter.createFileFor(conns, parentDir);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        NodeLabelFile labels = new NodeLabelFile(exportName);
+        //populate labels
+        try {
+            LocalFileWriter.createFileFor(labels, parentDir);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        MapFile map = new MapFile(exportName);
+        //populate map
+        try {
+            LocalFileWriter.createFileFor(map, parentDir);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     private JMenuItem exportManifest(){
         JMenuItem j = new JMenuItem("Export To The Drive");
         j.addActionListener((ActionEvent e) -> {

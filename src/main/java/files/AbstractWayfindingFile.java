@@ -33,23 +33,23 @@ public abstract class AbstractWayfindingFile {
         type = t;
     }
     
-    public static AbstractWayfindingFile fromType(FileType t){
+    public static AbstractWayfindingFile fromType(String name, FileType t){
         AbstractWayfindingFile ret = null;
         switch(t){
             case NODE_COORD:
-                ret = new NodeCoordFile();
+                ret = new NodeCoordFile(name);
                 break;
             case NODE_CONN:
-                ret = new NodeConnFile();
+                ret = new NodeConnFile(name);
                 break;
             case LABEL:
-                ret = new NodeLabelFile();
+                ret = new NodeLabelFile(name);
                 break;
             case MAP_IMAGE:
-                ret = new MapFile();
+                ret = new MapFile(name);
                 break;
             case MANIFEST:
-                ret = new WayfindingManifest();
+                ret = new WayfindingManifest(name);
                 break;
             case VERSION_LOG:
                 ret = new VersionLog();
@@ -60,47 +60,13 @@ public abstract class AbstractWayfindingFile {
         return ret;
     }
     
+    public String getName(){
+        return name;
+    }
+    
     public final FileType getType(){
         return type;
-    }
-    
-    /**
-     * Gets the File to upload.
-     * Returns this' local copy, if it exists,
-     * otherwise, returns a temporary file.
-     * @return 
-     */
-    public final java.io.File getFileToUpload() throws IOException{
-        return createTemp();
-    }
-    
-    /**
-     * Saves this' contents to the local file system.
-     * If this has a local file associated with it,
-     * writes to that file,
-     * otherwise, creates a new file on the local system in the given directory and writes to it.
-     * The contents of the file are given by this.getContentsToWrite()
-     * @param directory the directory to save the file to.
-     * @param fileName the name of the file to save this as
-     * @return the file created or updated
-     */
-    public java.io.File save(String directory, String fileName){
-        java.io.File f = new java.io.File(directory + java.io.File.separator + fileName + "." + type.getFileExtention());
-        writeToFile(f);
-        return f;
-    }
-    
-    /**
-     * Creates a temporary file on the local system
-     * @return the newly created file, or null if it failed.
-     * @throws IOException 
-     */
-    public final java.io.File createTemp() throws IOException{
-        java.io.File temp = java.io.File.createTempFile("wayfindingNodeManagerTempFile", type.getFileExtention());
-        temp.deleteOnExit();
-        temp = save(temp.getParent(), "wayfindingNodeManagerTempFile");
-        return temp;
-    }
+    }    
     
     /**
      * Uploads this' local copy to the drive. 
@@ -158,5 +124,5 @@ public abstract class AbstractWayfindingFile {
      * See the aforementioned classes for more details. 
      * @param f the file to write to.
      */
-    public abstract void writeToFile(java.io.File f);
+    public abstract void writeToFile(java.io.File f) throws IOException;
 }

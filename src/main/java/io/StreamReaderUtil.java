@@ -13,9 +13,13 @@ public class StreamReaderUtil {
     public static String readStream(InputStream in) throws IOException{
         StringBuilder ret = new StringBuilder();
         InputStreamReader read = new InputStreamReader(in);
-        BufferedReader buff = new BufferedReader(read);
-        while(buff.ready()){
-            ret.append(buff.readLine()).append('\n');
+        try (BufferedReader buff = new BufferedReader(read)) {
+            while(buff.ready()){
+                ret.append(buff.readLine()).append('\n');
+            }
+        } catch (IOException ex){
+            ex.printStackTrace();
+            throw ex; //make sure the calling method knows an error occured
         }
         return ret.toString();
     }

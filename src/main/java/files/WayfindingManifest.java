@@ -110,7 +110,7 @@ public class WayfindingManifest extends AbstractCsvFile{
         DriveIOOp<AbstractWayfindingFile> ret = new DriveIOOp<AbstractWayfindingFile>() {
             @Override
             public AbstractWayfindingFile perform() throws Exception {
-                AbstractWayfindingFile file = AbstractWayfindingFile.fromType(fileType);
+                AbstractWayfindingFile file = AbstractWayfindingFile.fromType("manifestFile", fileType);
                 String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
                 
                 GoogleDriveUploader.download(id).addOnSucceed((in)->{

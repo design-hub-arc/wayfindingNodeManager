@@ -88,7 +88,11 @@ public class LocalImportBody extends Container implements ActionListener{
             Files.list(f.toPath()).forEach((file)->{
                 fileCheckBoxes.forEach((checkBox)->{
                     if(file.getFileName().toString().toUpperCase().contains(checkBox.getFileType().getSuffix().toUpperCase())){
-                        checkBox.selectFile(file.toFile());
+                        try {
+                            checkBox.selectFile(file.toFile());
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 });
             });
