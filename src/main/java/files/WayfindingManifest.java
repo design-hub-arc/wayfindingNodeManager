@@ -1,4 +1,4 @@
-package localFiles;
+package files;
 
 import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;

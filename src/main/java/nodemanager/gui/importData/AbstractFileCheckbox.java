@@ -2,8 +2,8 @@ package nodemanager.gui.importData;
 
 import java.awt.GridLayout;
 import javax.swing.*;
-import localFiles.AbstractWayfindingFile;
-import localFiles.FileType;
+import files.AbstractWayfindingFile;
+import files.FileType;
 
 /**
  * This will serve as the base for local- and drive import file choosers.

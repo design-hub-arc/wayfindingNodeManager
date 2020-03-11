@@ -4,7 +4,7 @@ import java.awt.GridLayout;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
-import localFiles.FileType;
+import files.FileType;
 import nodemanager.io.Converter;
 
 /**

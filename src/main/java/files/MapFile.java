@@ -1,4 +1,4 @@
-package localFiles;
+package files;
 
 import java.awt.image.BufferedImage;
 import java.io.*;

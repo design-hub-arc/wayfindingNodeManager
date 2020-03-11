@@ -1,9 +1,9 @@
-package localFiles;
+package files;
 
 import java.io.InputStream;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
-import static localFiles.AbstractWayfindingFile.NL;
+import static files.AbstractWayfindingFile.NL;
 
 /**
  * Used to read/write the node connections file

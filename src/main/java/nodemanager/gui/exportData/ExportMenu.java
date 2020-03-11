@@ -1,13 +1,13 @@
 package nodemanager.gui.exportData;
 
-import localFiles.NodeConnFile;
-import localFiles.NodeLabelFile;
-import localFiles.NodeCoordFile;
+import files.NodeConnFile;
+import files.NodeLabelFile;
+import files.NodeCoordFile;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
-import localFiles.MapFile;
+import files.MapFile;
 
 
 /**

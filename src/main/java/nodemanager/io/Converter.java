@@ -1,11 +1,11 @@
 package nodemanager.io;
 
-import localFiles.NodeLabelFile;
-import localFiles.NodeCoordFile;
-import localFiles.NodeConnFile;
-import localFiles.MapFile;
-import localFiles.FileType;
-import localFiles.AbstractWayfindingFile;
+import files.NodeLabelFile;
+import files.NodeCoordFile;
+import files.NodeConnFile;
+import files.MapFile;
+import files.FileType;
+import files.AbstractWayfindingFile;
 
 /**
  * May switch to using this in 

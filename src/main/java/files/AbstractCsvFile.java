@@ -1,4 +1,4 @@
-package localFiles;
+package files;
 
 import java.io.BufferedWriter;
 import java.io.File;

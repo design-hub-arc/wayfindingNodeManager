@@ -1,7 +1,7 @@
 package nodemanager.io;
 
-import localFiles.FileType;
-import localFiles.AbstractCsvFile;
+import files.FileType;
+import files.AbstractCsvFile;
 import com.google.api.services.drive.model.File;
 import java.io.BufferedReader;
 import java.io.IOException;
