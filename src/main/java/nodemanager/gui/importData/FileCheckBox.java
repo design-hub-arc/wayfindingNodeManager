@@ -8,7 +8,6 @@ import nodemanager.gui.FileSelector;
 import files.FileType;
 import java.io.FileInputStream;
 import java.io.IOException;
-import nodemanager.io.Converter;
 
 /**
  * Used by LocalImportBody to allow the user to choose what wayfinding files to import.
@@ -46,7 +45,7 @@ public class FileCheckBox extends AbstractFileCheckbox{
     
     public void selectFile(File f) throws IOException{
         AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(f.getName(), getFileType());
-        wayfindingFile.readStream(new FileInputStream(f));
+        wayfindingFile.setContents(new FileInputStream(f));
         super.selectFile(wayfindingFile);
         fileName.setText(f.getAbsolutePath());
     }

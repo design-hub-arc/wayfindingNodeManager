@@ -1,10 +1,7 @@
 package files;
 
-import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.io.InputStream;
-import nodemanager.io.DriveIOOp;
-import nodemanager.io.GoogleDriveUploader;
 import nodemanager.io.VersionLog;
 
 /**
@@ -18,7 +15,7 @@ import nodemanager.io.VersionLog;
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 public abstract class AbstractWayfindingFile {
-    private String name;
+    private final String name;
     private final FileType type; 
     
     public static String NL = System.getProperty("line.separator");
@@ -69,60 +66,25 @@ public abstract class AbstractWayfindingFile {
     }    
     
     /**
-     * Uploads this' local copy to the drive. 
-     * If a local copy isn't set, 
-     * creates a temporary file to hold the data from the program,
-     * then uploads that temporary file.
-     * 
-     * @param folderId the id of the folder on the google drive to upload to.
-     * @return a DriveIOOp. See its file to see what it does
-     */
-    public DriveIOOp<File> upload(String folderId){
-        return GoogleDriveUploader.uploadFile(this, folderId);
-    }
-    
-    /**
-     * Loads this' data into the program
-     * @return a DriveIOOp containing this' data. 
-     * @throws java.lang.Exception if neither 
-     * this' local nor drive copies have been set
-     */
-    /*
-    public final DriveIOOp<InputStream> importData() throws Exception{
-        DriveIOOp<InputStream> ret = null;
-        if(localCopy != null){
-            try {
-                readStream(new FileInputStream(localCopy));
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        } else if(driveCopy != null){
-            ret = GoogleDriveUploader
-                    .download(driveCopy.getId())
-                    .addOnSucceed((stream)->readStream(stream));
-        } else {
-            throw new Exception("Cannot import if neither localCopy not driveCopy have been set!");
-        }
-        return ret;
-    }*/
-    
-    public void importData(){
-        //subclasses will override this to import their data into the program
-    }
-    
-    
-    /**
      * Reads the contents of an InputStream,
-     * then decides what to do with the content
-     * @param s 
+     * then sets the contents of this file
+     * @param s the inputstream from either a local file, or the Google Drive
+     * 
+     * @throws java.io.IOException if any errors occur when reading the stream
      */
-    public abstract void readStream(InputStream s) throws IOException;
+    public abstract void setContents(InputStream s) throws IOException;
     
     /**
-     * Defined in each direct subclass (AbstractCsvFile, MapFile).
-     * Called by save() after a new file has been created. 
-     * See the aforementioned classes for more details. 
+     * Imports the data from this file into
+     * the program
+     */
+    public abstract void importData();
+    
+    /**
+     * Writes the contents of this to a file on the user's computer.
+     *  
      * @param f the file to write to.
+     * @throws java.io.IOException if an error occurs
      */
     public abstract void writeToFile(java.io.File f) throws IOException;
 }

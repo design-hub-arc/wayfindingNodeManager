@@ -1,7 +1,6 @@
 package files;
 
 import files.FileType;
-import files.AbstractCsvFile;
 import java.io.InputStream;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
@@ -40,7 +39,7 @@ public class NodeLabelFile extends AbstractCsvFile{
     }
 
     @Override
-    public void readStream(InputStream s) {
+    public void setContents(InputStream s) {
         NodeParser.parseFile(s, (line)->{
             int id = Integer.parseInt(line[1].trim());
             if(Node.get(id) == null){
@@ -48,5 +47,10 @@ public class NodeLabelFile extends AbstractCsvFile{
             }
             Node.get(id).addLabel(line[0].trim());
         });
+    }
+
+    @Override
+    public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

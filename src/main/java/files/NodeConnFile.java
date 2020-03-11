@@ -44,7 +44,7 @@ public class NodeConnFile extends AbstractCsvFile{
      * @param s an InputStream from a connection file
      */
     @Override
-    public void readStream(InputStream s) {
+    public void setContents(InputStream s) {
         NodeParser.parseFile(s, (line)->{
             int id1 = Integer.parseInt(line[0].trim());
             int id2 = Integer.parseInt(line[1].trim());
@@ -56,5 +56,10 @@ public class NodeConnFile extends AbstractCsvFile{
             }
             Node.get(id1).addAdjId(id2);
         });
+    }
+
+    @Override
+    public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

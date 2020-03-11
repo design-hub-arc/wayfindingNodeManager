@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import nodemanager.exceptions.NoPermissionException;
 
 /**
  * Used to interact with the versions.csv file in the google drive.
@@ -42,7 +41,7 @@ public class VersionLog extends AbstractCsvFile{
         return GoogleDriveUploader
                 .download(URL)
                 .addOnSucceed((stream)->{
-                    readStream(stream);
+                    setContents(stream);
                     downloaded = true;
                 });
     }
@@ -157,7 +156,7 @@ public class VersionLog extends AbstractCsvFile{
     }
     
     @Override
-    public void readStream(InputStream s) {
+    public void setContents(InputStream s) {
         BufferedReader br = new BufferedReader(new InputStreamReader(s));
         boolean isFirstLine = true;
         String[] headers = {};
@@ -205,5 +204,10 @@ public class VersionLog extends AbstractCsvFile{
      */
     public boolean isDownloaded() {
         return downloaded;
+    }
+
+    @Override
+    public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

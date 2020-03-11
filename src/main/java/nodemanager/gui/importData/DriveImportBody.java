@@ -64,21 +64,7 @@ public class DriveImportBody extends Container{
         }
         
         importButton = new JButton("Import");
-        importButton.addActionListener((e)->{
-            try{
-                Class.forName("com.google.api.client.http.HttpTransport"); 
-                //will throw an error if don't have google drive API
-            } catch(ClassNotFoundException ex){
-                ex.printStackTrace();
-                msg.setText(
-                        "Looks like you forgot to include the lib folder \n"
-                      + "1. Download lib.zip from the node manager Google drive \n"
-                      + "2. Extract the contents so that the lib folder is in the same folder as NodeManager.jar \n"
-                      + "3. Click export again"
-                );
-                return;
-            }
-            
+        importButton.addActionListener((e)->{            
             msg.setText("Beginning download...");
             WayfindingManifest
                     .downloadManifest(exportIds[exportSelector.getSelectedIndex()])

@@ -24,7 +24,7 @@ public class MapFile extends AbstractWayfindingFile{
     }
 
     @Override
-    public void readStream(InputStream s) {
+    public void setContents(InputStream s) {
         try {
             content = ImageIO.read(ImageIO.createImageInputStream(s));
         } catch (IOException ex) {
@@ -38,6 +38,7 @@ public class MapFile extends AbstractWayfindingFile{
             throw new NullPointerException("Content must be set before importing");
         }
         Session.map.setImage(content);
+        Session.map.repaint();
     }
     
     @Override

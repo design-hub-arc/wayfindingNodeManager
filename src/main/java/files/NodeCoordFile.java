@@ -1,8 +1,7 @@
 package files;
 
-import files.FileType;
-import files.AbstractCsvFile;
 import java.io.InputStream;
+import java.util.Arrays;
 import nodemanager.Session;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
@@ -48,8 +47,9 @@ public class NodeCoordFile extends AbstractCsvFile{
      * @param s an InputStream from a node file
      */
     @Override
-    public void readStream(InputStream s) {
+    public void setContents(InputStream s) {
         NodeParser.parseFile(s, (line)->{
+            System.out.println("In NodeCoordFile.setContents: " + Arrays.toString(line));
             Node.updateNode(
                 Integer.parseInt(line[0].trim()),
                 Integer.parseInt(line[1].trim()),
@@ -58,5 +58,10 @@ public class NodeCoordFile extends AbstractCsvFile{
             Session.map.addNode(Node.get(Integer.parseInt(line[0].trim())));
         });
         Session.map.refreshNodes();
+    }
+
+    @Override
+    public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -7,7 +7,6 @@ import files.MapFile;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import nodemanager.*;
-import nodemanager.io.*;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
@@ -57,25 +56,25 @@ public class ImportMenu extends JMenu{
      */
     public void loadDefaults() {
         MapFile defaultMap = new MapFile();
-        defaultMap.readStream(getClass().getResourceAsStream("/map.png"));
+        defaultMap.setContents(getClass().getResourceAsStream("/map.png"));
         defaultMap.importData();
         
         try {
-            new NodeCoordFile().readStream(getClass().getResourceAsStream("/nodeData.csv"));
+            new NodeCoordFile().setContents(getClass().getResourceAsStream("/nodeData.csv"));
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Try running clean/build");
         }
         
         try {
-            new NodeConnFile().readStream(getClass().getResourceAsStream("/nodeConnections.csv"));
+            new NodeConnFile().setContents(getClass().getResourceAsStream("/nodeConnections.csv"));
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Try running clean/build");
         }
         
         try{
-            new NodeLabelFile().readStream(getClass().getResourceAsStream("/labels.csv"));
+            new NodeLabelFile().setContents(getClass().getResourceAsStream("/labels.csv"));
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Try running clean/build");

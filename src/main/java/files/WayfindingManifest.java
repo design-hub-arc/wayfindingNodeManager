@@ -56,7 +56,7 @@ public class WayfindingManifest extends AbstractCsvFile{
                 //download the file from the drive
                 GoogleDriveUploader.download(id).addOnSucceed((stream)->{
                     try {
-                        m.readStream(stream); //populate
+                        m.setContents(stream); //populate
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -76,19 +76,19 @@ public class WayfindingManifest extends AbstractCsvFile{
         DriveIOOp populate = new DriveIOOp<Boolean>(){
             @Override
             public Boolean perform() throws Exception {
-                new NodeCoordFile(title).upload(driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(new NodeCoordFile(title), driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.NODE_COORD, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                new NodeConnFile(title).upload(driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(new NodeConnFile(title), driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.NODE_CONN, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                new NodeLabelFile(title).upload(driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(new NodeLabelFile(title), driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.LABEL, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                new MapFile(title).upload(driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(new MapFile(title), driveFolder).addOnSucceed((f)->{
                     urls.put(FileType.MAP_IMAGE, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
@@ -115,7 +115,7 @@ public class WayfindingManifest extends AbstractCsvFile{
                 
                 GoogleDriveUploader.download(id).addOnSucceed((in)->{
                     try {
-                        file.readStream(in);
+                        file.setContents(in);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -132,8 +132,6 @@ public class WayfindingManifest extends AbstractCsvFile{
         return urls.get(type);
     }
     
-    
-    @Override
     public DriveIOOp<File> upload(String folderId){
         WayfindingManifest m = this;
         return new DriveIOOp<File>(){
@@ -154,7 +152,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     @Override
-    public void readStream(InputStream s) throws IOException {
+    public void setContents(InputStream s) throws IOException {
         BufferedReader br;
         String[] line = new String[0];
         boolean firstLine = true;
@@ -192,5 +190,10 @@ public class WayfindingManifest extends AbstractCsvFile{
                 .append(entry.getValue());
         });
         return sb.toString();
+    }
+
+    @Override
+    public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
