@@ -1,10 +1,13 @@
 package nodemanager.gui.importData;
 
+import files.AbstractWayfindingFile;
 import java.awt.GridLayout;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import files.FileType;
+import java.io.FileInputStream;
+import java.io.IOException;
 import nodemanager.io.Converter;
 
 /**
@@ -30,15 +33,21 @@ public class FileCheckBox extends AbstractFileCheckbox{
                     "Select " + getFileType().getTitle() + " file",
                     new String[]{t.getFileExtention()},
                     (f)->{
-                        selectFile(f);
+                        try {
+                            selectFile(f);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
             ).actionPerformed(e);
         });
         add(select);
     }
     
-    public void selectFile(File f){
-        super.selectFile(Converter.convert(f, getFileType()));
+    public void selectFile(File f) throws IOException{
+        AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(getFileType());
+        wayfindingFile.readStream(new FileInputStream(f));
+        super.selectFile(wayfindingFile);
         fileName.setText(f.getAbsolutePath());
     }
 }

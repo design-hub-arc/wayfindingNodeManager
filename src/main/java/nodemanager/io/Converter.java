@@ -6,6 +6,8 @@ import files.NodeConnFile;
 import files.MapFile;
 import files.FileType;
 import files.AbstractWayfindingFile;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * May switch to using this in 
@@ -41,7 +43,7 @@ public class Converter {
         return ret;
     }
     
-    public static AbstractWayfindingFile convert(java.io.File f, FileType t){
+    public static AbstractWayfindingFile convert(java.io.File f, FileType t) throws IOException{
         AbstractWayfindingFile ret = null;
         
         switch(t){
@@ -63,7 +65,7 @@ public class Converter {
         }
         
         if(ret != null){
-            ret.setLocalCopy(f);
+            ret.readStream(new FileInputStream(f));
         }
         
         return ret;

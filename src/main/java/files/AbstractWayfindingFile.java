@@ -11,15 +11,14 @@ import nodemanager.io.VersionLog;
  * Provides a base for the classes used to interface
  * with the files used by the program. 
  * 
- * This class provides the functions to
- * save or load to/from local files,
- * or upload or download files from Google Drive.
+ * It provides the generic template for the files used
+ * by the Wayfinding program. Note that these are not
+ * specifically files on the local file system or Google Drive.
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 public abstract class AbstractWayfindingFile {
     private String name;
-    private java.io.File localCopy; // The local version of this file
     private final FileType type; 
     
     public static String NL = System.getProperty("line.separator");
@@ -31,27 +30,26 @@ public abstract class AbstractWayfindingFile {
      */
     public AbstractWayfindingFile(String title, FileType t){
         name = title;
-        localCopy = null;
         type = t;
     }
     
-    public static AbstractWayfindingFile fromType(String title, FileType t){
+    public static AbstractWayfindingFile fromType(FileType t){
         AbstractWayfindingFile ret = null;
         switch(t){
             case NODE_COORD:
-                ret = new NodeCoordFile(title);
+                ret = new NodeCoordFile();
                 break;
             case NODE_CONN:
-                ret = new NodeConnFile(title);
+                ret = new NodeConnFile();
                 break;
             case LABEL:
-                ret = new NodeLabelFile(title);
+                ret = new NodeLabelFile();
                 break;
             case MAP_IMAGE:
-                ret = new MapFile(title);
+                ret = new MapFile();
                 break;
             case MANIFEST:
-                ret = new WayfindingManifest(title);
+                ret = new WayfindingManifest();
                 break;
             case VERSION_LOG:
                 ret = new VersionLog();
@@ -72,25 +70,8 @@ public abstract class AbstractWayfindingFile {
      * otherwise, returns a temporary file.
      * @return 
      */
-    public final java.io.File getFileToUpload(){
-        java.io.File upload = localCopy;
-        if(upload == null){
-            try{
-                upload = createTemp();
-            } catch(IOException e){
-                e.printStackTrace();
-            }
-        }
-        return upload;
-    }
-    
-    /**
-     * Associates a local file as the local copy of this file.
-     * @param f the file to associate with this.
-     */
-    public final void setLocalCopy(java.io.File f){
-        localCopy = f;
-        name = f.getName();
+    public final java.io.File getFileToUpload() throws IOException{
+        return createTemp();
     }
     
     /**
@@ -100,14 +81,13 @@ public abstract class AbstractWayfindingFile {
      * otherwise, creates a new file on the local system in the given directory and writes to it.
      * The contents of the file are given by this.getContentsToWrite()
      * @param directory the directory to save the file to.
+     * @param fileName the name of the file to save this as
      * @return the file created or updated
      */
-    public java.io.File save(String directory){
-        if(localCopy == null){
-            localCopy = new java.io.File(directory + java.io.File.separator + name + "." + type.getFileExtention());
-        }
-        writeToFile(localCopy);
-        return localCopy;
+    public java.io.File save(String directory, String fileName){
+        java.io.File f = new java.io.File(directory + java.io.File.separator + fileName + "." + type.getFileExtention());
+        writeToFile(f);
+        return f;
     }
     
     /**
@@ -116,9 +96,9 @@ public abstract class AbstractWayfindingFile {
      * @throws IOException 
      */
     public final java.io.File createTemp() throws IOException{
-        java.io.File temp = java.io.File.createTempFile(name, type.getFileExtention());
+        java.io.File temp = java.io.File.createTempFile("wayfindingNodeManagerTempFile", type.getFileExtention());
         temp.deleteOnExit();
-        temp = save(temp.getParent());
+        temp = save(temp.getParent(), "wayfindingNodeManagerTempFile");
         return temp;
     }
     

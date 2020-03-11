@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import static java.lang.System.out;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import nodemanager.io.Converter;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 
@@ -25,13 +25,17 @@ public class WayfindingManifest extends AbstractCsvFile{
     private String driveFolder;
     private final HashMap<FileType, String> urls;
     private static final String DOWNLOAD_URL_PREFIX = "https://drive.google.com/uc?export=download&id=";
-    
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_DATE_TIME;
     
     public WayfindingManifest(String folderName){
         super(folderName + "Manifest", FileType.MANIFEST);
         title = folderName;
         driveFolder = null;
         urls = new HashMap<>();
+    }
+    
+    public WayfindingManifest(){
+        this(LocalDateTime.now().format(DATE_FORMAT));
     }
     
     /**
@@ -106,7 +110,7 @@ public class WayfindingManifest extends AbstractCsvFile{
         DriveIOOp<AbstractWayfindingFile> ret = new DriveIOOp<AbstractWayfindingFile>() {
             @Override
             public AbstractWayfindingFile perform() throws Exception {
-                AbstractWayfindingFile file = AbstractWayfindingFile.fromType("", fileType);
+                AbstractWayfindingFile file = AbstractWayfindingFile.fromType(fileType);
                 String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
                 
                 GoogleDriveUploader.download(id).addOnSucceed((in)->{

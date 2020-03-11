@@ -33,10 +33,10 @@ public class ExportMenu extends JMenu{
                     String name = JOptionPane.showInputDialog(this, "What do you want to call this save?");
                     File newDir = new File(f.getAbsoluteFile() + File.separator + name);
                     newDir.mkdir();
-                    new NodeCoordFile(name).save(newDir.getAbsolutePath());
-                    new NodeConnFile(name).save(newDir.getAbsolutePath());
-                    new NodeLabelFile(name).save(newDir.getAbsolutePath());
-                    new MapFile(name).save(newDir.getAbsolutePath());
+                    new NodeCoordFile().save(newDir.getAbsolutePath(), name);
+                    new NodeConnFile().save(newDir.getAbsolutePath(), name);
+                    new NodeLabelFile().save(newDir.getAbsolutePath(), name);
+                    new MapFile().save(newDir.getAbsolutePath(), name);
                 }
         );
     }
