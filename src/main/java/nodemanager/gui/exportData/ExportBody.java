@@ -93,7 +93,7 @@ public final class ExportBody extends Container {
         revalidate();
         repaint();
         WayfindingManifest newMan = new WayfindingManifest(name.getText());
-        newMan.upload(folder.getText()).addOnSucceed((f)->{
+        GoogleDriveUploader.uploadManifest(newMan, folder.getText()).addOnSucceed((f)->{
             msg.setText("Upload complete!");
             Session.purgeActions();
             v.addUrl((String)selectType.getSelectedItem(), "https://drive.google.com/uc?export=download&id=" + f.getId());

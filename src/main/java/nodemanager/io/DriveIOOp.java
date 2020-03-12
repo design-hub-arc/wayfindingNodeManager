@@ -64,6 +64,9 @@ public abstract class DriveIOOp <T>{
                     onSucceed.forEach((func)->func.accept(alreadySucceeded));
                 } catch (Exception ex) {
                     alreadyFailed = ex;
+                    if(onFail.isEmpty()){
+                        ex.printStackTrace();
+                    }
                     onFail.forEach((func)->func.accept(ex));
                 }
             }

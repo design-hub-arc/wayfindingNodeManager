@@ -3,14 +3,10 @@ package files;
 import com.google.api.services.drive.model.File;
 import io.StreamReaderUtil;
 import static io.StreamReaderUtil.NEWLINE;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import static java.lang.System.out;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
@@ -40,6 +36,10 @@ public class WayfindingManifest extends AbstractCsvFile{
         this(LocalDateTime.now().format(DATE_FORMAT));
     }
     
+    public String getTitle(){
+        return title;
+    }
+    
     /**
      * Asynchronously downloads a manifest from the drive
      * 
@@ -67,6 +67,14 @@ public class WayfindingManifest extends AbstractCsvFile{
             }
         };
         return ret;
+    }
+    
+    public void setDriveFolder(String folderId){
+        driveFolder = folderId;
+    }
+    
+    public String getDriveFolderId(){
+        return driveFolder;
     }
     
     public final boolean containsUrlFor(FileType fileType) {
@@ -101,25 +109,6 @@ public class WayfindingManifest extends AbstractCsvFile{
     
     public final String getUrlFor(FileType type){
         return urls.get(type);
-    }
-    
-    public DriveIOOp<File> upload(String folderId){
-        WayfindingManifest m = this;
-        return new DriveIOOp<File>(){
-            @Override
-            public File perform() throws Exception {                
-                GoogleDriveUploader
-                        .createSubfolder(folderId, title)
-                        .addOnSucceed((folder)->{
-                            m.driveFolder = folder.getId();
-                        }).getExcecutingThread().join();
-                GoogleDriveUploader
-                    .uploadFile(m, m.driveFolder)
-                    .getExcecutingThread()
-                    .join();
-                return null;
-            }
-        };
     }
     
     @Override

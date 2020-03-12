@@ -17,6 +17,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
+import files.WayfindingManifest;
 import io.LocalFileWriter;
 
 import java.io.IOException;
@@ -138,6 +139,20 @@ public class GoogleDriveUploader{
         };
         
         return upload;
+    }
+    
+    public static final DriveIOOp<File> uploadManifest(WayfindingManifest man, String folderId){
+        try {
+            createSubfolder(folderId, man.getTitle()).addOnSucceed((folder)->{
+                man.setDriveFolder(folder.getId());
+            }).getExcecutingThread().join();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+
+        man.exportData();
+        
+        return uploadFile(man, man.getDriveFolderId());
     }
     
     public static final DriveIOOp<File> revise(VersionLog vl){
