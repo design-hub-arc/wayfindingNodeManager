@@ -19,7 +19,7 @@ public class LocalFileWriter {
     }
     
     public static File createFileFor(AbstractWayfindingFile awf, String parentDirectory) throws IOException{
-        File f = Paths.get(parentDirectory, awf.getName() + "." + awf.getType().getFileExtention()).toFile();
+        File f = Paths.get(parentDirectory, awf.getFileName()).toFile();
         awf.writeToFile(f);
         return f;
     }

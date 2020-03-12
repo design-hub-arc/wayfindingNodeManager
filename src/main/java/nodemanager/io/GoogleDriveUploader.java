@@ -118,7 +118,7 @@ public class GoogleDriveUploader{
 
                     Drive.Files.Create insert = drive.files().create(googleFile, content);
 
-                    googleFile.setName(localFileToUpload.getName());
+                    googleFile.setName(f.getFileName());
 
                     //since all of this google stuff is blocking code (O...K...)
                     //it will execute in whatever order we put it in.

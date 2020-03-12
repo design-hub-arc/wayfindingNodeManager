@@ -60,7 +60,11 @@ public abstract class AbstractWayfindingFile {
     
     public final FileType getType(){
         return type;
-    }    
+    }
+
+    public final String getFileName(){
+        return name + "." + type.getFileExtention();
+    }
     
     /**
      * Reads the contents of an InputStream,
