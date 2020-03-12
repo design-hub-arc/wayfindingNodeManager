@@ -42,7 +42,7 @@ public class ExportMenu extends JMenu{
     
     private void saveCurrentDataset(String exportName, String parentDir){
         NodeCoordFile coords = new NodeCoordFile(exportName);
-        //populate coords
+        coords.exportData();
         try {
             LocalFileWriter.createFileFor(coords, parentDir);
         } catch (IOException ex) {
@@ -50,7 +50,7 @@ public class ExportMenu extends JMenu{
         }
         
         NodeConnFile conns = new NodeConnFile(exportName);
-        //populate conns
+        conns.exportData();
         try {
             LocalFileWriter.createFileFor(conns, parentDir);
         } catch (IOException ex) {
@@ -58,7 +58,7 @@ public class ExportMenu extends JMenu{
         }
         
         NodeLabelFile labels = new NodeLabelFile(exportName);
-        //populate labels
+        labels.exportData();
         try {
             LocalFileWriter.createFileFor(labels, parentDir);
         } catch (IOException ex) {
@@ -66,7 +66,7 @@ public class ExportMenu extends JMenu{
         }
         
         MapFile map = new MapFile(exportName);
-        //populate map
+        map.exportData();
         try {
             LocalFileWriter.createFileFor(map, parentDir);
         } catch (IOException ex) {

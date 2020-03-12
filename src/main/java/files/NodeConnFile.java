@@ -50,6 +50,8 @@ public class NodeConnFile extends AbstractCsvFile{
      */
     @Override
     public void setContents(InputStream s) throws IOException {
+        connections.clear();
+        
         String fileContents = StreamReaderUtil.readStream(s);
         String[] lines = fileContents.split("\\n");
         

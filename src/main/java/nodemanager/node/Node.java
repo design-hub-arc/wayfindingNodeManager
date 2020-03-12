@@ -53,6 +53,13 @@ public class Node{
         }
     }
     
+    public Node(int id, int x, int y){
+        this(id);
+        rawX = x;
+        rawY = y;
+        getIcon().setPos(x, y);
+    }
+    
     public Node(){
         this(nextId);
     }

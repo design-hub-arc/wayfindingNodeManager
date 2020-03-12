@@ -1,17 +1,22 @@
 package files;
 
+import io.StreamReaderUtil;
 import static io.StreamReaderUtil.NEWLINE;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import nodemanager.node.Node;
-import nodemanager.node.NodeParser;
 
 /**
  *
  * @author Matt Crow
  */
 public class NodeLabelFile extends AbstractCsvFile{
+    private final HashMap<String, Integer> labelToId;
+    
     public NodeLabelFile(String title){
         super(title + "Labels", FileType.LABEL);
+        labelToId = new HashMap<>();
     }
     
     public NodeLabelFile(){
@@ -26,36 +31,55 @@ public class NodeLabelFile extends AbstractCsvFile{
     @Override
     public String getContentsToWrite(){
         StringBuilder s = new StringBuilder("label, id");
-        for(Node n : Node.getAll()){
-            for(String l : n.getLabels()){
-                s
-                        .append(NEWLINE)
-                        .append(l)
-                        .append(", ")
-                        .append(n.id);
-            }
-        }
+        labelToId.forEach((label, id)->{
+            s
+                .append(NEWLINE)
+                .append(label)
+                .append(", ")
+                .append(Integer.toString(id));
+        });
         return s.toString();
     }
 
     @Override
-    public void setContents(InputStream s) {
-        NodeParser.parseFile(s, (line)->{
-            int id = Integer.parseInt(line[1].trim());
-            if(Node.get(id) == null){
-                new Node(id);
-            }
-            Node.get(id).addLabel(line[0].trim());
-        });
+    public void setContents(InputStream s) throws IOException {
+        labelToId.clear();
+        String contents = StreamReaderUtil.readStream(s);
+        String[] rows = contents.split("\\n");
+        
+        String[] line;
+        String label;
+        int id;
+        for(int i = 1; i < rows.length; i++){
+            line = rows[i].split(",");
+            label = line[0].trim();
+            id = Integer.parseInt(line[1].trim());
+            labelToId.put(label, id);
+        }
     }
 
     @Override
     public void importData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        labelToId.forEach((label, id)->{
+            if(Node.get(id) == null){
+                new Node(id);
+            }
+            Node.get(id).addLabel(label);
+        });
     }
 
     @Override
     public void exportData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        labelToId.clear();
+        Node.getAll().forEach((node)->{
+            for(String label : node.getLabels()){
+                labelToId.put(label, node.id);
+            }
+        });
+    }
+    
+    @Override
+    public String toString(){
+        return getContentsToWrite();
     }
 }

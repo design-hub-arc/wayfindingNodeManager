@@ -1,20 +1,22 @@
 package files;
 
+import io.StreamReaderUtil;
 import static io.StreamReaderUtil.NEWLINE;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
 import nodemanager.Session;
 import nodemanager.node.Node;
-import nodemanager.node.NodeParser;
 
 /**
- * Used as an interface to easily save the Node connection data
- * to either the computer or the google drive
  * @author Matt Crow
  */
 public class NodeCoordFile extends AbstractCsvFile{
+    private final ArrayList<Node> nodes;
+    
     public NodeCoordFile(String title){
         super(title + "NodeCoords", FileType.NODE_COORD);
+        nodes = new ArrayList<>();
     }
     
     public NodeCoordFile(){
@@ -30,8 +32,7 @@ public class NodeCoordFile extends AbstractCsvFile{
     @Override
     public final String getContentsToWrite(){
         StringBuilder s = new StringBuilder("id, x, y");
-        
-        Node.getAll().forEach((n) -> {
+        nodes.forEach((n) -> {
             s
                     .append(NEWLINE)
                     .append(n.id)
@@ -48,26 +49,43 @@ public class NodeCoordFile extends AbstractCsvFile{
      * @param s an InputStream from a node file
      */
     @Override
-    public void setContents(InputStream s) {
-        NodeParser.parseFile(s, (line)->{
-            System.out.println("In NodeCoordFile.setContents: " + Arrays.toString(line));
-            Node.updateNode(
-                Integer.parseInt(line[0].trim()),
-                Integer.parseInt(line[1].trim()),
-                Integer.parseInt(line[2].trim())
-            );
-            Session.map.addNode(Node.get(Integer.parseInt(line[0].trim())));
+    public void setContents(InputStream s) throws IOException {
+        nodes.clear();
+        String contents = StreamReaderUtil.readStream(s);
+        String[] rows = contents.split("\\n");
+        
+        String[] line;
+        int id;
+        int x;
+        int y;
+        for(int i = 1; i < rows.length; i++){
+            line = rows[i].split(",");
+            id = Integer.parseInt(line[0].trim());
+            x = Integer.parseInt(line[1].trim());
+            y = Integer.parseInt(line[2].trim());
+            nodes.add(new Node(id, x, y));
+        }
+    }
+
+    @Override
+    public void importData() {
+        nodes.forEach((n)->{
+            Node.updateNode(n.id, n.getX(), n.getY());
+            Session.map.addNode(Node.get(n.id));
         });
         Session.map.refreshNodes();
     }
 
     @Override
-    public void importData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void exportData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        nodes.clear();
+        Node.getAll().forEach((n)->{
+            nodes.add(n);
+        });
+    }
+    
+    @Override
+    public String toString(){
+        return getContentsToWrite();
     }
 }
