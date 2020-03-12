@@ -77,12 +77,7 @@ public class ExportMenu extends JMenu{
     private JMenuItem exportManifest(){
         JMenuItem j = new JMenuItem("Export To The Drive");
         j.addActionListener((ActionEvent e) -> {
-            try{
-                Class.forName("com.google.api.client.http.HttpTransport");
-                new ExportDialog((JFrame)SwingUtilities.getRoot(this));
-            } catch (ClassNotFoundException ex) {
-                JOptionPane.showMessageDialog(this, "Looks like you forgot to include the lib folder! (See the guide for how to fix)");
-            }
+            new ExportDialog((JFrame)SwingUtilities.getRoot(this));
         });
         return j;
     }

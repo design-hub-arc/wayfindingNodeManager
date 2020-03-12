@@ -1,6 +1,7 @@
 package files;
 
 import com.google.api.services.drive.model.File;
+import io.StreamReaderUtil;
 import static io.StreamReaderUtil.NEWLINE;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -68,37 +69,6 @@ public class WayfindingManifest extends AbstractCsvFile{
         return ret;
     }
     
-    /**
-     * Uploads the contents of the program to the drive,
-     * then populates this with the urls of those new files.
-     * @return the DriveIOOp populating the manifest. The boolean is just a dummy value, it means nothing
-     */
-    private DriveIOOp<Boolean> populate(){
-        DriveIOOp populate = new DriveIOOp<Boolean>(){
-            @Override
-            public Boolean perform() throws Exception {
-                GoogleDriveUploader.uploadFile(new NodeCoordFile(title), driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.NODE_COORD, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                GoogleDriveUploader.uploadFile(new NodeConnFile(title), driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.NODE_CONN, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                GoogleDriveUploader.uploadFile(new NodeLabelFile(title), driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.LABEL, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                GoogleDriveUploader.uploadFile(new MapFile(title), driveFolder).addOnSucceed((f)->{
-                    urls.put(FileType.MAP_IMAGE, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                return true;
-            }
-        };
-        return populate;
-    }
-    
     public final boolean containsUrlFor(FileType fileType) {
         return urls.containsKey(fileType);
     }
@@ -154,34 +124,24 @@ public class WayfindingManifest extends AbstractCsvFile{
     
     @Override
     public void setContents(InputStream s) throws IOException {
-        BufferedReader br;
-        String[] line = new String[0];
-        boolean firstLine = true;
-        br = new BufferedReader(new InputStreamReader(s));
-        while(br.ready()){
-            try{
-                line = br.readLine().split(",");
-                if(!firstLine){
-                    urls.put(FileType.fromTitle(line[0]), line[1]);
-                }
-            } catch(Exception e){
-                if(!firstLine){
-                    //don't print errors for first line, as it will always fail, being a header
-                    out.println("Line fail: " + Arrays.toString(line));
-                    e.printStackTrace();
-                }
-            }
-            firstLine = false;
+        urls.clear();
+        
+        String contents = StreamReaderUtil.readStream(s);
+        String[] lines = contents.split("\\n");
+        
+        String[] line;
+        FileType type;
+        String url;
+        for(int i = 1; i < lines.length; i++){
+            line = lines[i].split(",");
+            type = FileType.fromTitle(line[0].trim());
+            url = line[1].trim();
+            urls.put(type, url);
         }
     }
     
     @Override
     public String getContentsToWrite() {
-        try {
-            populate().getExcecutingThread().join();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
         StringBuilder sb = new StringBuilder("Data, URL");
         urls.entrySet().forEach((entry) -> {
             sb
@@ -195,11 +155,64 @@ public class WayfindingManifest extends AbstractCsvFile{
 
     @Override
     public void importData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        urls.forEach((type, url)->{
+            try {
+                getFileFor(type).addOnSucceed((file)->{
+                    file.importData();
+                }).getExcecutingThread().join();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
+    /**
+     * Uploads the contents of the program to the drive,
+     * then populates this with the urls of those new files.
+     */
     @Override
     public void exportData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        urls.clear();
+        
+        NodeCoordFile coords = new NodeCoordFile(title);
+        coords.exportData();
+        
+        NodeConnFile conn = new NodeConnFile(title);
+        conn.exportData();
+        
+        NodeLabelFile labels = new NodeLabelFile(title);
+        labels.exportData();
+        
+        MapFile map = new MapFile(title);
+        map.exportData();
+        
+        DriveIOOp populate = new DriveIOOp<Boolean>(){
+            @Override
+            public Boolean perform() throws Exception {
+                GoogleDriveUploader.uploadFile(coords, driveFolder).addOnSucceed((f)->{
+                    urls.put(FileType.NODE_COORD, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
+                }).getExcecutingThread().join();
+                
+                GoogleDriveUploader.uploadFile(conn, driveFolder).addOnSucceed((f)->{
+                    urls.put(FileType.NODE_CONN, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
+                }).getExcecutingThread().join();
+                
+                GoogleDriveUploader.uploadFile(labels, driveFolder).addOnSucceed((f)->{
+                    urls.put(FileType.LABEL, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
+                }).getExcecutingThread().join();
+                
+                GoogleDriveUploader.uploadFile(map, driveFolder).addOnSucceed((f)->{
+                    urls.put(FileType.MAP_IMAGE, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
+                }).getExcecutingThread().join();
+                
+                return true;
+            }
+        };
+        
+        try {
+            populate.getExcecutingThread().join();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
 }

@@ -89,7 +89,6 @@ public class GoogleDriveUploader{
             @Override
             public InputStream perform() throws Exception {
                 ID_TO_NAME.put(id, drive.files().get(id).execute().getName());
-                System.out.println("ID is " + id);
                 return drive.files().get(id).executeMediaAsInputStream();
             }  
         };

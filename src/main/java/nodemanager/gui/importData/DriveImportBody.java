@@ -69,15 +69,9 @@ public class DriveImportBody extends Container{
             WayfindingManifest
                     .downloadManifest(exportIds[exportSelector.getSelectedIndex()])
                     .addOnSucceed((m)->{
-                        System.out.println(m.getContentsToWrite());
                         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
-                            System.out.println("getting here");
                             m.getFileFor(cb.getFileType()).addOnSucceed((file)->{
                                 file.importData();
-                                System.out.println(file);
-                                //cb.selectFile(file);
-                                //cb.importIfSelected();
-                                System.out.println("Import");
                             });
                         });
                         msg.setText("Done!");
