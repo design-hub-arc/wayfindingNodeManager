@@ -7,13 +7,12 @@ import nodemanager.Session;
 
 
 /**
- * won't work due to text encoding?
- * Maybe this just needs to extent an ImageFile class, while others extend CsvFile?
- * 
  * @author Matt Crow
  */
 public class MapFile extends AbstractWayfindingFile{
     private BufferedImage content;
+    
+    private static final String FILE_FORMAT = "png";
     
     public MapFile(String title) {
         super(title + "MapImage", FileType.MAP_IMAGE);
@@ -24,12 +23,16 @@ public class MapFile extends AbstractWayfindingFile{
     }
 
     @Override
-    public void setContents(InputStream s) {
-        try {
-            content = ImageIO.read(ImageIO.createImageInputStream(s));
-        } catch (IOException ex) {
-            ex.printStackTrace();
+    public void setContents(InputStream s) throws IOException {
+        content = ImageIO.read(ImageIO.createImageInputStream(s));
+    }
+    
+    @Override
+    public void writeToFile(File f) throws IOException{
+        if(content == null){
+            throw new NullPointerException("Cannot write to file before contents are set");
         }
+        ImageIO.write(content, FILE_FORMAT, f);
     }
     
     @Override
@@ -38,16 +41,15 @@ public class MapFile extends AbstractWayfindingFile{
             throw new NullPointerException("Content must be set before importing");
         }
         Session.map.setImage(content);
-        Session.map.repaint();
+    }
+
+    @Override
+    public void exportData() {
+        content = Session.map.getImage();
     }
     
     @Override
-    public void writeToFile(File f){
-        try{
-            ImageIO.write(Session.map.getImage(), "png", f);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    public String toString(){
+        return "MapFile " + content;
     }
-    
 }

@@ -1,5 +1,6 @@
 package files;
 
+import static io.StreamReaderUtil.NEWLINE;
 import java.io.InputStream;
 import java.util.Arrays;
 import nodemanager.Session;
@@ -32,7 +33,7 @@ public class NodeCoordFile extends AbstractCsvFile{
         
         Node.getAll().forEach((n) -> {
             s
-                    .append(NL)
+                    .append(NEWLINE)
                     .append(n.id)
                     .append(", ")
                     .append(n.getIcon().getX())
@@ -62,6 +63,11 @@ public class NodeCoordFile extends AbstractCsvFile{
 
     @Override
     public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void exportData() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

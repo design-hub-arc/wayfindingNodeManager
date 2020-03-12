@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JTextField;
 import nodemanager.io.GoogleDriveUploader;
-import nodemanager.io.VersionLog;
+import files.VersionLog;
 
 /**
  * Allows the user to manage the version log,

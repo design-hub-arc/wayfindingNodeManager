@@ -10,7 +10,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
 import files.FileType;
-import nodemanager.io.VersionLog;
+import files.VersionLog;
 import files.WayfindingManifest;
 
 /**
@@ -73,8 +73,10 @@ public class DriveImportBody extends Container{
                         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
                             System.out.println("getting here");
                             m.getFileFor(cb.getFileType()).addOnSucceed((file)->{
-                                cb.selectFile(file);
-                                cb.importIfSelected();
+                                file.importData();
+                                System.out.println(file);
+                                //cb.selectFile(file);
+                                //cb.importIfSelected();
                                 System.out.println("Import");
                             });
                         });

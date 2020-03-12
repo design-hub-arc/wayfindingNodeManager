@@ -2,16 +2,22 @@ package files;
 
 import java.io.InputStream;
 import nodemanager.node.Node;
-import nodemanager.node.NodeParser;
-import static files.AbstractWayfindingFile.NL;
+import io.StreamReaderUtil;
+import static io.StreamReaderUtil.NEWLINE;
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Used to read/write the node connections file
  * @author Matt Crow
  */
 public class NodeConnFile extends AbstractCsvFile{
+    
+    private final HashMap<Integer, Integer> connections;
+    
     public NodeConnFile(String title){
         super(title + "NodeConn", FileType.NODE_CONN);
+        connections = new HashMap<>();
     }
     
     public NodeConnFile(){
@@ -27,39 +33,63 @@ public class NodeConnFile extends AbstractCsvFile{
     @Override
     public String getContentsToWrite(){
         StringBuilder s = new StringBuilder("node1, node2");
-        Node.getAll().forEach((n) -> {
-            n.getAdjIds().forEach((i) -> {
-                s
-                        .append(NL)
-                        .append(n.id)
-                        .append(", ")
-                        .append(i);
-            });
+        connections.forEach((from, to)->{
+            s
+                .append(NEWLINE)
+                .append(Integer.toString(from))
+                .append(", ")
+                .append(Integer.toString(to));
         });
         return s.toString();
     }
 
     /**
-     * Reads an input stream, adding connections to nodes based on the data
+     * 
      * @param s an InputStream from a connection file
+     * @throws java.io.IOException
      */
     @Override
-    public void setContents(InputStream s) {
-        NodeParser.parseFile(s, (line)->{
-            int id1 = Integer.parseInt(line[0].trim());
-            int id2 = Integer.parseInt(line[1].trim());
-            if(Node.get(id1) == null){
-                new Node(id1);
-            }
-            if(Node.get(id2) == null){
-                new Node(id2);
-            }
-            Node.get(id1).addAdjId(id2);
-        });
+    public void setContents(InputStream s) throws IOException {
+        String fileContents = StreamReaderUtil.readStream(s);
+        String[] lines = fileContents.split("\\n");
+        
+        String[] line;
+        int id1;
+        int id2;
+        //skip header
+        for(int i = 1; i < lines.length; i++){
+            line = lines[i].split(",");
+            id1 = Integer.parseInt(line[0].trim());
+            id2 = Integer.parseInt(line[1].trim());
+            connections.put(id1, id2);
+        }
     }
 
     @Override
     public void importData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        connections.forEach((from, to)->{
+            if(Node.get(from) == null){
+                new Node(from);
+            }
+            if(Node.get(to) == null){
+                new Node(to);
+            }
+            Node.get(from).addAdjId(to);
+        });
+    }
+
+    @Override
+    public void exportData() {
+        connections.clear();
+        Node.getAll().forEach((n) -> {
+            n.getAdjIds().forEach((i) -> {
+                connections.put(n.id, i);
+            });
+        });
+    }
+    
+    @Override
+    public String toString(){
+        return getContentsToWrite();
     }
 }

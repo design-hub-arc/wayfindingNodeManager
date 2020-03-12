@@ -1,5 +1,6 @@
 package nodemanager.gui.exportData;
 
+import files.VersionLog;
 import files.WayfindingManifest;
 import java.awt.*;
 import java.awt.event.ItemEvent;

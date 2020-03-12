@@ -2,7 +2,6 @@ package files;
 
 import java.io.IOException;
 import java.io.InputStream;
-import nodemanager.io.VersionLog;
 
 /**
  * Provides a base for the classes used to interface
@@ -17,8 +16,6 @@ import nodemanager.io.VersionLog;
 public abstract class AbstractWayfindingFile {
     private final String name;
     private final FileType type; 
-    
-    public static String NL = System.getProperty("line.separator");
     
     /**
      * Creates an AbstracteWayfindingFile. Note that this does not actually do anything with files yet.
@@ -57,7 +54,7 @@ public abstract class AbstractWayfindingFile {
         return ret;
     }
     
-    public String getName(){
+    public final String getName(){
         return name;
     }
     
@@ -75,16 +72,22 @@ public abstract class AbstractWayfindingFile {
     public abstract void setContents(InputStream s) throws IOException;
     
     /**
-     * Imports the data from this file into
-     * the program
-     */
-    public abstract void importData();
-    
-    /**
      * Writes the contents of this to a file on the user's computer.
      *  
      * @param f the file to write to.
      * @throws java.io.IOException if an error occurs
      */
     public abstract void writeToFile(java.io.File f) throws IOException;
+    
+    /**
+     * Exports the current state of the program
+     * into this file's contents
+     */
+    public abstract void exportData();
+    
+    /**
+     * Imports the data from this file into
+     * the program
+     */
+    public abstract void importData();
 }

@@ -1,6 +1,7 @@
 package files;
 
 import com.google.api.services.drive.model.File;
+import static io.StreamReaderUtil.NEWLINE;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -184,7 +185,7 @@ public class WayfindingManifest extends AbstractCsvFile{
         StringBuilder sb = new StringBuilder("Data, URL");
         urls.entrySet().forEach((entry) -> {
             sb
-                .append(NL)
+                .append(NEWLINE)
                 .append(entry.getKey().getTitle())
                 .append(", ")
                 .append(entry.getValue());
@@ -194,6 +195,11 @@ public class WayfindingManifest extends AbstractCsvFile{
 
     @Override
     public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void exportData() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

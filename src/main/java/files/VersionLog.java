@@ -1,8 +1,7 @@
-package nodemanager.io;
+package files;
 
-import files.FileType;
-import files.AbstractCsvFile;
 import com.google.api.services.drive.model.File;
+import static io.StreamReaderUtil.NEWLINE;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +9,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import nodemanager.io.DriveIOOp;
+import nodemanager.io.GoogleDriveUploader;
 
 /**
  * Used to interact with the versions.csv file in the google drive.
@@ -125,7 +126,7 @@ public class VersionLog extends AbstractCsvFile{
         boolean good = urls.values().stream().anyMatch((list)->!list.isEmpty()); //good if any have any elements
         int idx = 0;
         while(good){
-            sb.append(NL);
+            sb.append(NEWLINE);
             isFirst = true;
             for(ArrayList list : urls.values()){
                 if(isFirst){
@@ -208,6 +209,11 @@ public class VersionLog extends AbstractCsvFile{
 
     @Override
     public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void exportData() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

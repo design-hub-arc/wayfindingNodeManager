@@ -1,6 +1,6 @@
 package files;
 
-import files.FileType;
+import static io.StreamReaderUtil.NEWLINE;
 import java.io.InputStream;
 import nodemanager.node.Node;
 import nodemanager.node.NodeParser;
@@ -29,7 +29,7 @@ public class NodeLabelFile extends AbstractCsvFile{
         for(Node n : Node.getAll()){
             for(String l : n.getLabels()){
                 s
-                        .append(NL)
+                        .append(NEWLINE)
                         .append(l)
                         .append(", ")
                         .append(n.id);
@@ -51,6 +51,11 @@ public class NodeLabelFile extends AbstractCsvFile{
 
     @Override
     public void importData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void exportData() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

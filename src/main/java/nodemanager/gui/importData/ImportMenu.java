@@ -5,6 +5,7 @@ import files.NodeCoordFile;
 import files.NodeConnFile;
 import files.MapFile;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import javax.swing.*;
 import nodemanager.*;
 
@@ -56,25 +57,33 @@ public class ImportMenu extends JMenu{
      */
     public void loadDefaults() {
         MapFile defaultMap = new MapFile();
-        defaultMap.setContents(getClass().getResourceAsStream("/map.png"));
-        defaultMap.importData();
-        
         try {
-            new NodeCoordFile().setContents(getClass().getResourceAsStream("/nodeData.csv"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Try running clean/build");
+            defaultMap.setContents(getClass().getResourceAsStream("/map.png"));
+            defaultMap.importData();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
         
+        NodeCoordFile coords = new NodeCoordFile();
         try {
-            new NodeConnFile().setContents(getClass().getResourceAsStream("/nodeConnections.csv"));
+            coords.setContents(getClass().getResourceAsStream("/nodeData.csv"));
+            coords.importData();
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Try running clean/build");
         }
         
+        NodeConnFile conn = new NodeConnFile();
+        try {
+            conn.setContents(getClass().getResourceAsStream("/nodeConnections.csv"));
+            conn.importData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        NodeLabelFile labels = new NodeLabelFile();
         try{
-            new NodeLabelFile().setContents(getClass().getResourceAsStream("/labels.csv"));
+            labels.setContents(getClass().getResourceAsStream("/labels.csv"));
+            labels.importData();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Try running clean/build");
