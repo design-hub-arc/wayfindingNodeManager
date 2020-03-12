@@ -207,7 +207,6 @@ public class NodeIcon{
         switch (Session.getMode()) {
             case NONE:
                 Session.selectNode(node);
-                node.displayData();
                 break;
             case ADD_CONNECTION:
                 Session.selectedNode.addAdjId(node.id);
