@@ -1,15 +1,20 @@
 package files;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 
 /**
- * Provides a base for the classes used to interface
- * with the files used by the program. 
+ * The AbstractWayfindingFile class is used to 
+ * serve as the base for the various data files
+ * created by the program, and used by the Wayfinding 
+ * program.
  * 
- * It provides the generic template for the files used
- * by the Wayfinding program. Note that these are not
- * specifically files on the local file system or Google Drive.
+ * Subclasses must include the proper fields to
+ * contain their appropriate data, as this class
+ * contains mostly just methods for creating files,
+ * with abstract methods for reading from and writing to files.
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
@@ -18,8 +23,10 @@ public abstract class AbstractWayfindingFile {
     private final FileType type; 
     
     /**
-     * Creates an AbstracteWayfindingFile. Note that this does not actually do anything with files yet.
-     * @param title what to call this file when it is saved or uploaded
+     * Creates an AbstracteWayfindingFile. Note that this does not actually
+     * create any files on the user's hard drive yet.
+     * 
+     * @param title what to call this file when it is saved or uploaded to the drive
      * @param t what type of file this will connect to. Used to get file extention and MIME type.
      */
     public AbstractWayfindingFile(String title, FileType t){
@@ -27,6 +34,14 @@ public abstract class AbstractWayfindingFile {
         type = t;
     }
     
+    /**
+     * Creates an instance of a subtype of AbstractWayfindingFile based of
+     * of the given FileType
+     * 
+     * @param name what to name the new file
+     * @param t the file type to create.
+     * @return an object inheriting from AbstractWayfindingFile
+     */
     public static AbstractWayfindingFile fromType(String name, FileType t){
         AbstractWayfindingFile ret = null;
         switch(t){
@@ -62,8 +77,25 @@ public abstract class AbstractWayfindingFile {
         return type;
     }
 
+    /**
+     * 
+     * @return the name of this file, plus its file extension. 
+     */
     public final String getFileName(){
         return name + "." + type.getFileExtention();
+    }
+    
+    public final File createTempFile() throws IOException{
+        File temp = File.createTempFile(name, type.getFileExtention());
+        temp.deleteOnExit();
+        writeToFile(temp);
+        return temp;
+    }
+    
+    public final File createFile(String parentDirectory) throws IOException{
+        File f = Paths.get(parentDirectory, getFileName()).toFile();
+        writeToFile(f);
+        return f;
     }
     
     /**

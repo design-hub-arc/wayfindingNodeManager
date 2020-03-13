@@ -8,7 +8,6 @@ import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import files.MapFile;
-import io.LocalFileWriter;
 import java.io.IOException;
 
 
@@ -44,7 +43,7 @@ public class ExportMenu extends JMenu{
         NodeCoordFile coords = new NodeCoordFile(exportName);
         coords.exportData();
         try {
-            LocalFileWriter.createFileFor(coords, parentDir);
+            coords.createFile(parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -52,7 +51,7 @@ public class ExportMenu extends JMenu{
         NodeConnFile conns = new NodeConnFile(exportName);
         conns.exportData();
         try {
-            LocalFileWriter.createFileFor(conns, parentDir);
+            conns.createFile(parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -60,7 +59,7 @@ public class ExportMenu extends JMenu{
         NodeLabelFile labels = new NodeLabelFile(exportName);
         labels.exportData();
         try {
-            LocalFileWriter.createFileFor(labels, parentDir);
+            labels.createFile(parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -68,7 +67,7 @@ public class ExportMenu extends JMenu{
         MapFile map = new MapFile(exportName);
         map.exportData();
         try {
-            LocalFileWriter.createFileFor(map, parentDir);
+            map.createFile(parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

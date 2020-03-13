@@ -18,12 +18,10 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
 import files.WayfindingManifest;
-import io.LocalFileWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import static java.lang.System.out;
 import java.util.*;
 import nodemanager.exceptions.NoPermissionException;
 import nodemanager.exceptions.VersionLogAccessException;
@@ -107,7 +105,7 @@ public class GoogleDriveUploader{
             public File perform() throws Exception {
                 File googleFile = null;
                 try{
-                    java.io.File localFileToUpload = LocalFileWriter.createTempFileFor(f);
+                    java.io.File localFileToUpload = f.createTempFile();
                     
                     googleFile = new File();
                     FileContent content = new FileContent(f.getType().getMimeType(), localFileToUpload);
@@ -162,7 +160,7 @@ public class GoogleDriveUploader{
                 File ret = null;
                 try{
                     ret = drive.files().get(VersionLog.ID).execute();
-                    java.io.File localFileToUpdate = LocalFileWriter.createTempFileFor(vl);
+                    java.io.File localFileToUpdate = vl.createTempFile();
                     drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
                 } catch(IOException e){
                     if(e instanceof GoogleJsonResponseException){
