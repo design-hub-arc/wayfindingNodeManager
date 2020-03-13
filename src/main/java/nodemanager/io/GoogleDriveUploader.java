@@ -149,7 +149,11 @@ public class GoogleDriveUploader{
         }
 
         man.exportData();
-        man.uploadContents();
+        try {
+            man.uploadContents().getExcecutingThread().join();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         
         return uploadFile(man, man.getDriveFolderId());
     }

@@ -166,35 +166,6 @@ public class WayfindingManifest extends AbstractCsvFile{
         MapFile map = new MapFile(title);
         map.exportData();
         attachedFiles.put(FileType.MAP_IMAGE, map);
-        /*
-        DriveIOOp populate = new DriveIOOp<Boolean>(){
-            @Override
-            public Boolean perform() throws Exception {
-                GoogleDriveUploader.uploadFile(coords, driveFolderId).addOnSucceed((f)->{
-                    urls.put(FileType.NODE_COORD, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                GoogleDriveUploader.uploadFile(conn, driveFolderId).addOnSucceed((f)->{
-                    urls.put(FileType.NODE_CONN, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                GoogleDriveUploader.uploadFile(labels, driveFolderId).addOnSucceed((f)->{
-                    urls.put(FileType.LABEL, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                GoogleDriveUploader.uploadFile(map, driveFolderId).addOnSucceed((f)->{
-                    urls.put(FileType.MAP_IMAGE, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
-                }).getExcecutingThread().join();
-                
-                return true;
-            }
-        };
-        
-        try {
-            populate.getExcecutingThread().join();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }*/
     }
     
     /**
