@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+import nodemanager.gui.FileSelector;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 
@@ -105,53 +107,35 @@ public class VersionLog extends AbstractCsvFile{
     
     /**
      * Gets what to write to the version log.
-     * Currently not optimal, so I'll probably redo it later.
      * @return the updated contents of the version log.
      */
     @Override
     public String getContentsToWrite() {
         StringBuilder sb = new StringBuilder();
-        boolean isFirst = true; //first cell in row
         
-        for(String header : urls.keySet()){
-            if(isFirst){
-                isFirst = false;
-            } else {
-                sb.append(",");
+        ArrayList<String> versions = new ArrayList<>(urls.keySet());
+        
+        sb.append(String.join(", ", versions));
+        
+        int maxUrls = 0; //maximum URLs any one version has
+        for(ArrayList<String> al : urls.values()){
+            if(al.size() > maxUrls){
+                maxUrls = al.size();
             }
-            sb.append(header);
         }
         
-        boolean good = urls.values().stream().anyMatch((list)->!list.isEmpty()); //good if any have any elements
-        int idx = 0;
-        while(good){
+        String[] newRow;
+        ArrayList<String> vUrls; //version's URLs
+        for(int i = 0; i < maxUrls; i++){
             sb.append(NEWLINE);
-            isFirst = true;
-            for(ArrayList list : urls.values()){
-                if(isFirst){
-                    isFirst = false;
-                } else {
-                    sb.append(",");
-                }
-                sb.append((list.size() > idx) ? list.get(idx) : "");
+            newRow = new String[urls.size()]; //number of columns
+            for(int j = 0; j < urls.size(); j++){
+                vUrls = urls.get(versions.get(j));
+                //           prevent out of bounds               blank if that version doesn't have an i'th URL
+                newRow[j] = (vUrls.size() > i) ? vUrls.get(i) : "";
             }
-            
-            //check if good. Check if any list has urls left to append to the stream
-            /*
-            lambda doesn't work because of .size()
-            good = urls.values().stream().anyMatch((list)->{
-                return list.size() > idx;
-            });*/
-            
-            good = false;
-            idx++;
-            for(ArrayList<String> urlList : urls.values()){
-                if(urlList.size() > idx){
-                    good = true;
-                }
-            }
+            sb.append(String.join(", ", newRow));
         }
-        
         return sb.toString();
     }
     
@@ -194,8 +178,10 @@ public class VersionLog extends AbstractCsvFile{
     
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
-        v.download();
-        //GoogleDriveUploader.revise(v);
+        v.download().addOnSucceed((stream)->{
+            System.out.println(v.getContentsToWrite());
+            //GoogleDriveUploader.revise(v);
+        });
     }
 
     /**
