@@ -12,6 +12,8 @@ import javax.swing.*;
 import files.FileType;
 import files.VersionLog;
 import files.WayfindingManifest;
+import java.io.IOException;
+import nodemanager.io.GoogleDriveUploader;
 
 /**
  * Acts as the body of the import dialog whenever the user clicks the import from drive button.
@@ -23,6 +25,7 @@ import files.WayfindingManifest;
 public class DriveImportBody extends Container{
     private JComboBox<String> version;
     private JComboBox<String> exportSelector;
+    private ArrayList<FileTypeCheckBox> cbs;
     private String[] exportIds;
     private String[] exportNames;
     
@@ -50,7 +53,7 @@ public class DriveImportBody extends Container{
         msg.setText("Please hold while I download the version log...");
         add(msg);
         
-        ArrayList<FileTypeCheckBox> cbs = new ArrayList<>();
+        cbs = new ArrayList<>();
         FileTypeCheckBox temp;
         for(FileType t : new FileType[]{
             FileType.NODE_COORD,
@@ -66,18 +69,19 @@ public class DriveImportBody extends Container{
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{            
             msg.setText("Beginning download...");
-            WayfindingManifest
-                    .downloadManifest(exportIds[exportSelector.getSelectedIndex()])
-                    .addOnSucceed((m)->{
-                        cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->m.containsUrlFor(cb.getFileType())).forEach((cb)->{
-                            m.getFileFor(cb.getFileType()).addOnSucceed((file)->{
-                                file.importData();
-                            });
-                        });
-                        msg.setText("Done!");
-                    }).addOnFail((err)->{
-                        msg.setText(err.getMessage());
-                    });
+            WayfindingManifest man = new WayfindingManifest();
+            GoogleDriveUploader.download(exportIds[exportSelector.getSelectedIndex()])
+            .addOnSucceed((s)->{
+                try {
+                    man.setContents(s);
+                    importManifest(man);
+                    msg.setText("Done!");
+                } catch (IOException ex) {
+                    msg.setText(ex.getMessage());
+                }
+            }).addOnFail((err)->{
+                msg.setText(err.getMessage());
+            });
         });
         add(importButton);
         
@@ -90,6 +94,18 @@ public class DriveImportBody extends Container{
         });
         
         updateExportSelector();
+    }
+    
+    private void importManifest(WayfindingManifest man){
+        cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
+            try {
+                man.getFileFor(cb.getFileType()).addOnSucceed((file)->{
+                    file.importData();
+                }).getExcecutingThread().join();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
     
     private void updateExportSelector(){

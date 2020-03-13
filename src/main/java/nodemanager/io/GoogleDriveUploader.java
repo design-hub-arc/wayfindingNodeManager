@@ -142,13 +142,14 @@ public class GoogleDriveUploader{
     public static final DriveIOOp<File> uploadManifest(WayfindingManifest man, String folderId){
         try {
             createSubfolder(folderId, man.getTitle()).addOnSucceed((folder)->{
-                man.setDriveFolder(folder.getId());
+                man.setDriveFolderId(folder.getId());
             }).getExcecutingThread().join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
 
         man.exportData();
+        man.uploadContents();
         
         return uploadFile(man, man.getDriveFolderId());
     }

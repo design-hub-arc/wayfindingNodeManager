@@ -1,6 +1,5 @@
 package files;
 
-import com.google.api.services.drive.model.File;
 import io.StreamReaderUtil;
 import static io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
@@ -12,23 +11,28 @@ import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 
 /**
- * creates a manifest file containing all the currently active data,
- * then upload each file to the google drive,
- * export them to the web,
- * and paste their URLs into the manifest
+ * The Manifest file is used by Wayfinding to specify which
+ * other files are meant to be used together.
+ * It provides URLs to a node coordinate file,
+ * node connection file, node label file, and a map image,
+ * so Wayfinding has an easier time finding them.
+ * 
  * @author Matt Crow
  */
 public class WayfindingManifest extends AbstractCsvFile{
     private final String title;
-    private String driveFolder;
+    private String driveFolderId;
+    private final HashMap<FileType, AbstractWayfindingFile> attachedFiles;
     private final HashMap<FileType, String> urls;
+    
     private static final String DOWNLOAD_URL_PREFIX = "https://drive.google.com/uc?export=download&id=";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_DATE_TIME;
     
     public WayfindingManifest(String folderName){
         super(folderName + "Manifest", FileType.MANIFEST);
         title = folderName;
-        driveFolder = null;
+        driveFolderId = null;
+        attachedFiles = new HashMap<>();
         urls = new HashMap<>();
     }
     
@@ -40,41 +44,12 @@ public class WayfindingManifest extends AbstractCsvFile{
         return title;
     }
     
-    /**
-     * Asynchronously downloads a manifest from the drive
-     * 
-     * @param id the file id or url of the manifest
-     * @return the DriveIIOp downloading the manifest
-     */
-    public static DriveIOOp<WayfindingManifest> downloadManifest(String id){
-        if(id.contains("id=")){
-            return downloadManifest(id.split("id=")[1]);
-        }
-        DriveIOOp<WayfindingManifest> ret = new DriveIOOp<WayfindingManifest>(){
-            @Override
-            public WayfindingManifest perform() throws Exception {
-                WayfindingManifest m = new WayfindingManifest("");
-                
-                //download the file from the drive
-                GoogleDriveUploader.download(id).addOnSucceed((stream)->{
-                    try {
-                        m.setContents(stream); //populate
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }).getExcecutingThread().join(); //wait until it's done
-                return m;
-            }
-        };
-        return ret;
-    }
-    
-    public void setDriveFolder(String folderId){
-        driveFolder = folderId;
+    public void setDriveFolderId(String folderId){
+        driveFolderId = folderId;
     }
     
     public String getDriveFolderId(){
-        return driveFolder;
+        return driveFolderId;
     }
     
     public final boolean containsUrlFor(FileType fileType) {
@@ -82,27 +57,41 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     public final DriveIOOp<AbstractWayfindingFile> getFileFor(FileType fileType){
-        if(!containsUrlFor(fileType)){
-            throw new NullPointerException(String.format("No file set for type '%s'", fileType.getTitle()));
-        } 
+        DriveIOOp<AbstractWayfindingFile> ret;
         
-        DriveIOOp<AbstractWayfindingFile> ret = new DriveIOOp<AbstractWayfindingFile>() {
-            @Override
-            public AbstractWayfindingFile perform() throws Exception {
-                AbstractWayfindingFile file = AbstractWayfindingFile.fromType("manifestFile", fileType);
-                String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
-                
-                GoogleDriveUploader.download(id).addOnSucceed((in)->{
-                    try {
-                        file.setContents(in);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }).getExcecutingThread().join();
-                
-                return file;
+        if(attachedFiles.containsKey(fileType)){
+            ret = new DriveIOOp<AbstractWayfindingFile>(){
+                @Override
+                public AbstractWayfindingFile perform() throws Exception {
+                    return attachedFiles.get(fileType);
+                }
+            };
+        } else {
+            //load the file
+            if(!containsUrlFor(fileType)){
+                //cannot load file, as I don't have a URL for it
+                throw new NullPointerException(String.format("No file set for type '%s'", fileType.getTitle()));
             }
-        };
+            //download the file
+            ret = new DriveIOOp<AbstractWayfindingFile>() {
+                @Override
+                public AbstractWayfindingFile perform() throws Exception {
+                    AbstractWayfindingFile file = AbstractWayfindingFile.fromType("manifestFile", fileType);
+                    String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
+
+                    GoogleDriveUploader.download(id).addOnSucceed((in)->{
+                        try {
+                            file.setContents(in);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        attachedFiles.put(fileType, file); //cache the file
+                    }).getExcecutingThread().join();
+
+                    return file;
+                }
+            };
+        }
         
         return ret;
     }
@@ -113,6 +102,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     
     @Override
     public void setContents(InputStream s) throws IOException {
+        attachedFiles.clear();
         urls.clear();
         
         String contents = StreamReaderUtil.readStream(s);
@@ -155,42 +145,44 @@ public class WayfindingManifest extends AbstractCsvFile{
         });
     }
 
-    /**
-     * Uploads the contents of the program to the drive,
-     * then populates this with the urls of those new files.
-     */
+    
     @Override
     public void exportData() {
+        attachedFiles.clear();
         urls.clear();
         
         NodeCoordFile coords = new NodeCoordFile(title);
         coords.exportData();
+        attachedFiles.put(FileType.NODE_COORD, coords);
         
         NodeConnFile conn = new NodeConnFile(title);
         conn.exportData();
+        attachedFiles.put(FileType.NODE_CONN, conn);
         
         NodeLabelFile labels = new NodeLabelFile(title);
         labels.exportData();
+        attachedFiles.put(FileType.LABEL, labels);
         
         MapFile map = new MapFile(title);
         map.exportData();
-        
+        attachedFiles.put(FileType.MAP_IMAGE, map);
+        /*
         DriveIOOp populate = new DriveIOOp<Boolean>(){
             @Override
             public Boolean perform() throws Exception {
-                GoogleDriveUploader.uploadFile(coords, driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(coords, driveFolderId).addOnSucceed((f)->{
                     urls.put(FileType.NODE_COORD, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                GoogleDriveUploader.uploadFile(conn, driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(conn, driveFolderId).addOnSucceed((f)->{
                     urls.put(FileType.NODE_CONN, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                GoogleDriveUploader.uploadFile(labels, driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(labels, driveFolderId).addOnSucceed((f)->{
                     urls.put(FileType.LABEL, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
-                GoogleDriveUploader.uploadFile(map, driveFolder).addOnSucceed((f)->{
+                GoogleDriveUploader.uploadFile(map, driveFolderId).addOnSucceed((f)->{
                     urls.put(FileType.MAP_IMAGE, DOWNLOAD_URL_PREFIX + ((com.google.api.services.drive.model.File)f).getId());
                 }).getExcecutingThread().join();
                 
@@ -202,6 +194,33 @@ public class WayfindingManifest extends AbstractCsvFile{
             populate.getExcecutingThread().join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
+        }*/
+    }
+    
+    /**
+     * Uploads the contents of the program to the drive,
+     * then populates this with the urls of those new files.
+     * @return 
+     */
+    public DriveIOOp<Boolean> uploadContents(){
+        if(attachedFiles.isEmpty()){
+            exportData();
         }
+        return new DriveIOOp<Boolean>(){
+            @Override
+            public Boolean perform() throws Exception {
+                attachedFiles.forEach((type, file)->{
+                    try {
+                        GoogleDriveUploader.uploadFile(file, driveFolderId).addOnSucceed((f)->{
+                            urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
+                        }).getExcecutingThread().join();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+                
+                return true;
+            }
+        };
     }
 }

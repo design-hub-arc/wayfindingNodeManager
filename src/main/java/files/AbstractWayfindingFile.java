@@ -113,7 +113,7 @@ public abstract class AbstractWayfindingFile {
      * @param f the file to write to.
      * @throws java.io.IOException if an error occurs
      */
-    public abstract void writeToFile(java.io.File f) throws IOException;
+    public abstract void writeToFile(File f) throws IOException;
     
     /**
      * Exports the current state of the program
