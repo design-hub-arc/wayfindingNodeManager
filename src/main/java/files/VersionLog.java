@@ -24,7 +24,6 @@ import nodemanager.io.GoogleDriveUploader;
  */
 public class VersionLog extends AbstractCsvFile{
     public static final String ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
-    public static final String URL = "https://drive.google.com/open?id=" + ID;
     private boolean downloaded;
     private final LinkedHashMap<String, ArrayList<String>> urls; //Each column is a wayfinding type(artfinding, wayfinding, etc), and each cell in the column is the URL of a manifest
     
@@ -40,7 +39,7 @@ public class VersionLog extends AbstractCsvFile{
      */
     public DriveIOOp<InputStream> download(){
         return GoogleDriveUploader
-                .download(URL)
+                .download(ID)
                 .addOnSucceed((stream)->{
                     setContents(stream);
                     downloaded = true;

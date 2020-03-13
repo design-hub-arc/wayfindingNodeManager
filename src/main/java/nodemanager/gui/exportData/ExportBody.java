@@ -7,6 +7,7 @@ import java.awt.event.ItemEvent;
 import javax.swing.*;
 import nodemanager.Session;
 import nodemanager.io.*;
+import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
 
 /**
  * Acts as the body of the export dialog whenever the user clicks the export to drive button.
@@ -96,7 +97,7 @@ public final class ExportBody extends Container {
         GoogleDriveUploader.uploadManifest(newMan, folder.getText()).addOnSucceed((f)->{
             msg.setText("Upload complete!");            
             Session.purgeActions();
-            v.addUrl((String)selectType.getSelectedItem(), "https://drive.google.com/uc?export=download&id=" + f.getId());
+            v.addUrl((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
             v.save().addOnFail((err)->{
                 msg.setText(err.getMessage());
             });

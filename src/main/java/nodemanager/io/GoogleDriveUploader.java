@@ -34,6 +34,7 @@ import nodemanager.exceptions.VersionLogAccessException;
  * @author Matt Crow
  */
 public class GoogleDriveUploader{
+    public static final String DOWNLOAD_URL_PREFIX = "https://drive.google.com/uc?export=download&id=";
     public static final String DEFAULT_FOLDER_ID = "1-HZrReHNM6szXfmZ1rNoG2HXf2ejal1o"; //the 'Matt, Implement These' folder
     
     //used to make it easier to reference files

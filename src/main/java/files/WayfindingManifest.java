@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
+import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
 
 /**
  * The Manifest file is used by Wayfinding to specify which
@@ -25,7 +26,6 @@ public class WayfindingManifest extends AbstractCsvFile{
     private final HashMap<FileType, AbstractWayfindingFile> attachedFiles;
     private final HashMap<FileType, String> urls;
     
-    private static final String DOWNLOAD_URL_PREFIX = "https://drive.google.com/uc?export=download&id=";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_DATE_TIME;
     
     public WayfindingManifest(String folderName){
