@@ -97,7 +97,7 @@ public final class ExportBody extends Container {
         GoogleDriveUploader.uploadManifest(newMan, folder.getText()).addOnSucceed((f)->{
             msg.setText("Upload complete!");            
             Session.purgeActions();
-            v.addUrl((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
+            v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
             v.save().addOnFail((err)->{
                 msg.setText(err.getMessage());
             });

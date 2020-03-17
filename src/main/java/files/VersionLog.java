@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import nodemanager.gui.FileSelector;
@@ -22,18 +23,75 @@ import nodemanager.io.GoogleDriveUploader;
  * but we also need to be able to push changes from this manager to Wayfinding without manually changing which manifest it queries.
  * Versions.csv contains a list of manifests, which the program queries, and will run through the manifests listed until it finds one that works.
  * 
+ * Note that the VersionLog must be saved for changes to take effect.
+ * (more on this later)
+ * 
  * @author Matt Crow
  */
 public class VersionLog extends AbstractCsvFile{
     public static final String ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
+    
+    /**
+     * Key is the wayfinding type (wayfinding, artfinding, etc)
+     * Value is the list of URLs for exports for that version,
+     * ordered oldest to newest
+     */
+    private final HashMap<String, ArrayList<String>> exports;
+    
     private boolean downloaded;
-    private final LinkedHashMap<String, ArrayList<String>> urls; //Each column is a wayfinding type(artfinding, wayfinding, etc), and each cell in the column is the URL of a manifest
     
     public VersionLog(){
         super("versions", FileType.VERSION_LOG);
-        urls = new LinkedHashMap<>();
         downloaded = false;
+        
+        exports = new HashMap<>();
     }
+    
+    /**
+     * Adds an export URL to the VersionLog.
+     * 
+     * @param wayfindingType the type of wayfinding this export is for.
+     * If this type is not listed in this Version Log, it will create a new 
+     * type.
+     * 
+     * @param url the URL of the WayfindingManifest on Google Drive to add
+     * as an export for the given wayfinding type.
+     * 
+     * @return this, for chaining purposes. 
+     */
+    public final VersionLog addExport(String wayfindingType, String url){
+        if(!exports.containsKey(wayfindingType)){
+            exports.put(wayfindingType, new ArrayList<>());
+        }
+        exports.get(wayfindingType).add(url);
+        
+        return this;
+    }
+    
+    /**
+     * Removes the export with the given type and url from the VersionLog, if such an export exists.
+     * Note that this does not delete anything from the Google Drive.
+     * 
+     * @param wayfindingType the type of wayfinding this export is for.
+     * If this type is not listed in this Version Log, it will create a new 
+     * type.
+     * 
+     * @param url the URL of the WayfindingManifest on Google Drive to add
+     * as an export for the given wayfinding type.
+     * 
+     * @return whether or not the given export exists, and was therefore removed 
+     */
+    public final boolean removeExport(String wayfindingType, String url){
+        boolean wasRemoved = false;
+        
+        if(exports.containsKey(wayfindingType) && exports.get(wayfindingType).contains(url)){
+            exports.get(wayfindingType).remove(url);
+            wasRemoved = true;
+        }
+        
+        return wasRemoved;
+    }
+    
     
     /**
      * Downloads versions.csv, then populates urls to match its data
@@ -46,24 +104,6 @@ public class VersionLog extends AbstractCsvFile{
                     setContents(stream);
                     downloaded = true;
                 });
-    }
-    
-    /**
-     * Adds a url to the version log. Note that this does not edit the file
-     * @param wayfindingVersion the header of the column you want to add the url to
-     * @param url the url to the manifest file you want to add to the version log
-     */
-    public void addUrl(String wayfindingVersion, String url){
-        if(!urls.containsKey(wayfindingVersion)){
-            urls.put(wayfindingVersion, new ArrayList<>());
-        } //note that this is not an if/else
-        urls.get(wayfindingVersion).add(url);
-    }
-    
-    public boolean deleteUrl(String url){
-        boolean found = false;
-        
-        return found;
     }
     
     public void addType(String type){
