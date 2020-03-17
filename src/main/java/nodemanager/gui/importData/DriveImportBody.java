@@ -25,11 +25,9 @@ import nodemanager.io.GoogleDriveUploader;
  * @author Matt Crow
  */
 public class DriveImportBody extends Container{
-    private JComboBox<String> wayfindingTypeSelector;
-    private JComboBox<String> exportSelector;
-    private ArrayList<FileTypeCheckBox> cbs;
-    private String[] exportIds;
-    private String[] exportNames;
+    private final JComboBox<String> wayfindingTypeSelector;
+    private final JComboBox<String> exportSelector;
+    private final ArrayList<FileTypeCheckBox> cbs;
     
     private VersionLog v;
     
@@ -75,7 +73,7 @@ public class DriveImportBody extends Container{
         importButton.addActionListener((e)->{            
             msg.setText("Beginning download...");
             WayfindingManifest man = new WayfindingManifest();
-            GoogleDriveUploader.download(exportIds[exportSelector.getSelectedIndex()])
+            GoogleDriveUploader.download(nameToUrl.get((String)exportSelector.getSelectedItem()))
             .addOnSucceed((s)->{
                 try {
                     man.setContents(s);
@@ -92,9 +90,7 @@ public class DriveImportBody extends Container{
         
         v = new VersionLog();
         v.download().addOnSucceed((stream)->{
-            for(String type : v.getTypes()){
-                wayfindingTypeSelector.addItem(type);
-            }
+            importVersionLog(v);
             msg.setText("Ready to import!");
         });
         
@@ -118,6 +114,9 @@ public class DriveImportBody extends Container{
     }
     
     private void updateExportSelector(){
+        exportSelector.removeAllItems();
+        nameToUrl.clear();
+        
         String selectedType = (String)wayfindingTypeSelector.getSelectedItem();
         String[] exportUrls = v.getExportsFor(selectedType);
         final LinkedList<String> exportNames = new LinkedList<>();
@@ -137,25 +136,6 @@ public class DriveImportBody extends Container{
             exportSelector.addItem(name);
         });
         
-        /*
-        if(!v.isDownloaded()){
-            return;
-        }
-        exportIds = v.getExportIdsFor(wayfindingTypeSelector.getSelectedItem().toString());
-        exportNames = v.getExportNamesFor(wayfindingTypeSelector.getSelectedItem().toString());
-        exportSelector.removeAllItems();
-        
-        //we want to order it by newest to oldest, so we have to reverse both of them
-        for(int i = exportNames.length -1; i >= 0; i--){
-            exportSelector.addItem(exportNames[i]);
-        }
-        
-        String temp;
-        for(int i = 0; i < exportIds.length / 2; i++){
-            temp = exportIds[i];
-            exportIds[i] = exportIds[exportIds.length - 1 - i];
-            exportIds[exportIds.length - 1 - i] = temp;
-        }*/
         revalidate();
         repaint();
     }

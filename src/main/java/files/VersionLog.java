@@ -173,12 +173,12 @@ public class VersionLog extends AbstractCsvFile{
     public String getContentsToWrite() {
         StringBuilder sb = new StringBuilder();
         
-        ArrayList<String> versions = new ArrayList<>(urls.keySet());
+        ArrayList<String> versions = new ArrayList<>(exports.keySet());
         
         sb.append(String.join(", ", versions));
         
         int maxUrls = 0; //maximum URLs any one version has
-        for(ArrayList<String> al : urls.values()){
+        for(ArrayList<String> al : exports.values()){
             if(al.size() > maxUrls){
                 maxUrls = al.size();
             }
@@ -188,9 +188,9 @@ public class VersionLog extends AbstractCsvFile{
         ArrayList<String> vUrls; //version's URLs
         for(int i = 0; i < maxUrls; i++){
             sb.append(NEWLINE);
-            newRow = new String[urls.size()]; //number of columns
-            for(int j = 0; j < urls.size(); j++){
-                vUrls = urls.get(versions.get(j));
+            newRow = new String[exports.size()]; //number of columns
+            for(int j = 0; j < exports.size(); j++){
+                vUrls = exports.get(versions.get(j));
                 //           prevent out of bounds               blank if that version doesn't have an i'th URL
                 newRow[j] = (vUrls.size() > i) ? vUrls.get(i) : "";
             }
@@ -212,13 +212,13 @@ public class VersionLog extends AbstractCsvFile{
                     isFirstLine = false;
                     headers = br.readLine().split(",");
                     for(String header : headers){
-                        urls.put(header, new ArrayList<>());
+                        exports.put(header, new ArrayList<>());
                     }
                 } else {
                     row = br.readLine().split(",");
                     for(int i = 0; i < row.length; i++){
                         if(!row[i].equals("")){
-                            addUrl(headers[i], row[i]);
+                            addExport(headers[i], row[i]);
                         }
                     }
                 }
