@@ -1,10 +1,9 @@
 package files;
 
+import io.StreamReaderUtil;
 import static io.StreamReaderUtil.NEWLINE;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import nodemanager.io.GoogleDriveUploader;
@@ -137,9 +136,9 @@ public class VersionLog extends AbstractCsvFile{
     }
     
     
-    
-    
-    
+    /*
+    Inherited methods
+    */    
     
     
     /**
@@ -176,53 +175,63 @@ public class VersionLog extends AbstractCsvFile{
         return sb.toString();
     }
     
+    /**
+     * Reads the contents of the given InputStream,
+     * and sets the contents of this VersionLog to match.
+     * 
+     * @param s the contents of the version log on Google Drive
+     * @throws java.io.IOException if an error occurs while reading the stream
+     */
     @Override
-    public void setContents(InputStream s) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(s));
-        boolean isFirstLine = true;
-        String[] headers = {};
-        String[] row;
+    public void setContents(InputStream s) throws IOException {
+        exports.clear();
         
-        try{
-            while(br.ready()){
-                if(isFirstLine){
-                    isFirstLine = false;
-                    headers = br.readLine().split(",");
-                    for(String header : headers){
-                        exports.put(header, new ArrayList<>());
-                    }
-                } else {
-                    row = br.readLine().split(",");
-                    for(int i = 0; i < row.length; i++){
-                        if(!row[i].equals("")){
-                            addExport(headers[i], row[i]);
-                        }
-                    }
+        String content = StreamReaderUtil.readStream(s);
+        String[] rows = content.split("\\n");
+        
+        //locate columns
+        HashMap<Integer, String> columnToType = new HashMap<>();
+        String[] headers = rows[0].split(",");
+        for(int i = 0; i < headers.length; i++){
+            columnToType.put(i, headers[i].trim());
+        }
+        
+        //populate exports
+        String[] row;
+        for(int rowNum = 1; rowNum < rows.length; rowNum++){
+            row = rows[rowNum].split(",");
+            for(int column = 0; column < row.length; column++){
+                if(!"".equals(row[column].trim())){
+                    //not empty
+                    addExport(columnToType.get(column), row[column].trim());
                 }
             }
-        }catch(IOException e){
-            e.printStackTrace();
         }
     }
+    
+    @Override
+    public void importData() {}
+
+    @Override
+    public void exportData() {}
+    
+    
+    /*
+    Test methods
+    */
     
     
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
         GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            v.setContents(stream);
-            System.out.println(v.getContentsToWrite());
-            //GoogleDriveUploader.revise(v);
+            try {
+                v.setContents(stream);
+                System.out.println(v.getContentsToWrite());
+                
+                //GoogleDriveUploader.revise(v);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
-    }
-
-
-    @Override
-    public void importData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void exportData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

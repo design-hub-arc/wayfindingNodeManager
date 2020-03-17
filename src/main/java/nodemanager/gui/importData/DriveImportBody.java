@@ -90,9 +90,14 @@ public class DriveImportBody extends Container{
         
         v = new VersionLog();
         GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            v.setContents(stream);
-            importVersionLog(v);
-            msg.setText("Ready to import!");
+            try {
+                v.setContents(stream);
+                importVersionLog(v);
+                msg.setText("Ready to import!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                msg.setText("an error occurred while downloading the version log");
+            }
         });
         
         updateExportSelector();

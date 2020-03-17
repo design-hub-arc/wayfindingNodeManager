@@ -4,6 +4,7 @@ import files.VersionLog;
 import files.WayfindingManifest;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.io.IOException;
 import javax.swing.*;
 import nodemanager.Session;
 import nodemanager.io.*;
@@ -77,13 +78,17 @@ public final class ExportBody extends Container {
     
     private void downloadVersionLog(){
         GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            v.setContents(stream);
-            for(String option : v.getTypes()){
-                selectType.addItem(option);
+            try {
+                v.setContents(stream);
+                for(String option : v.getTypes()){
+                    selectType.addItem(option);
+                }
+                selectType.addItem(NEW_TYPE);
+                selectType.setSelectedIndex(0);
+                msg.setText("Ready to export!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-            selectType.addItem(NEW_TYPE);
-            selectType.setSelectedIndex(0);
-            msg.setText("Ready to export!");
         });
     }
     

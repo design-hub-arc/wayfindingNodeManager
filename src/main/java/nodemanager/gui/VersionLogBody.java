@@ -25,8 +25,12 @@ public class VersionLogBody extends Container implements MouseListener{
         
         v = new VersionLog();
         GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            v.setContents(stream);
-            refresh();
+            try {
+                v.setContents(stream);
+                refresh();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
     }
     
