@@ -89,7 +89,8 @@ public class DriveImportBody extends Container{
         add(importButton);
         
         v = new VersionLog();
-        v.download().addOnSucceed((stream)->{
+        GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
+            v.setContents(stream);
             importVersionLog(v);
             msg.setText("Ready to import!");
         });

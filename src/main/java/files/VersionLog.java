@@ -1,18 +1,12 @@
 package files;
 
-import com.google.api.services.drive.model.File;
 import static io.StreamReaderUtil.NEWLINE;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
-import nodemanager.gui.FileSelector;
-import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 
 /**
@@ -29,7 +23,7 @@ import nodemanager.io.GoogleDriveUploader;
  * @author Matt Crow
  */
 public class VersionLog extends AbstractCsvFile{
-    public static final String ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
+    public static final String DEFAULT_VERSION_LOG_ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
     
     /**
      * Key is the wayfinding type (wayfinding, artfinding, etc)
@@ -38,21 +32,15 @@ public class VersionLog extends AbstractCsvFile{
      */
     private final HashMap<String, ArrayList<String>> exports;
     
-    private boolean downloaded;
-    
     public VersionLog(){
         super("versions", FileType.VERSION_LOG);
-        downloaded = false;
-        
         exports = new HashMap<>();
     }
-    
     
     
     /*
     Export editting methods
     */
-    
     
     
     /**
@@ -118,11 +106,9 @@ public class VersionLog extends AbstractCsvFile{
     }
     
     
-    
     /*
     Getters
     */
-    
     
     
     /**
@@ -152,18 +138,9 @@ public class VersionLog extends AbstractCsvFile{
     
     
     
-    /**
-     * Downloads versions.csv, then populates urls to match its data
-     * @return the DriveIOOp downloading this
-     */
-    public DriveIOOp<InputStream> download(){
-        return GoogleDriveUploader
-                .download(ID)
-                .addOnSucceed((stream)->{
-                    setContents(stream);
-                    downloaded = true;
-                });
-    }
+    
+    
+    
     
     /**
      * Gets what to write to the version log.
@@ -228,29 +205,16 @@ public class VersionLog extends AbstractCsvFile{
         }
     }
     
-    public DriveIOOp<File> save(){
-        return GoogleDriveUploader.revise(this);
-    }
-    
-    public void displayData(){
-        System.out.println(getContentsToWrite());
-    }
     
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
-        v.download().addOnSucceed((stream)->{
+        GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
+            v.setContents(stream);
             System.out.println(v.getContentsToWrite());
             //GoogleDriveUploader.revise(v);
         });
     }
 
-    /**
-     * 
-     * @return whether or not the call to this.download has completed
-     */
-    public boolean isDownloaded() {
-        return downloaded;
-    }
 
     @Override
     public void importData() {

@@ -165,7 +165,7 @@ public class GoogleDriveUploader{
             public File perform() throws Exception {
                 File ret = null;
                 try{
-                    ret = drive.files().get(VersionLog.ID).execute();
+                    ret = drive.files().get(VersionLog.DEFAULT_VERSION_LOG_ID).execute();
                     java.io.File localFileToUpdate = vl.createTempFile();
                     drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
                 } catch(IOException e){
@@ -331,17 +331,5 @@ public class GoogleDriveUploader{
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP, JSON, clientInfo, Collections.singleton(DriveScopes.DRIVE))
                 .setDataStoreFactory(STORE).build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-    }
-
-    public static void main(String[] args) throws IOException{
-        /*
-        try{
-            drive.files().update("1HdesCi9x5rD5r7qDNHDp_78ZcI547HFl", new File(), new FileContent("text/csv", new java.io.File("C:\\Users\\w1599227\\Desktop\\test.txt.txt"))).execute();
-        } catch(com.google.api.client.googleapis.json.GoogleJsonResponseException e){
-            System.out.println(e.getDetails().get("code"));
-        }*/
-        VersionLog v = new VersionLog();
-        v.download();
-        v.save();
     }
 }

@@ -76,7 +76,8 @@ public final class ExportBody extends Container {
     }
     
     private void downloadVersionLog(){
-        v.download().addOnSucceed((stream)->{
+        GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
+            v.setContents(stream);
             for(String option : v.getTypes()){
                 selectType.addItem(option);
             }
@@ -98,7 +99,7 @@ public final class ExportBody extends Container {
             msg.setText("Upload complete!");            
             Session.purgeActions();
             v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
-            v.save().addOnFail((err)->{
+            GoogleDriveUploader.revise(v).addOnFail((err)->{
                 msg.setText(err.getMessage());
             });
         }).addOnFail((ex)->msg.setText(ex.getMessage()));
