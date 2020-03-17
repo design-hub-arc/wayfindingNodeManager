@@ -47,6 +47,14 @@ public class VersionLog extends AbstractCsvFile{
         exports = new HashMap<>();
     }
     
+    
+    
+    /*
+    Export editting methods
+    */
+    
+    
+    
     /**
      * Adds an export URL to the VersionLog.
      * 
@@ -92,6 +100,57 @@ public class VersionLog extends AbstractCsvFile{
         return wasRemoved;
     }
     
+    /**
+     * Removes all exports with the given type from the
+     * VersionLog, and deletes that column.
+     * 
+     * @param wayfindingType the type to remove.
+     * 
+     * @return if the given type existed in the version log, and therefore was removed. 
+     */
+    public final boolean removeType(String wayfindingType){
+        boolean wasRemoved = false;
+        if(exports.containsKey(wayfindingType)){
+            exports.remove(wayfindingType);
+            wasRemoved = true;
+        }
+        return wasRemoved;
+    }
+    
+    
+    
+    /*
+    Getters
+    */
+    
+    
+    
+    /**
+     * 
+     * @return the different wayfinding types listed in this VersionLog 
+     */
+    public String[] getTypes(){
+        return exports.keySet().toArray(new String[exports.size()]);
+    }
+    
+    /**
+     * 
+     * @param wayfindingType the wayfindingType to get
+     * exports for.
+     * 
+     * @return an array of the URLs of exports for the given type,
+     * ordered oldest to newest. If the given type is not listed in
+     * this VersionLog, returns an empty array.
+     */
+    public String[] getExportsFor(String wayfindingType){
+        String[] exportUrls = new String[0];
+        if(exports.containsKey(wayfindingType)){
+            exportUrls = exports.get(wayfindingType).toArray(new String[exports.get(wayfindingType).size()]);
+        }
+        return exportUrls;
+    }
+    
+    
     
     /**
      * Downloads versions.csv, then populates urls to match its data
@@ -104,45 +163,6 @@ public class VersionLog extends AbstractCsvFile{
                     setContents(stream);
                     downloaded = true;
                 });
-    }
-    
-    public void addType(String type){
-        urls.put(type, new ArrayList<>());
-    }
-    
-    public void deleteType(String type){
-        urls.remove(type);
-    }
-    
-    public String[] getTypes(){
-        return Arrays.copyOf(urls.keySet().toArray(), urls.size(), String[].class);
-    }
-    
-    public String[] getExportIdsFor(String type){
-        ArrayList<String> exportIds = new ArrayList<>();
-        ArrayList<String> uploads = urls.get(type);
-        for(int i = 0; i < uploads.size(); i++){
-            try{
-                GoogleDriveUploader.getFileName(uploads.get(i)); //checks if file exists, else throws error
-                exportIds.add(uploads.get(i));
-            } catch(IOException e){
-                System.err.println("Not file id: " + uploads.get(i));
-            }
-        }
-        return Arrays.copyOf(exportIds.toArray(), exportIds.size(), String[].class);
-    }
-    
-    public String[] getExportNamesFor(String type){
-        ArrayList<String> exportNames = new ArrayList<>();
-        ArrayList<String> uploads = urls.get(type);
-        for(int i = 0; i < uploads.size(); i++){
-            try{
-                exportNames.add(GoogleDriveUploader.getFileName(uploads.get(i)));
-            } catch(IOException e){
-                System.err.println("Couldn't get the name of " + uploads.get(i));
-            }
-        }
-        return Arrays.copyOf(exportNames.toArray(), exportNames.size(), String[].class);
     }
     
     /**

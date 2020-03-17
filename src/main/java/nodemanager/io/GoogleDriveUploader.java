@@ -266,18 +266,30 @@ public class GoogleDriveUploader{
         };
     }
     
-    
-    
-    public static String getFileName(String id) throws IOException{
+    public static DriveIOOp<String> getFileName(String id){
+        DriveIOOp<String> ret = null;
+        
         if(id.contains("id=")){
-            id = id.split("id=")[1];
+            ret = getFileName(id.split("id=")[1]);
+        } else if(ID_TO_NAME.containsKey(id)){
+            ret = new DriveIOOp<String>() {
+                @Override
+                public String perform() throws Exception {
+                    return ID_TO_NAME.get(id);
+                }
+            };
+        } else {
+            ret = new DriveIOOp<String>() {
+                @Override
+                public String perform() throws Exception {
+                    String name = drive.files().get(id).execute().getName();
+                    ID_TO_NAME.put(id, name);
+                    return name;
+                }
+            };
         }
         
-        if(!ID_TO_NAME.containsKey(id)){
-            ID_TO_NAME.put(id, drive.files().get(id).execute().getName());
-        }
-        
-        return ID_TO_NAME.get(id);
+        return ret;
     }
     
     /**

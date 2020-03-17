@@ -13,23 +13,27 @@ import files.FileType;
 import files.VersionLog;
 import files.WayfindingManifest;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import nodemanager.io.GoogleDriveUploader;
 
 /**
  * Acts as the body of the import dialog whenever the user clicks the import from drive button.
- * Allows the user to specify which version of wayfinding they are importing from, as well as what to name the export.
- * 
- * TODO: combine this and ExportBody
+ * Allows the user to specify which wayfindingTypeSelector of wayfinding they are importing from, as well as what to name the export.
+ 
+ TODO: combine this and ExportBody
  * @author Matt Crow
  */
 public class DriveImportBody extends Container{
-    private JComboBox<String> version;
+    private JComboBox<String> wayfindingTypeSelector;
     private JComboBox<String> exportSelector;
     private ArrayList<FileTypeCheckBox> cbs;
     private String[] exportIds;
     private String[] exportNames;
     
     private VersionLog v;
+    
+    private final HashMap<String, String> nameToUrl;
     
     private final JButton importButton;
     private final JTextArea msg;
@@ -38,12 +42,13 @@ public class DriveImportBody extends Container{
         super();
         setLayout(new GridLayout(8, 1));
         
+        nameToUrl = new HashMap<>();
         
-        version = new JComboBox<>();
-        version.addItemListener((e)->{
+        wayfindingTypeSelector = new JComboBox<>();
+        wayfindingTypeSelector.addItemListener((e)->{
             updateExportSelector();
         });
-        add(version);
+        add(wayfindingTypeSelector);
         
         exportSelector = new JComboBox<>();
         add(exportSelector);
@@ -88,7 +93,7 @@ public class DriveImportBody extends Container{
         v = new VersionLog();
         v.download().addOnSucceed((stream)->{
             for(String type : v.getTypes()){
-                version.addItem(type);
+                wayfindingTypeSelector.addItem(type);
             }
             msg.setText("Ready to import!");
         });
@@ -96,24 +101,48 @@ public class DriveImportBody extends Container{
         updateExportSelector();
     }
     
-    private void importManifest(WayfindingManifest man){
-        cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
+    private void importVersionLog(VersionLog v){
+        //clear old data
+        nameToUrl.clear();
+        wayfindingTypeSelector.removeAllItems();
+        exportSelector.removeAllItems();
+        
+        //add new data
+        String[] types = v.getTypes();
+        for(String type : types){
+            wayfindingTypeSelector.addItem(type);
+        }
+        wayfindingTypeSelector.setSelectedIndex(0);
+        
+        updateExportSelector();
+    }
+    
+    private void updateExportSelector(){
+        String selectedType = (String)wayfindingTypeSelector.getSelectedItem();
+        String[] exportUrls = v.getExportsFor(selectedType);
+        final LinkedList<String> exportNames = new LinkedList<>();
+        
+        for(String url : exportUrls){
             try {
-                man.getFileFor(cb.getFileType()).addOnSucceed((file)->{
-                    file.importData();
+                GoogleDriveUploader.getFileName(url).addOnSucceed((fileName)->{
+                    nameToUrl.put(fileName, url);
+                    exportNames.addFirst(fileName); //orders from newest to oldest
                 }).getExcecutingThread().join();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+        }
+        
+        exportNames.forEach((name)->{
+            exportSelector.addItem(name);
         });
-    }
-    
-    private void updateExportSelector(){
+        
+        /*
         if(!v.isDownloaded()){
             return;
         }
-        exportIds = v.getExportIdsFor(version.getSelectedItem().toString());
-        exportNames = v.getExportNamesFor(version.getSelectedItem().toString());
+        exportIds = v.getExportIdsFor(wayfindingTypeSelector.getSelectedItem().toString());
+        exportNames = v.getExportNamesFor(wayfindingTypeSelector.getSelectedItem().toString());
         exportSelector.removeAllItems();
         
         //we want to order it by newest to oldest, so we have to reverse both of them
@@ -126,8 +155,20 @@ public class DriveImportBody extends Container{
             temp = exportIds[i];
             exportIds[i] = exportIds[exportIds.length - 1 - i];
             exportIds[exportIds.length - 1 - i] = temp;
-        }
+        }*/
         revalidate();
         repaint();
+    }
+    
+    private void importManifest(WayfindingManifest man){
+        cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
+            try {
+                man.getFileFor(cb.getFileType()).addOnSucceed((file)->{
+                    file.importData();
+                }).getExcecutingThread().join();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 }

@@ -35,21 +35,21 @@ public class VersionLogBody extends Container implements MouseListener{
         
         setLayout(new GridLayout(rows.length, rows[0].split(",").length));
         String[] data;
-        JTextField j;
         boolean firstRow = true;
         for(String row : rows){
             data = row.split(",", -1); // -1 allows it to include empty cells
             for(String datum : data){
-                j = new JTextField(datum);
+                JTextField j = new JTextField(datum);
                 j.setBackground(Color.LIGHT_GRAY);
                 if(!firstRow && datum.trim().length() > 0){
-                    try{
-                        j.setText(GoogleDriveUploader.getFileName(datum));
+                    GoogleDriveUploader.getFileName(datum).addOnSucceed((name)->{
+                        j.setText(name);
                         j.setBackground(Color.GREEN);
-                    }catch(IOException e){
+                    }).addOnFail((ex)->{
+                        ex.printStackTrace();
                         j.setText("Google drive cannot find file by id: " + datum);
                         j.setBackground(Color.RED);
-                    }
+                    });
                 }
                 j.addMouseListener(this);
                 j.setEditable(false);
