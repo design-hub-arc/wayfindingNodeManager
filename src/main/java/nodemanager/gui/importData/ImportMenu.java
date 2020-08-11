@@ -1,9 +1,9 @@
 package nodemanager.gui.importData;
 
-import files.NodeLabelFile;
-import files.NodeCoordFile;
-import files.NodeConnFile;
-import files.MapFile;
+import nodemanager.files.NodeLabelFile;
+import nodemanager.files.NodeCoordFile;
+import nodemanager.files.NodeConnFile;
+import nodemanager.files.MapFile;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import javax.swing.*;

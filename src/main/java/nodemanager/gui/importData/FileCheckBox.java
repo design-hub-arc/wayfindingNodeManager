@@ -1,11 +1,11 @@
 package nodemanager.gui.importData;
 
-import files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFile;
 import java.awt.GridLayout;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
-import files.FileType;
+import nodemanager.files.FileType;
 import java.io.FileInputStream;
 import java.io.IOException;
 

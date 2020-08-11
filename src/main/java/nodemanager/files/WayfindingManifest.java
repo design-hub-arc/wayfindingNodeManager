@@ -1,7 +1,7 @@
-package files;
+package nodemanager.files;
 
-import io.StreamReaderUtil;
-import static io.StreamReaderUtil.NEWLINE;
+import nodemanager.io.StreamReaderUtil;
+import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;

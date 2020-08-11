@@ -1,4 +1,4 @@
-package files;
+package nodemanager.files;
 
 import java.awt.image.BufferedImage;
 import java.io.*;

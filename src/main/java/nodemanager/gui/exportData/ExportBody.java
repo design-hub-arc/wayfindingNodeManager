@@ -1,7 +1,7 @@
 package nodemanager.gui.exportData;
 
-import files.VersionLog;
-import files.WayfindingManifest;
+import nodemanager.files.VersionLog;
+import nodemanager.files.WayfindingManifest;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.io.IOException;

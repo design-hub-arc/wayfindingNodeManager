@@ -1,9 +1,9 @@
-package files;
+package nodemanager.files;
 
 import java.io.InputStream;
 import nodemanager.node.Node;
-import io.StreamReaderUtil;
-import static io.StreamReaderUtil.NEWLINE;
+import nodemanager.io.StreamReaderUtil;
+import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.util.HashMap;
 

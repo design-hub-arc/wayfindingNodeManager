@@ -1,7 +1,7 @@
 package nodemanager.io;
 
-import files.VersionLog;
-import files.AbstractWayfindingFile;
+import nodemanager.files.VersionLog;
+import nodemanager.files.AbstractWayfindingFile;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -17,7 +17,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
-import files.WayfindingManifest;
+import nodemanager.files.WayfindingManifest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,7 +101,7 @@ public class GoogleDriveUploader{
      * @return a DriveIOOp. See DriveIOOp for how to use this
      */
     public static DriveIOOp<File> uploadFile(AbstractWayfindingFile f, String folderId){
-        DriveIOOp upload = new DriveIOOp<File>(){
+        DriveIOOp<File> upload = new DriveIOOp<File>(){
             @Override
             public File perform() throws Exception {
                 File googleFile = null;
