@@ -1,6 +1,7 @@
 # wayfindingNodeManager
 
-A data management program for the Wayfinding project
+A data management program for the Wayfinding project.
+The Google Drive API credentials used by this program have been invalidated, so any Drive API functionality will fail.
 
 ## Important Notice
 
