@@ -22,6 +22,8 @@ public class NodeDataPane extends JComponent{
     private final JScrollPane infoView;
     private GridBagConstraints gbc;
     
+    private static final String NONE_SELECTED_MSG = "Click on a node to select it";
+    
     public NodeDataPane(){
         setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -31,14 +33,14 @@ public class NodeDataPane extends JComponent{
         selectedNode = null;
         hasNodeSelected = false;
         
-        nodeInfo = new JTextArea("No node selected");
-        nodeInfo.setBackground(Color.red);
+        nodeInfo = new JTextArea(NONE_SELECTED_MSG);
+        nodeInfo.setBackground(Color.white);
         nodeInfo.setEditable(false);
         nodeInfo.setLineWrap(true);
         infoView = new JScrollPane(
-                nodeInfo,
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
+            nodeInfo,
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+            JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         );
         gbc.ipady = 100;
         add(infoView, gbc);
@@ -158,7 +160,7 @@ public class NodeDataPane extends JComponent{
         
         //isn't doing anything, both print 0 regardless of where the bar is
         //System.out.println(infoView.getVerticalScrollBar().getModel().getValue());
-        infoView.getVerticalScrollBar().getModel().setValue(0);
+        infoView.getVerticalScrollBar().setValue(0);//.getModel().setValue(0);
         //System.out.println(infoView.getVerticalScrollBar().getModel().getValue());
         n.getIcon().setDrawLinks(true);
         n.getIcon().getHost().repaint();

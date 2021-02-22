@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import nodemanager.modes.ModeNewNode;
 import nodemanager.node.*;
 
 /**
@@ -88,8 +89,8 @@ public class EditCanvas extends JPanel {
 
         JMenuItem addNodeButton = new JMenuItem("Add a new Node");
         addNodeButton.addActionListener((ActionEvent e) -> {
-            Session.setMode(Mode.ADD);
-            JOptionPane.showMessageDialog(null, "Click on any location on the map to add a new node");
+            Session.setMode(Mode.ADD); // not sure which style to use
+            Session.setMode(new ModeNewNode());
         });
         menu.add(addNodeButton);
 

@@ -8,6 +8,8 @@ import javax.swing.*;
 import nodemanager.events.EditEvent;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
+import nodemanager.modes.AbstractMode;
+import nodemanager.modes.ModeNone;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -25,6 +27,7 @@ import nodemanager.gui.*;
 */
 public class Session {
     private static Mode mode = Mode.NONE;
+    private static AbstractMode newMode = new ModeNone();
     public static Node selectedNode = null;
     public static NodeDataPane dataPane = null;
     public static int newMapX = 0;
@@ -46,13 +49,11 @@ public class Session {
      * A text component used to display the program's controls
      */
     public static final JTextArea CONTROL_LIST = new JTextArea("Controls:\n");
-    public static final JLabel MODE_LABEL = new JLabel("Current mode: " + Mode.NONE.toString());
+    public static final JTextArea MODE_LABEL = new JTextArea(String.format("Current mode: \n* %s\n(%s)", mode.toString(), newMode.getMessage()));
     
     static{
         CONTROL_LIST.setEditable(false);
-        MODE_LABEL.setMaximumSize(new Dimension(100, 30));
-        MODE_LABEL.setBackground(Color.GRAY);
-        MODE_LABEL.setOpaque(true);
+        MODE_LABEL.setEditable(false);
         MODE_LABEL.revalidate();
     }
     
@@ -130,7 +131,12 @@ public class Session {
     
     public static void setMode(Mode m){
         mode = m;
-        MODE_LABEL.setText("Current mode: " + m.toString());
+        MODE_LABEL.setText(String.format("Current mode: \n* %s\n(%s)", Mode.NONE.toString(), newMode.getMessage()));
+    }
+    
+    public static void setMode(AbstractMode m){
+        newMode = m;
+        MODE_LABEL.setText(String.format("Current mode: \n* %s\n(%s)", Mode.NONE.toString(), newMode.getMessage()));
     }
     
     public static Mode getMode(){
