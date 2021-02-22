@@ -39,11 +39,4 @@ The Netbeans project this uses is built using Gradle.
 
 ## Contributing
 
-This project is the property of the American River College Design Hub, and as such, is not open to accept contributions from people outside the company. 
-If you are an intern or employee of the Design Hub, and are interested in working on the project, please contact Matt Crow (w# is 1599227), and he can get you situated.
-
-## Authors
-
-* **Matt Crow** - *Programmer* - [IronHeart7334](https://github.com/IronHeart7334)
-
-See also the list of [contributors](https://github.com/IronHeart7334/wayfindingNodeManager/contributors) who participated in this project.
+This project is the property of the American River College Design Hub, and as such, is not open to accept contributions from people outside the company.

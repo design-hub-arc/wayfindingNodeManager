@@ -335,7 +335,9 @@ public class MapImage extends JLabel{
      */
     private void resize() {
         zoom = 1.0;
-        scaler.setSize(buff.getWidth(), buff.getHeight());
+        if(buff != null){
+            scaler.setSize(buff.getWidth(), buff.getHeight());
+        }
         resizeNodeIcons();
     }
 
@@ -414,7 +416,11 @@ public class MapImage extends JLabel{
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.scale(zoom, zoom);
 
-        g2d.drawImage(buff, 0, 0, this);
+        if(buff == null){
+            g2d.drawString("Import an image to show it here", getWidth() / 2, getHeight() / 2);
+        } else {
+            g2d.drawImage(buff, 0, 0, this);
+        }
         nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
     }
     

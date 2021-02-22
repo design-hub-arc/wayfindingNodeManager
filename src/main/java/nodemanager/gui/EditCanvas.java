@@ -32,40 +32,24 @@ public class EditCanvas extends JPanel {
         super();
 
         Session.currentPanel = this;
-
-        GridBagLayout lo = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();
-        setLayout(lo);
-
-        menu = new JMenuBar();
-        menu.setMinimumSize(new Dimension(50, 50));
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.weightx = 1;
-        c.fill = GridBagConstraints.BOTH;
-        add(menu, c);
+        
+        setLayout(new BorderLayout());
+        
+        menu = new JMenuBar();        
+        add(menu, BorderLayout.PAGE_START);
         menu.setLayout(new FlowLayout());
 
+        JSplitPane content = new JSplitPane();
+        content.setContinuousLayout(true);
+        add(content, BorderLayout.CENTER);
+        
         body = new JComponent() {
         };
         body.setLayout(new FlowLayout());
-        c.gridx = 1;
-        c.gridy = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.weightx = 9;
-        c.weighty = 9;
-        c.fill = GridBagConstraints.BOTH;
-        add(body, c);
-
+        content.setRightComponent(body);
+        
         sideBar = new Sidebar();
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 1;
-        c.weightx = 1;
-        c.weighty = 9;
-        c.fill = GridBagConstraints.BOTH;
-        add(sideBar, c);
+        content.setLeftComponent(sideBar);
 
         selectedNode = new NodeDataPane();
         sideBar.add(selectedNode);
@@ -133,9 +117,6 @@ public class EditCanvas extends JPanel {
         setBackground(Color.blue);
         revalidate();
         repaint();
-
-        
-        importMenu.loadDefaults();
     }
     
     private JMenu createSelectMenu(){

@@ -51,42 +51,4 @@ public class ImportMenu extends JMenu{
         });
         return resize;
     }
-    
-    /**
-     * Imports the default data used by the program
-     */
-    public void loadDefaults() {
-        MapFile defaultMap = new MapFile();
-        try {
-            defaultMap.setContents(getClass().getResourceAsStream("/map.png"));
-            defaultMap.importData();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        
-        NodeCoordFile coords = new NodeCoordFile();
-        try {
-            coords.setContents(getClass().getResourceAsStream("/nodeData.csv"));
-            coords.importData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        NodeConnFile conn = new NodeConnFile();
-        try {
-            conn.setContents(getClass().getResourceAsStream("/nodeConnections.csv"));
-            conn.importData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        NodeLabelFile labels = new NodeLabelFile();
-        try{
-            labels.setContents(getClass().getResourceAsStream("/labels.csv"));
-            labels.importData();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Try running clean/build");
-        }
-    }
 }
