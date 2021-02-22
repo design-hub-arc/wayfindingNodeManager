@@ -1,11 +1,6 @@
 package nodemanager.gui.importData;
 
-import nodemanager.files.NodeLabelFile;
-import nodemanager.files.NodeCoordFile;
-import nodemanager.files.NodeConnFile;
-import nodemanager.files.MapFile;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import javax.swing.*;
 import nodemanager.*;
 
@@ -17,7 +12,7 @@ public class ImportMenu extends JMenu{
     public ImportMenu(){
         super("Import");
         add(importLocalMenu());
-        add(importFromDriveMenu());
+        //add(importFromDriveMenu());
         add(resizeMapMenu());
     }
     

@@ -158,10 +158,10 @@ public class NodeDataPane extends JComponent{
         selectedNode = n;
         nodeInfo.setText(n.getDesc());
         
-        //isn't doing anything, both print 0 regardless of where the bar is
-        //System.out.println(infoView.getVerticalScrollBar().getModel().getValue());
-        infoView.getVerticalScrollBar().setValue(0);//.getModel().setValue(0);
-        //System.out.println(infoView.getVerticalScrollBar().getModel().getValue());
+        SwingUtilities.invokeLater(()->{
+            infoView.getVerticalScrollBar().setValue(0);//.getModel().setValue(0);
+        });
+        
         n.getIcon().setDrawLinks(true);
         n.getIcon().getHost().repaint();
     }

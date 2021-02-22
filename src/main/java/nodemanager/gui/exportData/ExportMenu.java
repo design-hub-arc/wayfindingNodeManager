@@ -23,7 +23,7 @@ public class ExportMenu extends JMenu{
         super("Export");
         
         add(saveLocal());
-        add(exportManifest());
+        //add(exportManifest());
     }
     
     private JMenuItem saveLocal(){
