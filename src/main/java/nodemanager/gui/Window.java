@@ -39,7 +39,7 @@ public class Window extends JFrame{
             }
         });
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setContentPane(new EditCanvas());
+        setContentPane(new ApplicationBody());
         pack();
         setVisible(true);
     }

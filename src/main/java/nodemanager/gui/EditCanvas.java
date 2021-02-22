@@ -13,7 +13,7 @@ import nodemanager.node.*;
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
  */
-public class EditCanvas extends JPanel {
+public class EditCanvas extends ApplicationPage {
 
     /**
      * EditCanvas is the main JPanel used by the program
@@ -28,8 +28,8 @@ public class EditCanvas extends JPanel {
     /**
      * Creates many different components, then adds them to the JPanel.
      */
-    public EditCanvas() {
-        super();
+    public EditCanvas(ApplicationBody parent) {
+        super(parent);
 
         Session.currentPanel = this;
         

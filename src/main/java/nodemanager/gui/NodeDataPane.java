@@ -34,6 +34,7 @@ public class NodeDataPane extends JComponent{
         hasNodeSelected = false;
         
         nodeInfo = new JTextArea(NONE_SELECTED_MSG);
+        nodeInfo.setRows(5);
         nodeInfo.setBackground(Color.white);
         nodeInfo.setEditable(false);
         nodeInfo.setLineWrap(true);
@@ -42,9 +43,7 @@ public class NodeDataPane extends JComponent{
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
             JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         );
-        gbc.ipady = 100;
         add(infoView, gbc);
-        gbc.ipady = 0;
         
         addOption("Delete this node", () ->{
             if(selectedNode.id < 0){
