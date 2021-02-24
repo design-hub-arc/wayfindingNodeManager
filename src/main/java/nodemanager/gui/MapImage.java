@@ -108,18 +108,22 @@ public class MapImage extends JLabel{
         });
         
         mouseClickActions.put(Mode.ADD, (me) -> {
-            //adds a Node where the user clicks
-            Node n = new Node();
-            Node.updateNode(
+            // adds a Node where the user clicks,
+            // unless they click on an existing node
+            NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
+            if(hoveringOver == null){
+                Node n = new Node();
+                Node.updateNode(
                     n.id, 
                     (int) scaler.inverseX(translateClickX(me.getX())),
                     (int) scaler.inverseY(translateClickY(me.getY()))
-            );
-            
-            addNode(n);
-            Session.logAction(new NodeCreateEvent(n, this));
-            repaint();
-            Session.setMode(Mode.NONE);
+                );
+                addNode(n);
+                Session.logAction(new NodeCreateEvent(n, this));
+                repaint();
+            } else {
+                Session.setMode(Mode.NONE);
+            }            
         });
         
         mouseClickActions.put(Mode.MOVE, (me) -> {

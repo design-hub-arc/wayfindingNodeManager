@@ -73,19 +73,13 @@ public class EditCanvas extends ApplicationPage {
 
         JMenuItem addNodeButton = new JMenuItem("Add a new Node");
         addNodeButton.addActionListener((ActionEvent e) -> {
-            Session.setMode(Mode.ADD); // not sure which style to use
-            Session.setMode(new ModeNewNode());
+            Session.setMode(Mode.ADD);
         });
         menu.add(addNodeButton);
 
         JMenuItem resetData = new JMenuItem("Clear all data");
         resetData.addActionListener((ActionEvent e) -> {
-            map.removeAllNodes();
-            Node.removeAll();
-            map.addNode(Node.updateNode(-1, 0, 0));
-            map.addNode(Node.updateNode(-2, 100, 100));
-            map.scaleTo(0, 0, 100, 100);
-            map.setImage(new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)); //dummy image to prevent NullPointerException
+            resetData();
         });
         menu.add(resetData);
         
@@ -115,8 +109,18 @@ public class EditCanvas extends ApplicationPage {
         }, "redo");
 
         setBackground(Color.blue);
+        resetData();
         revalidate();
         repaint();
+    }
+    
+    private void resetData(){
+        map.removeAllNodes();
+        Node.removeAll();
+        map.addNode(Node.updateNode(-1, 0, 0));
+        map.addNode(Node.updateNode(-2, 100, 100));
+        map.scaleTo(0, 0, 100, 100);
+        map.setImage(new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)); //dummy image to prevent NullPointerException
     }
     
     private JMenu createSelectMenu(){

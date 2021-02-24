@@ -9,6 +9,7 @@ import nodemanager.events.EditEvent;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
 import nodemanager.modes.AbstractMode;
+import nodemanager.modes.ModeNewNode;
 import nodemanager.modes.ModeNone;
 
 /**
@@ -131,12 +132,16 @@ public class Session {
     
     public static void setMode(Mode m){
         mode = m;
-        MODE_LABEL.setText(String.format("Current mode: \n* %s\n(%s)", Mode.NONE.toString(), newMode.getMessage()));
-    }
-    
-    public static void setMode(AbstractMode m){
-        newMode = m;
-        MODE_LABEL.setText(String.format("Current mode: \n* %s\n(%s)", Mode.NONE.toString(), newMode.getMessage()));
+        switch(m){
+            case ADD:
+                newMode = new ModeNewNode();
+                break;
+            default:
+                newMode = new ModeNone();
+                break;
+        }
+        MODE_LABEL.setText(String.format("Current mode: \n* %s\n(%s)", m.toString(), newMode.getMessage()));
+        MODE_LABEL.repaint();
     }
     
     public static Mode getMode(){

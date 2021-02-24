@@ -7,7 +7,7 @@ package nodemanager.modes;
 public final class ModeNewNode extends AbstractMode{
 
     public ModeNewNode() {
-        super("Click on any location on the map to add a new node there.");
+        super("Click on any location on the map to add a new node there.\nClick on an existing node to exit this mode.");
     }
 
 }
