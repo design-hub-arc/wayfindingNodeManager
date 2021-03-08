@@ -14,7 +14,7 @@ public class Window extends JFrame{
     public Window(){
         super();
         setTitle("Wayfinding Node Manager");
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         JFrame self = this;
         addWindowListener(new WindowAdapter(){

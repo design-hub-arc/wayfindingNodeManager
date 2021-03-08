@@ -136,8 +136,6 @@ public class MapImage extends JLabel{
             Session.setMode(Mode.RESCALE_LR);
             Session.newMapX = Node.get(-1).getIcon().getX();
             Session.newMapY = Node.get(-1).getIcon().getY();
-            
-            JOptionPane.showMessageDialog(null, "Position the upper left corner of node -2 at the lower right corner of where you want to crop");
         });
         
         mouseClickActions.put(Mode.RESCALE_LR, (me) -> {

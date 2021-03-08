@@ -9,8 +9,11 @@ import nodemanager.events.EditEvent;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
 import nodemanager.modes.AbstractMode;
+import nodemanager.modes.ModeAddConnection;
 import nodemanager.modes.ModeNewNode;
 import nodemanager.modes.ModeNone;
+import nodemanager.modes.ModeRemoveConnection;
+import nodemanager.modes.ModeRescaleLowerRight;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -135,6 +138,15 @@ public class Session {
         switch(m){
             case ADD:
                 newMode = new ModeNewNode();
+                break;
+            case ADD_CONNECTION:
+                newMode = new ModeAddConnection(selectedNode.id);
+                break;
+            case REMOVE_CONNECTION:
+                newMode = new ModeRemoveConnection(selectedNode.id);
+                break;
+            case RESCALE_LR:
+                newMode = new ModeRescaleLowerRight();
                 break;
             default:
                 newMode = new ModeNone();

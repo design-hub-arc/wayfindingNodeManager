@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import nodemanager.io.InputConsole;
 import nodemanager.modes.ModeNewNode;
 import nodemanager.node.*;
 
@@ -123,35 +124,42 @@ public class EditCanvas extends ApplicationPage {
         map.setImage(new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)); //dummy image to prevent NullPointerException
     }
     
+    private void trySelectNode(int id){
+        Node find = Node.get(id);
+        if(find == null){
+            InputConsole.getInstance().warn("Couldn't find a node with an id of " + id);
+        } else {
+            selectedNode.selectNode(find);
+        }
+    }
+    
+    private void trySelectNode(String label){
+        Node find = Node.get(label);
+        if(find == null){
+            InputConsole.getInstance().warn("Cannot find node with label " + label);
+        } else {
+            selectedNode.selectNode(find);
+        }
+    }
+    
     private JMenu createSelectMenu(){
         JMenu m = new JMenu("Find a node");
         
         JMenuItem byId = new JMenuItem("...by id");
         byId.addActionListener((e) -> {
-            try{
-                int id = Integer.parseInt(JOptionPane.showInputDialog("Enter the id of the node you want to find: "));
-            
-                Node find = Node.get(id);
-                if(find == null){
-                    JOptionPane.showMessageDialog(this, "Couldn't find a node with an id of " + id);
-                } else {
-                    selectedNode.selectNode(find);
-                }
-            } catch(NumberFormatException ex){
-                //do nothing
-            }
+            InputConsole.getInstance().askInt(
+                "Enter the id of the node you want to find: ",
+                this::trySelectNode
+            );
         });
         m.add(byId);
         
         JMenuItem byLabel = new JMenuItem("...by label");
         byLabel.addActionListener((e) -> {
-            String label = JOptionPane.showInputDialog("Enter a label of the node you want to find: ");
-            Node find = Node.get(label);
-            if(find == null){
-                JOptionPane.showMessageDialog(menu, "Cannot find node with label " + label);
-            } else {
-                selectedNode.selectNode(find);
-            }
+            InputConsole.getInstance().askString(
+                "Enter a label of the node you want to find: ", 
+                this::trySelectNode
+            ); 
         });
         m.add(byLabel);
         
@@ -163,32 +171,28 @@ public class EditCanvas extends ApplicationPage {
 
         JMenuItem chooseNodeSize = new JMenuItem("Change node icon size");
         chooseNodeSize.addActionListener((e) -> {
-            try {
-                NodeIcon.setSize(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new size for node icons:")));
-            } catch (NumberFormatException ex) {
-                //just ignore it
-            }
+            InputConsole.getInstance().askInt(
+                "Enter new size for node icons:", 
+                NodeIcon::setSize
+            );
         });
         m.add(chooseNodeSize);
 
         JMenuItem choosePanSpeed = new JMenuItem("Change pan speed");
         choosePanSpeed.addActionListener((ActionEvent e) -> {
-            try {
-                map.setPanSpeed(Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new panning speed (5-10 recommended):")));
-            } catch (NumberFormatException ex) {
-                //just ignore it
-            }
+            InputConsole.getInstance().askInt(
+                "Enter new panning speed (5-10 recommended):", 
+                map::setPanSpeed
+            );
         });
         m.add(choosePanSpeed);
 
         JMenuItem chooseZoomSpeed = new JMenuItem("Change zoom speed");
         chooseZoomSpeed.addActionListener((ActionEvent e) -> {
-            try {
-                int perc = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new zooming speed (1-10 recommended):"));
-                map.setZoomSpeed(0.01 * perc);
-            } catch (NumberFormatException ex) {
-                //just ignore it
-            }
+            InputConsole.getInstance().askInt(
+                "Enter new zooming speed (1-10 recommended):", 
+                (perc)->map.setZoomSpeed(0.01 * perc)
+            );
         });
         m.add(chooseZoomSpeed);
         

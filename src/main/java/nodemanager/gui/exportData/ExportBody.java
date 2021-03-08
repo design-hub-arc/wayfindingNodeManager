@@ -38,19 +38,22 @@ public final class ExportBody extends Container {
         selectType = new JComboBox<>();
         selectType.addItemListener((ItemEvent e)->{
             if(selectType.getSelectedItem().equals(NEW_TYPE) && !updating){
-                String versionName = JOptionPane.showInputDialog("Enter the name of this new version:");
+                InputConsole.getInstance().askString(
+                    "Enter the name of this new version:", 
+                    (String versionName)->{
+                        updating = true;
                 
-                updating = true;
-                
-                if(selectType.getItemCount() > 1){
-                    selectType.setSelectedIndex(0);
-                }
-                selectType.insertItemAt(versionName, selectType.getItemCount() - 1);
-                selectType.setSelectedItem(versionName);
-                revalidate();
-                repaint();
-                
-                updating = false;
+                        if(selectType.getItemCount() > 1){
+                            selectType.setSelectedIndex(0);
+                        }
+                        selectType.insertItemAt(versionName, selectType.getItemCount() - 1);
+                        selectType.setSelectedItem(versionName);
+                        revalidate();
+                        repaint();
+                        
+                        updating = false;
+                    }
+                );
             }
         });
         

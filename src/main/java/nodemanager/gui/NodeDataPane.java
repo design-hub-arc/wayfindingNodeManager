@@ -6,6 +6,7 @@ import java.awt.event.*;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
+import nodemanager.io.InputConsole;
 import nodemanager.node.Node;
 
 /**
@@ -45,11 +46,13 @@ public class NodeDataPane extends JComponent{
         );
         add(infoView, gbc);
         
+        InputConsole ip = InputConsole.getInstance();
+        
         addOption("Delete this node", () ->{
             if(selectedNode.id < 0){
                 //prevent user from deleting corner nodes
-                JOptionPane.showMessageDialog(null, "Cannot delete node with id of " + selectedNode.id);
-            } else if(JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this node? This will not alter the original spreadsheet.") == JOptionPane.YES_OPTION){
+                ip.warn("Cannot delete node with id of " + selectedNode.id);
+            } else {
                 Session.logAction(new NodeDeleteEvent(selectedNode, selectedNode.getIcon().getHost()));
                 selectedNode.getIcon().getHost().removeNode(selectedNode);
                 Node.removeNode(selectedNode.id);
@@ -59,7 +62,7 @@ public class NodeDataPane extends JComponent{
         
         addOption("Move this node", () -> {
             if(selectedNode.id < 0){
-                JOptionPane.showMessageDialog(null, "Cannot move node with id of " + selectedNode.id);
+                ip.warn("Cannot move node with id of " + selectedNode.id);
             } else {
                 Session.setMode(Mode.MOVE);
                 Session.logAction(new NodeMovedEvent(selectedNode, selectedNode.getIcon().getX(), selectedNode.getIcon().getY()));
@@ -73,25 +76,28 @@ public class NodeDataPane extends JComponent{
         });
         
         addOption("Add a connection", () -> {
-            JOptionPane.showMessageDialog(null, "Click on a node to connect it to node " + selectedNode.id);
             Session.setMode(Mode.ADD_CONNECTION);
         });
         
         addOption("Remove a connection", () -> {
-            JOptionPane.showMessageDialog(null, "Click on a node to disconnect it from node " + selectedNode.id);
             Session.setMode(Mode.REMOVE_CONNECTION);
         });
         
         addOption("Add a label", () -> {
-            String ip = JOptionPane.showInputDialog("Enter the label to add to this node: ");
-            if(selectedNode.addLabel(ip)){
-                Session.logAction(new LabelAddedEvent(selectedNode, ip));
-                selectNode(selectedNode); //reload node description
-            } else {
-                JOptionPane.showMessageDialog(null, "Label '" + ip + "' is already in use.");
-            }
+            ip.askString(
+                "Enter the label to add to this node: ", 
+                (String label)->{
+                    if(selectedNode.addLabel(label)){
+                        Session.logAction(new LabelAddedEvent(selectedNode, label));
+                        selectNode(selectedNode); //reload node description
+                    } else {
+                        ip.warn(String.format("Label '%s' is already in use.", label));
+                    }
+                }
+            );
         });
         
+        /*
         addOption("Add a URL", ()->{
             String url = JOptionPane.showInputDialog("Enter the URL to add: ");
             String title = JOptionPane.showInputDialog("What do you want to call this URL?");
@@ -107,13 +113,18 @@ public class NodeDataPane extends JComponent{
             }
             selectNode(selectedNode); //reload node description
         });
+        */
         
         addOption("Remove a label", () -> {
-            String ip = JOptionPane.showInputDialog("Enter the label to remove from this node: ");
-            if(selectedNode.removeLabel(ip)){
-                Session.logAction(new LabelRemovedEvent(selectedNode, ip));
-                selectNode(selectedNode); //reload node description
-            }
+            ip.askString(
+                "Enter the label to remove from this node: ",
+                (String label)->{
+                    if(selectedNode.removeLabel(label)){
+                        Session.logAction(new LabelRemovedEvent(selectedNode, label));
+                        selectNode(selectedNode); //reload node description
+                    }
+                }
+            );
         });
         
         setVisible(true);
@@ -158,7 +169,7 @@ public class NodeDataPane extends JComponent{
         nodeInfo.setText(n.getDesc());
         
         SwingUtilities.invokeLater(()->{
-            infoView.getVerticalScrollBar().setValue(0);//.getModel().setValue(0);
+            infoView.getVerticalScrollBar().setValue(0);
         });
         
         n.getIcon().setDrawLinks(true);
