@@ -9,6 +9,7 @@ import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.files.MapFile;
 import java.io.IOException;
+import nodemanager.io.InputConsole;
 
 
 /**
@@ -28,14 +29,18 @@ public class ExportMenu extends JMenu{
     
     private JMenuItem saveLocal(){
         return new FileSelector(
-                "Save to this computer",
-                FileSelector.DIR,
-                (File f)->{
-                    String name = JOptionPane.showInputDialog(this, "What do you want to call this save?");
-                    File newDir = new File(f.getAbsoluteFile() + File.separator + name);
-                    newDir.mkdir();
-                    saveCurrentDataset(name, newDir.getAbsolutePath());
-                }
+            "Save to this computer",
+            FileSelector.DIR,
+            (File f)->{
+                InputConsole.getInstance().askString(
+                    "What do you want to call this save?", 
+                    (String name)->{
+                        File newDir = new File(f.getAbsoluteFile() + File.separator + name);
+                        newDir.mkdir();
+                        saveCurrentDataset(name, newDir.getAbsolutePath());
+                    }
+                );                
+            }
         );
     }
     

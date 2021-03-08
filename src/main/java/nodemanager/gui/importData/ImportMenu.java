@@ -3,6 +3,7 @@ package nodemanager.gui.importData;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import nodemanager.*;
+import nodemanager.io.InputConsole;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
@@ -31,7 +32,7 @@ public class ImportMenu extends JMenu{
                 Class.forName("com.google.api.client.http.HttpTransport");
                 new DriveImportDialog((JFrame)SwingUtilities.getRoot(this));
             } catch (ClassNotFoundException ex) {
-                JOptionPane.showMessageDialog(this, "Looks like you forgot to include the lib folder! (See the guide for how to fix)");
+                InputConsole.getInstance().warn("Couldn't find the Google Drive API");
             }
             
         });
@@ -41,7 +42,6 @@ public class ImportMenu extends JMenu{
     private JMenuItem resizeMapMenu(){
         JMenuItem resize = new JMenuItem("Resize map image");
         resize.addActionListener((ActionEvent e) -> {
-            JOptionPane.showMessageDialog(null, "Click on a point on the new map to set the new upper-left corner");
             Session.setMode(Mode.RESCALE_UL);    
         });
         return resize;

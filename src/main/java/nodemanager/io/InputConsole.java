@@ -27,7 +27,7 @@ public class InputConsole {
     
     public final void askString(String message, Consumer<String> then){
         String response = JOptionPane.showInputDialog(message);
-        then.accept(message);
+        then.accept(response);
     }
     
     // need to change to non-blocking once I implement into GUI

@@ -1,5 +1,6 @@
 package nodemanager;
 
+import nodemanager.modes.ModeRescaleUpperLeft;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -139,11 +140,17 @@ public class Session {
             case ADD:
                 newMode = new ModeNewNode();
                 break;
+            case MOVE:
+                //...
+                break;
             case ADD_CONNECTION:
                 newMode = new ModeAddConnection(selectedNode.id);
                 break;
             case REMOVE_CONNECTION:
                 newMode = new ModeRemoveConnection(selectedNode.id);
+                break;
+            case RESCALE_UL:
+                newMode = new ModeRescaleUpperLeft();
                 break;
             case RESCALE_LR:
                 newMode = new ModeRescaleLowerRight();

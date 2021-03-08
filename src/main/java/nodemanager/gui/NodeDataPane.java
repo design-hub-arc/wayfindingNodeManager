@@ -86,36 +86,16 @@ public class NodeDataPane extends JComponent{
         addOption("Add a label", () -> {
             ip.askString(
                 "Enter the label to add to this node: ", 
-                (String label)->{
-                    if(selectedNode.addLabel(label)){
-                        Session.logAction(new LabelAddedEvent(selectedNode, label));
-                        selectNode(selectedNode); //reload node description
-                    } else {
-                        ip.warn(String.format("Label '%s' is already in use.", label));
-                    }
-                }
+                this::tryAddLabel
             );
         });
         
-        /*
         addOption("Add a URL", ()->{
-            String url = JOptionPane.showInputDialog("Enter the URL to add: ");
-            String title = JOptionPane.showInputDialog("What do you want to call this URL?");
-            if(selectedNode.addLabel(url)){
-                Session.logAction(new LabelAddedEvent(selectedNode, url));
-                if(selectedNode.addLabel(title)){
-                    Session.logAction(new LabelAddedEvent(selectedNode, title));
-                } else {
-                    JOptionPane.showMessageDialog(null, "Label '" + title + "' is already in use.");
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Label '" + url + "' is already in use.");
-            }
-            selectNode(selectedNode); //reload node description
+            ip.askString("Enter the URL to add: ", this::tryAddLabel);
+            ip.askString("What do you want to call this URL?", this::tryAddLabel);
         });
-        */
         
-        addOption("Remove a label", () -> {
+        addOption("Remove a label", ()->{
             ip.askString(
                 "Enter the label to remove from this node: ",
                 (String label)->{
@@ -128,6 +108,15 @@ public class NodeDataPane extends JComponent{
         });
         
         setVisible(true);
+    }
+    
+    private void tryAddLabel(String label){
+        if(selectedNode.addLabel(label)){
+            Session.logAction(new LabelAddedEvent(selectedNode, label));
+            selectNode(selectedNode); //reload node description
+        } else {
+            InputConsole.getInstance().warn(String.format("Label '%s' is already in use.", label));
+        }
     }
     
     /**
