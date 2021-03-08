@@ -3,7 +3,7 @@ package nodemanager.gui.importData;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import nodemanager.*;
-import nodemanager.io.InputConsole;
+import nodemanager.gui.InputConsole;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.

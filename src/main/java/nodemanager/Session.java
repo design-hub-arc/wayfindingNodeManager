@@ -11,6 +11,7 @@ import nodemanager.node.Node;
 import nodemanager.gui.*;
 import nodemanager.modes.AbstractMode;
 import nodemanager.modes.ModeAddConnection;
+import nodemanager.modes.ModeMove;
 import nodemanager.modes.ModeNewNode;
 import nodemanager.modes.ModeNone;
 import nodemanager.modes.ModeRemoveConnection;
@@ -54,12 +55,9 @@ public class Session {
      * A text component used to display the program's controls
      */
     public static final JTextArea CONTROL_LIST = new JTextArea("Controls:\n");
-    public static final JTextArea MODE_LABEL = new JTextArea(String.format("Current mode: \n* %s\n(%s)", mode.toString(), newMode.getMessage()));
     
     static{
         CONTROL_LIST.setEditable(false);
-        MODE_LABEL.setEditable(false);
-        MODE_LABEL.revalidate();
     }
     
     public static void selectNode(Node n){
@@ -141,7 +139,7 @@ public class Session {
                 newMode = new ModeNewNode();
                 break;
             case MOVE:
-                //...
+                newMode = new ModeMove();
                 break;
             case ADD_CONNECTION:
                 newMode = new ModeAddConnection(selectedNode.id);
@@ -159,8 +157,7 @@ public class Session {
                 newMode = new ModeNone();
                 break;
         }
-        MODE_LABEL.setText(String.format("Current mode: \n* %s\n(%s)", m.toString(), newMode.getMessage()));
-        MODE_LABEL.repaint();
+        InputConsole.getInstance().writeMessage(String.format("Current mode: \n* %s\n(%s)", m.toString(), newMode.getMessage()));
     }
     
     public static Mode getMode(){

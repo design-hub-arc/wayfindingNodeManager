@@ -9,7 +9,7 @@ import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.files.MapFile;
 import java.io.IOException;
-import nodemanager.io.InputConsole;
+import nodemanager.gui.InputConsole;
 
 
 /**

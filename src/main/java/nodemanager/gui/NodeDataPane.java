@@ -6,7 +6,6 @@ import java.awt.event.*;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
-import nodemanager.io.InputConsole;
 import nodemanager.node.Node;
 
 /**

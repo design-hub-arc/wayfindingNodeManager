@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import nodemanager.io.InputConsole;
 import nodemanager.modes.ModeNewNode;
 import nodemanager.node.*;
 
@@ -44,8 +43,7 @@ public class EditCanvas extends ApplicationPage {
         content.setContinuousLayout(true);
         add(content, BorderLayout.CENTER);
         
-        body = new JComponent() {
-        };
+        body = new JPanel();
         body.setLayout(new FlowLayout());
         content.setRightComponent(body);
         
@@ -56,7 +54,9 @@ public class EditCanvas extends ApplicationPage {
         sideBar.add(selectedNode);
         Session.dataPane = selectedNode;
         sideBar.add(Session.CONTROL_LIST);
-        sideBar.add(Session.MODE_LABEL);
+        
+        
+        sideBar.add(InputConsole.getInstance());
 
         body.setLayout(new GridLayout(1, 1));
         map = new MapImage();
