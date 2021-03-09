@@ -38,9 +38,6 @@ public class MapImage extends JLabel{
     private double zoom;
 
     private NodeIcon hoveringOver;
-
-    private int panSpeed; //how fast the map pans
-    private double zoomSpeed; //how fast the map zooms
     
     /**
     The way this component handles mouse events:
@@ -76,9 +73,6 @@ public class MapImage extends JLabel{
 
         hoveringOver = null;
 
-        panSpeed = 5;
-        zoomSpeed = 0.01;
-
         setBackground(Color.BLACK);
         
         mouseMoveActions = new HashMap<>();
@@ -91,6 +85,7 @@ public class MapImage extends JLabel{
         MapPanner panner = new MapPanner(this);
         addMouseListener(panner);
         addMouseMotionListener(panner);
+        addMouseWheelListener(new MapZoomer(this));
         
         Session.map = this;
     }
@@ -217,8 +212,8 @@ public class MapImage extends JLabel{
             }
         });
 
-        Session.registerControl(KeyEvent.VK_Q, () -> zoom(-zoomSpeed), "zoom in");
-        Session.registerControl(KeyEvent.VK_E, () -> zoom(zoomSpeed), "zoom out");
+        //Session.registerControl(KeyEvent.VK_Q, () -> zoom(-zoomSpeed), "zoom in");
+        //Session.registerControl(KeyEvent.VK_E, () -> zoom(zoomSpeed), "zoom out");
     }
 
     /**
@@ -298,34 +293,13 @@ public class MapImage extends JLabel{
     }
 
     /**
-     * Sets how fast the map will pan
-     *
-     * @param speed the amount, in pixels, the map moves when the user presses a
-     * directional key
-     */
-    public void setPanSpeed(int speed) {
-        panSpeed = speed;
-    }
-
-    /**
      * changes the zoom level of the image
      *
      * @param perc the percentage to zoom in. Negative to zoom in.
      */
-    private void zoom(double perc) {
+    protected void zoom(double perc) {
         zoom -= perc;
         repaint();
-    }
-
-    /**
-     * changes how fast the map zooms in and out. 0.01 corresponds to a 1% zoom
-     * out
-     *
-     * @param speed the amount the map will zoom each time the user presses the
-     * zoom key
-     */
-    public void setZoomSpeed(double speed) {
-        zoomSpeed = speed;
     }
 
     /**

@@ -117,24 +117,6 @@ public class ApplicationMenuBar extends JMenuBar {
             );
         });
         m.add(chooseNodeSize);
-
-        JMenuItem choosePanSpeed = new JMenuItem("Change pan speed");
-        choosePanSpeed.addActionListener((ActionEvent e) -> {
-            InputConsole.getInstance().askInt(
-                "Enter new panning speed (5-10 recommended):", 
-                Session.map::setPanSpeed
-            );
-        });
-        m.add(choosePanSpeed);
-
-        JMenuItem chooseZoomSpeed = new JMenuItem("Change zoom speed");
-        chooseZoomSpeed.addActionListener((ActionEvent e) -> {
-            InputConsole.getInstance().askInt(
-                "Enter new zooming speed (1-10 recommended):", 
-                (perc)->Session.map.setZoomSpeed(0.01 * perc)
-            );
-        });
-        m.add(chooseZoomSpeed);
         
         JMenuItem showAllConn = new JMenuItem("Draw all connections");
         showAllConn.addActionListener((e) -> {
