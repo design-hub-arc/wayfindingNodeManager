@@ -7,10 +7,6 @@ The Google Drive API credentials used by this program have been invalidated, so 
 
 The application will not allow you to download or upload data if you log in using a Google account without access to the Wayfinding folder on the ARCDH Google Drive.
 
-## Google Slides presentation
-
-A detailed guide to the project can be found [here](https://docs.google.com/presentation/d/1xR_FmCgcqRirlRckI1GQ5tRe3W5-rQg5GFW9UXm-Nbk/edit?usp=sharing).
-
 ## Prerequisites
 
 Users wishing to run the application need just Java installed for the app to work.
@@ -22,8 +18,8 @@ which you can download [here](https://netbeans.org/downloads/8.2/).
 ## Using the application
 
 To use the Node Manager, simply download and unzip the project to your computer. 
-The application is located in the dist folder of the project.
-Double click on the NodeManager.jar file to launch the application.
+The application is located in the build/libs folder of the project.
+Double click on the WayfindingNodeManager.jar file to launch the application.
 You can safely move the JAR file from this folder.
 
 ## Editting the application

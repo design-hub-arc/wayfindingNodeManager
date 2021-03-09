@@ -35,7 +35,6 @@ public class EditCanvas extends ApplicationPage {
         setLayout(new BorderLayout());
         
         menu = new JMenuBar();        
-        add(menu, BorderLayout.PAGE_START);
         menu.setLayout(new FlowLayout());
 
         JSplitPane content = new JSplitPane();
@@ -109,6 +108,10 @@ public class EditCanvas extends ApplicationPage {
         resetData();
         revalidate();
         repaint();
+    }
+    
+    public final JMenuBar getMenu(){
+        return menu;
     }
     
     private void resetData(){

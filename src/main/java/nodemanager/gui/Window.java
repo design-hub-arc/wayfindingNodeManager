@@ -15,7 +15,7 @@ public class Window extends JFrame{
         super();
         setTitle("Wayfinding Node Manager");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+               
         JFrame self = this;
         addWindowListener(new WindowAdapter(){
             @Override
@@ -39,7 +39,9 @@ public class Window extends JFrame{
             }
         });
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setContentPane(new ApplicationBody());
+        ApplicationBody body = new ApplicationBody();
+        setContentPane(body);
+        setJMenuBar(body.deleteThisMethodLater().getMenu());
         pack();
         setVisible(true);
     }
