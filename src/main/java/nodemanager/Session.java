@@ -2,11 +2,7 @@ package nodemanager;
 
 import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.modes.ModeRescaleUpperLeft;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import javax.swing.*;
 import nodemanager.events.EditEvent;
 import nodemanager.node.Node;
 import nodemanager.gui.*;
@@ -40,8 +36,6 @@ public class Session {
     public static int newMapWidth = 0;
     public static int newMapHeight = 0;
     public static boolean isSaved = true;
-    
-    public static JPanel currentPanel = null;
     public static MapImage map = null;
     
     //used to undo actions

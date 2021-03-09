@@ -25,8 +25,6 @@ public class EditCanvas extends ApplicationPage {
      */
     public EditCanvas(ApplicationBody parent) {
         super(parent);
-
-        Session.currentPanel = this;
         
         setLayout(new BorderLayout());
 

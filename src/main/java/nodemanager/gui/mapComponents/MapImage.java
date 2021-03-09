@@ -22,7 +22,7 @@ import nodemanager.gui.Scale;
  * set of coordinates
  *
  */
-public class MapImage extends JLabel{
+public class MapImage extends JLabel implements MouseListener, MouseMotionListener {
     private BufferedImage buff;
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons; // the node icons this is displaying
@@ -36,24 +36,6 @@ public class MapImage extends JLabel{
     private double zoom;
 
     private NodeIcon hoveringOver;
-    
-    /**
-    The way this component handles mouse events:
-     *
-     * Whenever the user moves the mouse, a MouseAdapter calls its mouseMoved
-     * method, checking what Session.mode is, then calling the EasyMouseListener
-     * stored in mouseMoveActions.get(Session.mode).
-     *
-     * Functions similarly for mouse clicking.
-     *
-     * To add your own mouse reactions, use
-     * <br>      
-     * {@code
-     * mouseMoveActions.put(Mode, (me) -> { STUFF }); }
-     * <br>
-     */
-    private final HashMap<Mode, EasyMouseListener> mouseMoveActions; //responses to mouse movement
-    private final HashMap<Mode, EasyMouseListener> mouseClickActions; //responses to mouse click
 
     /**
      * Initially, does not have any image or scale.
@@ -73,13 +55,12 @@ public class MapImage extends JLabel{
 
         setBackground(Color.BLACK);
         
-        mouseMoveActions = new HashMap<>();
-        mouseClickActions = new HashMap<>();
-        
         setFocusable(true);
         
         registerControls();
         
+        addMouseListener(this);
+        addMouseMotionListener(this);
         MapPanner panner = new MapPanner(this);
         addMouseListener(panner);
         addMouseMotionListener(panner);
@@ -94,113 +75,6 @@ public class MapImage extends JLabel{
      * and registers all the mouse listeners
      */
     private void registerControls() {
-        mouseMoveActions.put(Mode.MOVE, (me) -> {
-            Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));     
-        });
-        mouseMoveActions.put(Mode.RESCALE_UL, (me) -> {
-            double shiftX = translateClickX(me.getX());
-            double shiftY = translateClickY(me.getY());
-            scaler.setOrigin((int)shiftX, (int)shiftY);
-            resizeNodeIcons();
-        });
-        mouseMoveActions.put(Mode.RESCALE_LR, (me) -> {
-            scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
-            resizeNodeIcons();
-        });
-        
-        mouseClickActions.put(Mode.ADD, (me) -> {
-            // adds a Node where the user clicks,
-            // unless they click on an existing node
-            NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
-            if(hoveringOver == null){
-                Node n = new Node();
-                Node.updateNode(
-                    n.id, 
-                    (int) scaler.inverseX(translateClickX(me.getX())),
-                    (int) scaler.inverseY(translateClickY(me.getY()))
-                );
-                addNode(n);
-                Session.logAction(new NodeCreateEvent(n, this));
-                repaint();
-            } else {
-                Session.setMode(Mode.NONE);
-            }            
-        });
-        
-        mouseClickActions.put(Mode.MOVE, (me) -> {
-            Session.selectedNode.getIcon().respositionNode();
-            Session.setMode(Mode.NONE);
-        });
-        
-        mouseClickActions.put(Mode.RESCALE_UL, (me) -> {
-            // sets the upper-left corner of the new map image clip
-            Session.setMode(Mode.RESCALE_LR);
-            Session.newMapX = Node.get(-1).getIcon().getX();
-            Session.newMapY = Node.get(-1).getIcon().getY();
-        });
-        
-        mouseClickActions.put(Mode.RESCALE_LR, (me) -> {
-            // sets the lower-right corner of the new map image clip
-            Session.setMode(Mode.NONE);
-            Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
-            Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
-
-            int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
-
-            if (clip[0] < 0) {
-                clip[0] = 0;
-            }
-            if (clip[1] < 0) {
-                clip[1] = 0;
-            }
-            if (clip[2] > buff.getWidth() - clip[0]) {
-                clip[2] = buff.getWidth() - clip[0];
-            }
-            if (clip[3] > buff.getHeight() - clip[1]) {
-                clip[3] = buff.getHeight() - clip[1];
-            }
-            
-            Session.newMapX = 0;
-            Session.newMapY = 0;
-            scaler.setOrigin(0, 0);
-            
-            Session.logAction(new MapResizeEvent(this, buff, buff.getSubimage(clip[0], clip[1], clip[2], clip[3])));
-            
-            setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
-        });
-        
-        MouseAdapter ma = new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent me) {
-                NodeIcon oldOver = hoveringOver;
-                hoveringOver = hoveredNodeIcon(me.getX(), me.getY());
-
-                if (oldOver != hoveringOver) {
-                    if (hoveringOver != null) {
-                        hoveringOver.mouseEntered(me);
-                    }
-                    if (oldOver != null) {
-                        oldOver.mouseExited(me);
-                    }
-                }
-
-                mouseMoveActions.getOrDefault(Session.getMode(), (me2) -> {}).mouseAction(me);
-                
-                repaint();
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent me){
-                if (hoveringOver != null) {
-                    hoveringOver.mouseClicked(me);
-                }
-                mouseClickActions.getOrDefault(Session.getMode(), (me2) -> {}).mouseAction(me);
-            }
-        };
-        
-        addMouseListener(ma);
-        addMouseMotionListener(ma);
-
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent ce) {
@@ -388,8 +262,126 @@ public class MapImage extends JLabel{
         }
         nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
     }
+
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        
+        if (hoveringOver != null) {
+            hoveringOver.mouseClicked(me);
+        }
+        
+        switch(Session.getMode()){
+            case ADD: {
+                // adds a Node where the user clicks,
+                // unless they click on an existing node
+                NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
+                if (hoveringOver == null) {
+                    Node n = new Node();
+                    Node.updateNode(
+                        n.id,
+                        (int) scaler.inverseX(translateClickX(me.getX())),
+                        (int) scaler.inverseY(translateClickY(me.getY()))
+                    );
+                    addNode(n);
+                    Session.logAction(new NodeCreateEvent(n, this));
+                    repaint();
+                } else {
+                    Session.setMode(Mode.NONE);
+                }
+                break;
+            }
+            case MOVE: {
+                Session.selectedNode.getIcon().respositionNode();
+                Session.setMode(Mode.NONE);
+                break;
+            }
+            case RESCALE_UL: {
+                // sets the upper-left corner of the new map image clip
+                Session.setMode(Mode.RESCALE_LR);
+                Session.newMapX = Node.get(-1).getIcon().getX();
+                Session.newMapY = Node.get(-1).getIcon().getY();
+                break;
+            }
+            case RESCALE_LR: {
+                // sets the lower-right corner of the new map image clip
+                Session.setMode(Mode.NONE);
+                Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
+                Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
+
+                int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
+
+                if (clip[0] < 0) {
+                    clip[0] = 0;
+                }
+                if (clip[1] < 0) {
+                    clip[1] = 0;
+                }
+                if (clip[2] > buff.getWidth() - clip[0]) {
+                    clip[2] = buff.getWidth() - clip[0];
+                }
+                if (clip[3] > buff.getHeight() - clip[1]) {
+                    clip[3] = buff.getHeight() - clip[1];
+                }
+
+                Session.newMapX = 0;
+                Session.newMapY = 0;
+                scaler.setOrigin(0, 0);
+
+                Session.logAction(new MapResizeEvent(this, buff, buff.getSubimage(clip[0], clip[1], clip[2], clip[3])));
+
+                setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
     
-    private interface EasyMouseListener{
-        public void mouseAction(MouseEvent e);
+    @Override
+    public void mouseDragged(MouseEvent e) {}
+
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        NodeIcon oldOver = hoveringOver;
+        hoveringOver = hoveredNodeIcon(me.getX(), me.getY());
+
+        if (oldOver != hoveringOver) {
+            if (hoveringOver != null) {
+                hoveringOver.mouseEntered(me);
+            }
+            if (oldOver != null) {
+                oldOver.mouseExited(me);
+            }
+        }
+
+        switch(Session.getMode()){
+            case MOVE: {
+                Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
+                repaint();
+                break;
+            }
+            case RESCALE_UL: {
+                double shiftX = translateClickX(me.getX());
+                double shiftY = translateClickY(me.getY());
+                scaler.setOrigin((int)shiftX, (int)shiftY);
+                resizeNodeIcons();
+                break;
+            }
+            case RESCALE_LR: {
+                scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
+                resizeNodeIcons();
+                break;
+            }
+        }
     }
 }
