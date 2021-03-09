@@ -1,23 +1,29 @@
 package nodemanager.gui;
 
 import java.awt.BorderLayout;
+import java.util.LinkedList;
 import java.util.function.Consumer;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 /**
- * This will eventually be a GUI component to replace JOptionPane
- * @author Matt
+ * A GUI component used to write messages to the user, and receive input from
+ * them.
+ * 
+ * @author Matt Crow
  */
 public class InputConsole extends JPanel {
     private final JTextArea text;
+    private final JTextField inputField;
     private final JScrollBar bar;
     private final StringBuilder msgs;
+    private final LinkedList<Consumer<String>> waitingCommands;
+    
     private static InputConsole instance;
     
     private InputConsole(){
@@ -34,6 +40,13 @@ public class InputConsole extends JPanel {
         bar = scroll.getVerticalScrollBar();
         add(scroll, BorderLayout.CENTER);
         
+        inputField = new JTextField();
+        add(inputField, BorderLayout.PAGE_END);
+        inputField.addActionListener((e)->{
+            readInput();
+        });
+        
+        waitingCommands = new LinkedList<>();
         writeMessage("=== Messages will appear here ===");
     }
     
@@ -53,22 +66,38 @@ public class InputConsole extends JPanel {
     }
     
     public final void warn(String message){
-        JOptionPane.showMessageDialog(this, message);
+        writeMessage(String.format("!Warning: %s", message));
+    }
+    
+    /**
+     * Run whenever the user enters something into the text field.
+     * If their are any waiting commands, dequeues the first one,
+     * and feeds it the user's input
+     */
+    private void readInput(){
+        if(waitingCommands.isEmpty()){
+            writeMessage("No commands waiting");
+        } else {
+            waitingCommands.poll().accept(inputField.getText());
+        }
+        writeMessage(String.format("<= %s", inputField.getText()));
+        inputField.setText("");
     }
     
     public final void askString(String message, Consumer<String> then){
-        String response = JOptionPane.showInputDialog(this, message);
-        then.accept(response);
+        writeMessage(message);
+        waitingCommands.addLast(then);
     }
     
-    // need to change to non-blocking once I implement into GUI
     public final void askInt(String message, Consumer<Integer> then){
-        String response = JOptionPane.showInputDialog(this, message);
-        try {
-            int asInt = Integer.parseInt(response);
-            then.accept(asInt);
-        } catch(NumberFormatException ex){
-            warn(String.format("I couldn't find a number in %s", response));
-        }
+        writeMessage(message);
+        waitingCommands.addLast((str)->{
+            try {
+                int asInt = Integer.parseInt(str);
+                then.accept(asInt);
+            } catch(NumberFormatException ex){
+                warn(String.format("I couldn't find a number in %s", str));
+            }
+        });
     }
 }
