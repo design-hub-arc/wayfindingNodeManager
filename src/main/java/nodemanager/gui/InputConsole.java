@@ -22,7 +22,7 @@ public class InputConsole extends JPanel {
     private final JTextField inputField;
     private final JScrollBar bar;
     private final StringBuilder msgs;
-    private final LinkedList<Consumer<String>> waitingCommands;
+    private final LinkedList<InputRequest> waitingCommands;
     
     private static InputConsole instance;
     
@@ -69,6 +69,13 @@ public class InputConsole extends JPanel {
         writeMessage(String.format("!Warning: %s", message));
     }
     
+    private void enqueueCommand(InputRequest req){
+        if(waitingCommands.isEmpty()){
+            writeMessage(req.getMessage());
+        }
+        waitingCommands.addLast(req);
+    }
+    
     /**
      * Run whenever the user enters something into the text field.
      * If their are any waiting commands, dequeues the first one,
@@ -79,25 +86,26 @@ public class InputConsole extends JPanel {
             writeMessage("No commands waiting");
         } else {
             waitingCommands.poll().accept(inputField.getText());
+            if(!waitingCommands.isEmpty()){
+                writeMessage(waitingCommands.peek().getMessage());
+            }
         }
         writeMessage(String.format("<= %s", inputField.getText()));
         inputField.setText("");
     }
     
     public final void askString(String message, Consumer<String> then){
-        writeMessage(message);
-        waitingCommands.addLast(then);
+        enqueueCommand(new InputRequest(message, then));
     }
     
     public final void askInt(String message, Consumer<Integer> then){
-        writeMessage(message);
-        waitingCommands.addLast((str)->{
+        enqueueCommand(new InputRequest(message, (str)->{
             try {
                 int asInt = Integer.parseInt(str);
                 then.accept(asInt);
             } catch(NumberFormatException ex){
                 warn(String.format("I couldn't find a number in %s", str));
             }
-        });
+        }));
     }
 }
