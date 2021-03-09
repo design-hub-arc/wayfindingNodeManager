@@ -82,6 +82,8 @@ public class MapImage extends JLabel{
         mouseMoveActions = new HashMap<>();
         mouseClickActions = new HashMap<>();
         
+        setFocusable(true);
+        
         registerControls();
         
         Session.map = this;

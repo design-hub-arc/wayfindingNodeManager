@@ -39,9 +39,8 @@ public class Window extends JFrame{
             }
         });
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        ApplicationBody body = new ApplicationBody();
-        setContentPane(body);
-        setJMenuBar(body.deleteThisMethodLater().getMenu());
+        setContentPane(new ApplicationBody());
+        setJMenuBar(new ApplicationMenuBar());
         pack();
         setVisible(true);
     }

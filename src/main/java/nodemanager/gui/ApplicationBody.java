@@ -45,8 +45,4 @@ public class ApplicationBody extends JPanel{
             throw new IllegalArgumentException();
         }
     }
-    
-    public final EditCanvas deleteThisMethodLater(){
-        return (EditCanvas)pages.get(EDIT);
-    }
 }
