@@ -44,91 +44,15 @@ public class Session {
     public static JPanel currentPanel = null;
     public static MapImage map = null;
     
-    
     //used to undo actions
-    //add redo button?
     private static final ArrayList<EditEvent> ACTIONS = new ArrayList<>();
     private static int actionIdx = -1; //the most recent action index
-
-    /**
-     * A text component used to display the program's controls
-     */
-    public static final JTextArea CONTROL_LIST = new JTextArea("Controls:\n");
-    
-    static{
-        CONTROL_LIST.setEditable(false);
-    }
     
     public static void selectNode(Node n){
         selectedNode = n;
         if(dataPane != null){
             dataPane.selectNode(n);
         }
-    }
-    
-    /**
-     * Adds a key control to the program.
-     * 
-     * For the run parameter, you can simply do
-     * <br>
-     * {@code
-     * () -> {
-     *     code to run when key is pressed
-     * }
-     * }
-     * <br>
-     * or
-     * <br>
-     * {@code
-     * () -> code to run when key is pressed
-     * }
-     * <br>
-     * it's that easy.
-     * 
-     * @param keyCode the keycode of the key to trigger the action. Use KeyEvent.VK_X to get the keycode
-     * @param run the runnable to run whenever the given key is pressed
-     * @param desc the description that will be displayed next to the key in the control list
-     */
-    public static void registerControl(int keyCode, Runnable run, String desc){
-        registerControl(KeyStroke.getKeyStroke(keyCode, 0), run, desc);
-    }
-    
-    /**
-     * Adds a key control to the program.
-     * 
-     * For the run parameter, you can simply do
-     * <br>
-     * {@code
-     * () -> {
-     *     code to run when key is pressed
-     * }
-     * }
-     * <br>
-     * or
-     * <br>
-     * {@code
-     * () -> code to run when key is pressed
-     * }
-     * <br>
-     * it's that easy.
-     * 
-     * @param ks the keystroke of the key to trigger the action. Use KeyStroke.getKeyStroke
-     * @param run the runnable to run whenever the given key is pressed
-     * @param desc the description that will be displayed next to the key in the control list
-     */
-    public static void registerControl(KeyStroke ks, Runnable run, String desc){
-        if(currentPanel == null){
-            throw new NullPointerException("Must set currentWindow before registering controls!");
-        }
-        currentPanel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(ks, ks.toString());
-        currentPanel.getActionMap().put(ks.toString(), new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                run.run();
-            }
-        });
-        
-        CONTROL_LIST.append(ks.toString() + ": " + desc + "\n");
     }
     
     public static void setMode(Mode m){

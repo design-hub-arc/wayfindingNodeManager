@@ -22,6 +22,9 @@ The application is located in the build/libs folder of the project.
 Double click on the WayfindingNodeManager.jar file to launch the application.
 You can safely move the JAR file from this folder.
 
+You can pan the map image by clicking and dragging it around.
+You can also zoom in and out using the mouse scroll wheel.
+
 ## Editting the application
 
 As stated above, this application was built using Netbeans 8.2 IDE, and can easily be opened in that version.

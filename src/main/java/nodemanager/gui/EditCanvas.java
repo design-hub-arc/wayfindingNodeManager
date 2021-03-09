@@ -44,7 +44,6 @@ public class EditCanvas extends ApplicationPage {
         selectedNode = new NodeDataPane();
         sideBar.add(selectedNode);
         Session.dataPane = selectedNode;
-        sideBar.add(Session.CONTROL_LIST);
         
         body.setLayout(new GridLayout(1, 1));
         map = new MapImage();

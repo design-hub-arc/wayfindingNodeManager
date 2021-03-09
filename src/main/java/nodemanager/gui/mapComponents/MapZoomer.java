@@ -24,7 +24,7 @@ public class MapZoomer implements MouseWheelListener {
     
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        double dTheta = -e.getPreciseWheelRotation() * ZOOM_SPEED;
+        double dTheta = e.getPreciseWheelRotation() * ZOOM_SPEED;
         map.zoom(dTheta);
     }
 

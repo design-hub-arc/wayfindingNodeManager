@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.*;
-import static java.lang.System.out;
 import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
@@ -24,7 +23,6 @@ import nodemanager.gui.Scale;
  *
  */
 public class MapImage extends JLabel{
-
     private BufferedImage buff;
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons; // the node icons this is displaying
@@ -171,8 +169,6 @@ public class MapImage extends JLabel{
             setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
         });
         
-        
-        
         MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent me) {
@@ -211,9 +207,6 @@ public class MapImage extends JLabel{
                 resize();
             }
         });
-
-        //Session.registerControl(KeyEvent.VK_Q, () -> zoom(-zoomSpeed), "zoom in");
-        //Session.registerControl(KeyEvent.VK_E, () -> zoom(zoomSpeed), "zoom out");
     }
 
     /**
