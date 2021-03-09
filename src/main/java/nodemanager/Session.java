@@ -1,5 +1,6 @@
 package nodemanager;
 
+import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.modes.ModeRescaleUpperLeft;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,8 +29,6 @@ import nodemanager.modes.ModeRescaleLowerRight;
 * 
 * While having global variables is generally not a good idea,
 * it is significantly better than passing a Session object to every object the program creates
-* 
-* Maybe make this extend JFrame?
 */
 public class Session {
     private static Mode mode = Mode.NONE;
@@ -160,7 +159,7 @@ public class Session {
         InputConsole.getInstance().writeMessage(String.format("Current mode: \n* %s\n(%s)", m.toString(), newMode.getMessage()));
     }
     
-    public static Mode getMode(){
+    public final static Mode getMode(){
         return mode;
     }
     

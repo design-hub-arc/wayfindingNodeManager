@@ -1,4 +1,4 @@
-package nodemanager.gui;
+package nodemanager.gui.mapComponents;
 
 import java.awt.*;
 import javax.swing.*;
@@ -9,6 +9,8 @@ import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.*;
+import nodemanager.gui.NodeIcon;
+import nodemanager.gui.Scale;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -86,6 +88,10 @@ public class MapImage extends JLabel{
         
         registerControls();
         
+        MapPanner panner = new MapPanner(this);
+        addMouseListener(panner);
+        addMouseMotionListener(panner);
+        
         Session.map = this;
     }
 
@@ -160,11 +166,6 @@ public class MapImage extends JLabel{
             if (clip[3] > buff.getHeight() - clip[1]) {
                 clip[3] = buff.getHeight() - clip[1];
             }
-
-            out.println();
-            for (int i : clip) {
-                out.print(i + " ");
-            }
             
             Session.newMapX = 0;
             Session.newMapY = 0;
@@ -216,13 +217,6 @@ public class MapImage extends JLabel{
             }
         });
 
-        /*
-        For some reason, VK_UP & co don't work
-         */
-        Session.registerControl(KeyEvent.VK_W, () -> pan(0, -panSpeed), "pan the map up");
-        Session.registerControl(KeyEvent.VK_S, () -> pan(0, panSpeed), "pan the map down");
-        Session.registerControl(KeyEvent.VK_A, () -> pan(-panSpeed, 0), "pan the map left");
-        Session.registerControl(KeyEvent.VK_D, () -> pan(panSpeed, 0), "pan the map right");
         Session.registerControl(KeyEvent.VK_Q, () -> zoom(-zoomSpeed), "zoom in");
         Session.registerControl(KeyEvent.VK_E, () -> zoom(zoomSpeed), "zoom out");
     }
@@ -297,7 +291,7 @@ public class MapImage extends JLabel{
      * @param x the amount the clip is moved to the right
      * @param y the amount the clip is moved down
      */
-    private void pan(int x, int y) {
+    protected void pan(int x, int y) {
         clipX += x;
         clipY += y;
         repaint();

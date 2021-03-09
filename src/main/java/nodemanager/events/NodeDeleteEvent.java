@@ -1,6 +1,6 @@
 package nodemanager.events;
 
-import nodemanager.gui.MapImage;
+import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.node.Node;
 
 /**

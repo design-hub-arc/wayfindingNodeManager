@@ -1,5 +1,6 @@
 package nodemanager.gui;
 
+import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.*;
 import javax.swing.*;
 import java.awt.*;

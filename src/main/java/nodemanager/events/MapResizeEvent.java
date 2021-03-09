@@ -2,7 +2,7 @@ package nodemanager.events;
 
 import java.awt.image.BufferedImage;
 import nodemanager.Session;
-import nodemanager.gui.MapImage;
+import nodemanager.gui.mapComponents.MapImage;
 
 /**
  *
