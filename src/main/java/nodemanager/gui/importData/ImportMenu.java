@@ -40,7 +40,7 @@ public class ImportMenu extends JMenu{
         ret.addActionListener((e)->{
             try{
                 Class.forName("com.google.api.client.http.HttpTransport");
-                new DriveImportDialog((JFrame)SwingUtilities.getRoot(this));
+                parent.getNodeManagerWindow().getBody().switchToPage(ApplicationBody.REMOTE_IMPORT);
             } catch (ClassNotFoundException ex) {
                 InputConsole.getInstance().warn("Couldn't find the Google Drive API");
             }

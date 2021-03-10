@@ -5,7 +5,6 @@
  */
 package nodemanager.gui.importData;
 
-import java.awt.Container;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -15,7 +14,9 @@ import nodemanager.files.WayfindingManifest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import nodemanager.gui.ApplicationBody;
 import nodemanager.io.GoogleDriveUploader;
+import nodemanager.gui.ApplicationPage;
 
 /**
  * Acts as the body of the import dialog whenever the user clicks the import from drive button.
@@ -24,7 +25,7 @@ import nodemanager.io.GoogleDriveUploader;
  TODO: combine this and ExportBody
  * @author Matt Crow
  */
-public class DriveImportBody extends Container{
+public class DriveImportPage extends ApplicationPage {
     private final JComboBox<String> wayfindingTypeSelector;
     private final JComboBox<String> exportSelector;
     private final ArrayList<FileTypeCheckBox> cbs;
@@ -36,8 +37,8 @@ public class DriveImportBody extends Container{
     private final JButton importButton;
     private final JTextArea msg;
     
-    public DriveImportBody(){
-        super();
+    public DriveImportPage(ApplicationBody parent){
+        super(parent);
         setLayout(new GridLayout(8, 1));
         
         nameToUrl = new HashMap<>();
@@ -156,5 +157,6 @@ public class DriveImportBody extends Container{
                 ex.printStackTrace();
             }
         });
+        this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
     }
 }
