@@ -1,7 +1,7 @@
 package nodemanager.node;
 
 import java.util.*;
-import nodemanager.gui.NodeIcon;
+import nodemanager.gui.mapComponents.NodeIcon;
 import static java.lang.System.out;
 
 

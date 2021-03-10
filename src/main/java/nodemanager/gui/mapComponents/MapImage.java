@@ -8,7 +8,6 @@ import java.util.*;
 import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.*;
-import nodemanager.gui.NodeIcon;
 import nodemanager.gui.Scale;
 
 /**
@@ -260,7 +259,9 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         } else {
             g2d.drawImage(buff, 0, 0, this);
         }
-        nodeIcons.values().stream().forEach(icon -> icon.draw(g2d));
+        // draw icons above the connections
+        nodeIcons.values().stream().forEach((icon) -> icon.drawAllLinks(g2d));
+        nodeIcons.values().stream().forEach((icon) -> icon.draw(g2d));
     }
 
     @Override

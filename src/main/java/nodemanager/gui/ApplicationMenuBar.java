@@ -1,5 +1,6 @@
 package nodemanager.gui;
 
+import nodemanager.gui.mapComponents.NodeIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -135,12 +136,14 @@ public class ApplicationMenuBar extends JMenuBar {
         JMenuItem showAllConn = new JMenuItem("Draw all connections");
         showAllConn.addActionListener((e) -> {
             Node.getAll().forEach(node -> node.getIcon().setDrawLinks(true));
+            parent.getBody().repaint();
         });
         m.add(showAllConn);
         
         JMenuItem hideAllConn = new JMenuItem("Hide all connections");
         hideAllConn.addActionListener((e) -> {
             Node.getAll().forEach(node -> node.getIcon().setDrawLinks(false));
+            parent.getBody().repaint();
         });
         m.add(hideAllConn);
 

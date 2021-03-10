@@ -1,11 +1,10 @@
-package nodemanager.gui;
+package nodemanager.gui.mapComponents;
 
-import nodemanager.gui.mapComponents.MapImage;
 import java.awt.*;
 import java.awt.event.*;
-import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
+import nodemanager.gui.Scale;
 import nodemanager.node.Node;
 
 /**
@@ -190,10 +189,7 @@ public class NodeIcon{
      * @return whether or not this was clicked on
      */
     public boolean isIn(int xc, int yc){
-        return x <= xc && 
-               x + size >= xc &&
-               y <= yc &&
-               y + size >= yc;
+        return Math.sqrt(Math.pow(x - xc, 2) + Math.pow(y - yc, 2)) <= size / 2;
     }
     
     /**
@@ -240,14 +236,10 @@ public class NodeIcon{
      */
     public void draw(Graphics g){
         g.setColor(color);
-        g.fillRect(x, y, size, size);
+        g.fillOval(x - size / 2, y - size / 2, size, size);
         
         g.setColor(Color.black);
         g.drawString(Integer.toString(id), x, y);
-        
-        if(drawLinks){
-            drawAllLinks(g);
-        }
     }
     
     
@@ -255,11 +247,13 @@ public class NodeIcon{
      * Graphically display all the connections between this icon's Nodes and its adjacent Nodes
      * @param g the Graphics context to draw on
      */
-    private void drawAllLinks(Graphics g){
-        node.getAdjIds()
+    public void drawAllLinks(Graphics g){
+        if(drawLinks){
+            node.getAdjIds()
                 .stream()
                 .map(id -> Node.get(id))
                 .forEach(node -> drawLink(g, node));
+        }
     }
     
     
