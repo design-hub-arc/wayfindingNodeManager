@@ -34,6 +34,7 @@ public class NodeDataPane extends JComponent{
         hasNodeSelected = false;
         
         nodeInfo = new JTextArea(NONE_SELECTED_MSG);
+        nodeInfo.setColumns(NONE_SELECTED_MSG.length());
         nodeInfo.setRows(5);
         nodeInfo.setBackground(Color.white);
         nodeInfo.setEditable(false);

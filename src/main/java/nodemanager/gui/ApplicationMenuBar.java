@@ -22,7 +22,6 @@ public class ApplicationMenuBar extends JMenuBar {
     
     public ApplicationMenuBar(NodeManagerWindow parent){
         super();
-        
         this.parent = parent;
         add(createHomeButton());
         add(new ImportMenu(this));

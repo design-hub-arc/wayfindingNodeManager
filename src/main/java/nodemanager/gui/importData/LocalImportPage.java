@@ -28,6 +28,7 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
     public LocalImportPage(ApplicationBody parent){
         super(parent);
         setLayout(new GridLayout(7, 1));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         fileCheckBoxes = new ArrayList<>();
         
