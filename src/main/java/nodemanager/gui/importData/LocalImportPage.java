@@ -1,7 +1,6 @@
 package nodemanager.gui.importData;
 
 import nodemanager.files.FileType;
-import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,22 +9,24 @@ import java.io.IOException;
 import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
-import nodemanager.io.*;
+import nodemanager.gui.ApplicationPage;
 
 /**
- * The LocalImportBody is used to 
- * import files on the user's computer 
- * into the program.
+ * The LocalImportPage is used to 
+ import files on the user's computer 
+ into the program.
  * 
  * @author Matt Crow
  */
-public class LocalImportBody extends Container implements ActionListener{
+public class LocalImportPage extends ApplicationPage implements ActionListener{
     private final JButton selectFolder;
     private final JTextField selectedFolder;
     private final ArrayList<FileCheckBox> fileCheckBoxes;
     
-    public LocalImportBody(){
+    public LocalImportPage(ApplicationBody parent){
+        super(parent);
         setLayout(new GridLayout(7, 1));
         
         fileCheckBoxes = new ArrayList<>();
@@ -66,6 +67,7 @@ public class LocalImportBody extends Container implements ActionListener{
                 //don't do lambda. Needs to do in order.
                 b.importIfSelected();
             }
+            this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
         });
         add(importAll);
     }

@@ -10,8 +10,10 @@ import nodemanager.Session;
  * Basic JFrame used to host the EditCanvas
  * @author Matt Crow (greengrappler12@gmail.com)
  */
-public class Window extends JFrame{
-    public Window(){
+public class NodeManagerWindow extends JFrame{
+    private final ApplicationBody body;
+    
+    public NodeManagerWindow(){
         super();
         setTitle("Wayfinding Node Manager");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -34,14 +36,18 @@ public class Window extends JFrame{
             }
 
             @Override
-            public void windowClosed(WindowEvent we) {
-                
-            }
+            public void windowClosed(WindowEvent we) {}
         });
+        body = new ApplicationBody();
+        
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setContentPane(new ApplicationBody());
-        setJMenuBar(new ApplicationMenuBar());
+        setContentPane(body);
+        setJMenuBar(new ApplicationMenuBar(this));
         pack();
         setVisible(true);
+    }
+    
+    public final ApplicationBody getBody(){
+        return body;
     }
 }

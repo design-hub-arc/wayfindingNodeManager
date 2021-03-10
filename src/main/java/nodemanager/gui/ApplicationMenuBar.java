@@ -18,10 +18,14 @@ import nodemanager.node.Node;
  * @author Matt
  */
 public class ApplicationMenuBar extends JMenuBar {
-    public ApplicationMenuBar(){
+    private final NodeManagerWindow parent;
+    
+    public ApplicationMenuBar(NodeManagerWindow parent){
         super();
         
-        add(new ImportMenu());
+        this.parent = parent;
+        
+        add(new ImportMenu(this));
         add(new ExportMenu());
         add(createSelectMenu());
         add(createOptionMenu());
@@ -53,6 +57,10 @@ public class ApplicationMenuBar extends JMenuBar {
         add(redo);
         
         resetData();
+    }
+    
+    public final NodeManagerWindow getNodeManagerWindow(){
+        return parent;
     }
     
     private void resetData(){

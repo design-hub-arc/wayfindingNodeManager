@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import nodemanager.gui.importData.LocalImportPage;
 
 /**
  *
@@ -17,10 +18,12 @@ public class ApplicationBody extends JPanel{
     private ApplicationPage currentPage;
     
     public static final String EDIT = "EDIT";
+    public static final String LOCAL_IMPORT = "LOCAL_IMPORT";
     
     public ApplicationBody(){
         pages = new HashMap<>();
         pages.put(EDIT, new EditCanvas(this));
+        pages.put(LOCAL_IMPORT, new LocalImportPage(this));
         currentPage = null;
         
         setLayout(new BorderLayout());
@@ -40,7 +43,10 @@ public class ApplicationBody extends JPanel{
     public final void switchToPage(String pageName){
         if(pages.containsKey(pageName)){
             contentArea.removeAll();
-            contentArea.add(pages.get(pageName));
+            currentPage = pages.get(pageName);
+            contentArea.add(currentPage);
+            revalidate();
+            repaint();
         } else {
             throw new IllegalArgumentException();
         }

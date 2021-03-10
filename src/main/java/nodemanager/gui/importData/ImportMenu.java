@@ -3,6 +3,8 @@ package nodemanager.gui.importData;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import nodemanager.*;
+import nodemanager.gui.ApplicationBody;
+import nodemanager.gui.ApplicationMenuBar;
 import nodemanager.gui.InputConsole;
 
 /**
@@ -10,17 +12,25 @@ import nodemanager.gui.InputConsole;
  * @author Matt Crow
  */
 public class ImportMenu extends JMenu{
-    public ImportMenu(){
+    private final ApplicationMenuBar parent;
+    
+    public ImportMenu(ApplicationMenuBar parent){
         super("Import");
+        this.parent = parent;
+        
         add(importLocalMenu());
         //add(importFromDriveMenu());
         add(resizeMapMenu());
     }
     
+    public final ApplicationMenuBar getMenuBar(){
+        return parent;
+    }
+    
     private JMenuItem importLocalMenu(){
         JMenuItem ret = new JMenuItem("Import local files");
         ret.addActionListener((e)->{
-            new LocalImportDialog((JFrame)SwingUtilities.getRoot(this));
+            parent.getNodeManagerWindow().getBody().switchToPage(ApplicationBody.LOCAL_IMPORT);
         });
         return ret;
     }
