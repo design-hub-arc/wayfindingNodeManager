@@ -25,6 +25,8 @@ You can safely move the JAR file from this folder.
 You can pan the map image by clicking and dragging it around.
 You can also zoom in and out using the mouse scroll wheel.
 
+Exit the current mode by using the ESC key
+
 ## Editting the application
 
 As stated above, this application was built using Netbeans 8.2 IDE, and can easily be opened in that version.

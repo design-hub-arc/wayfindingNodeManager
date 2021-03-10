@@ -82,6 +82,7 @@ public class InputConsole extends JPanel {
      * and feeds it the user's input
      */
     private void readInput(){
+        writeMessage(String.format("<= %s", inputField.getText()));
         if(waitingCommands.isEmpty()){
             writeMessage("No commands waiting");
         } else {
@@ -90,7 +91,6 @@ public class InputConsole extends JPanel {
                 writeMessage(waitingCommands.peek().getMessage());
             }
         }
-        writeMessage(String.format("<= %s", inputField.getText()));
         inputField.setText("");
     }
     

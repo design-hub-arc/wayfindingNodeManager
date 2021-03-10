@@ -212,12 +212,10 @@ public class NodeIcon{
             case ADD_CONNECTION:
                 Session.selectedNode.addAdjId(node.id);
                 Session.logAction(new ConnectionAddedEvent(Session.selectedNode.id, node.id));
-                Session.setMode(Mode.NONE);
                 break;
             case REMOVE_CONNECTION:
                 if(Session.selectedNode.removeAdj(node.id)){
                     Session.logAction(new ConnectionRemovedEvent(Session.selectedNode.id, node.id));
-                    Session.setMode(Mode.NONE);
                 }
                 break;
             default:

@@ -1,11 +1,15 @@
 package nodemanager.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import nodemanager.gui.exportData.ExportBody;
-import nodemanager.gui.importData.DriveImportPage;
+import javax.swing.KeyStroke;
+import nodemanager.Mode;
+import nodemanager.Session;
 import nodemanager.gui.importData.LocalImportPage;
 
 /**
@@ -38,10 +42,19 @@ public class ApplicationBody extends JPanel{
         contentArea.setLayout((new BorderLayout()));
         
         JSplitPane topAndBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        topAndBottom.setResizeWeight(0.75);
         topAndBottom.setTopComponent(contentArea);
         topAndBottom.setBottomComponent(InputConsole.getInstance());
         topAndBottom.setContinuousLayout(true);
         add(topAndBottom, BorderLayout.CENTER);
+        
+        this.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "exit cmd");
+        this.getActionMap().put("exit cmd", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Session.setMode(Mode.NONE);
+            }
+        });
         
         switchToPage(EDIT);
     }
