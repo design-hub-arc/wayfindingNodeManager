@@ -24,9 +24,9 @@ public class ApplicationMenuBar extends JMenuBar {
         super();
         
         this.parent = parent;
-        
+        add(createHomeButton());
         add(new ImportMenu(this));
-        add(new ExportMenu());
+        add(new ExportMenu(this));
         add(createSelectMenu());
         add(createOptionMenu());
         
@@ -63,6 +63,13 @@ public class ApplicationMenuBar extends JMenuBar {
         return parent;
     }
     
+    private JMenuItem createHomeButton(){
+        JMenuItem ret = new JMenuItem("Home");
+        ret.addActionListener((e)->{
+            this.getNodeManagerWindow().getBody().switchToPage(ApplicationBody.EDIT);
+        });
+        return ret;
+    }
     private void resetData(){
         Session.map.removeAllNodes();
         Node.removeAll();

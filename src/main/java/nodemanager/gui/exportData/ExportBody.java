@@ -8,7 +8,9 @@ import java.awt.event.ItemEvent;
 import java.io.IOException;
 import javax.swing.*;
 import nodemanager.Session;
+import nodemanager.gui.ApplicationBody;
 import nodemanager.io.*;
+import nodemanager.gui.ApplicationPage;
 import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
 
 /**
@@ -17,7 +19,7 @@ import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
  * 
  * @author Matt Crow
  */
-public final class ExportBody extends Container {
+public final class ExportBody extends ApplicationPage {
     public static final String NEW_TYPE = "New type";
     private final JTextField name;
     private final JTextField folder;
@@ -27,8 +29,8 @@ public final class ExportBody extends Container {
     private final VersionLog v;
     private volatile boolean updating;
     
-    public ExportBody() {
-        super();
+    public ExportBody(ApplicationBody parent) {
+        super(parent);
         updating = false;
         
         setLayout(new GridLayout(4, 2));
@@ -111,6 +113,7 @@ public final class ExportBody extends Container {
             GoogleDriveUploader.revise(v).addOnFail((err)->{
                 msg.setText(err.getMessage());
             });
+            this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
         }).addOnFail((ex)->msg.setText(ex.getMessage()));
     }
     

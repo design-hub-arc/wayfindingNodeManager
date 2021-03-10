@@ -9,6 +9,8 @@ import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.files.MapFile;
 import java.io.IOException;
+import nodemanager.gui.ApplicationBody;
+import nodemanager.gui.ApplicationMenuBar;
 import nodemanager.gui.InputConsole;
 
 
@@ -17,11 +19,15 @@ import nodemanager.gui.InputConsole;
  * @author Matt Crow
  */
 public class ExportMenu extends JMenu{
+    private final ApplicationMenuBar parent;
+    
     /**
      * Creates a new ExportMenu
+     * @param parent the menu bar this resides in
      */
-    public ExportMenu(){
+    public ExportMenu(ApplicationMenuBar parent){
         super("Export");
+        this.parent = parent;
         
         add(saveLocal());
         //add(exportManifest());
@@ -81,7 +87,7 @@ public class ExportMenu extends JMenu{
     private JMenuItem exportManifest(){
         JMenuItem j = new JMenuItem("Export To The Drive");
         j.addActionListener((ActionEvent e) -> {
-            new ExportDialog((JFrame)SwingUtilities.getRoot(this));
+            this.parent.getNodeManagerWindow().getBody().switchToPage(ApplicationBody.REMOTE_EXPORT);
         });
         return j;
     }

@@ -16,7 +16,7 @@ public class NodeManagerWindow extends JFrame{
     public NodeManagerWindow(){
         super();
         setTitle("Wayfinding Node Manager");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                
         JFrame self = this;
         addWindowListener(new WindowAdapter(){

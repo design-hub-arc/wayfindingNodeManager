@@ -333,6 +333,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 break;
             }
         }
+        repaint();
     }
 
     @Override
