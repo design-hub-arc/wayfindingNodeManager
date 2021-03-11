@@ -22,6 +22,47 @@ public class Graph {
         labels = new HashMap<>();
     }
     
+    public final Node getNodeById(int id){
+        return nodes.get(id);
+    }
+    
+    public final int[] getConnectionsById(int id){
+        return connections.entrySet().stream().filter((entry)->{
+            return entry.getKey() == id;
+        }).map((entry)->{
+            return entry.getValue();
+        }).mapToInt((i)->{
+            return i.intValue();
+        }).toArray();
+    }
+    
+    public final String[] getLabelsById(int id){
+        return labels.entrySet().stream().filter((entry)->{
+            return entry.getValue() == id;
+        }).map((entry)->{
+            return entry.getKey();
+        }).toArray((size)->new String[size]);
+    }
+    
+    public final String getDescriptionForNode(int nodeId){
+        StringBuilder sb = new StringBuilder();
+        Node node = getNodeById(nodeId);
+        if(node == null){
+            sb.append(String.format("Couldn't find node with id %d", nodeId));
+        } else {
+            sb.append(String.format("%s%n", node.toString()));
+            sb.append("* Connections:\n");
+            for(int conns : getConnectionsById(node.getId())){
+                sb.append(String.format("\t%d%n", conns));
+            }
+            sb.append("* Labels:\n");
+            for(String label : getLabelsById(node.getId())){
+                sb.append(String.format("\t%s%n", label));
+            }
+        }
+        return sb.toString();
+    }
+    
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();

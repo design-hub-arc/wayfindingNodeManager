@@ -6,6 +6,7 @@ import java.awt.event.*;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
+import nodemanager.model.Graph;
 import nodemanager.node.Node;
 
 /**
@@ -155,7 +156,11 @@ public class NodeDataPane extends JComponent{
         }
         hasNodeSelected = true;
         selectedNode = n;
-        nodeInfo.setText(n.getDesc());
+        
+        Graph dataSet = Session.getCurrentDataSet();
+        if(dataSet != null){
+            nodeInfo.setText(dataSet.getDescriptionForNode(n.getId()));
+        }
         
         SwingUtilities.invokeLater(()->{
             infoView.getVerticalScrollBar().setValue(0);

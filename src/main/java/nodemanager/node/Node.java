@@ -166,6 +166,10 @@ public class Node {
         return allNodes.values();
     }
     
+    public final int getId(){
+        return id;
+    }
+    
     /**
      * the x coordinate of this Node on the source plane
      * @return the x coordinate of this Node on the source plane
@@ -299,27 +303,6 @@ public class Node {
     public void update(){
         rawX = (int)icon.getScale().inverseX(icon.getX());
         rawY = (int)icon.getScale().inverseY(icon.getY());
-    }
-    
-    /**
-     * Get the textual description of this Node
-     * @return a description of this Node
-     */
-    public String getDesc(){
-        StringBuilder ret = new StringBuilder();
-        String n = System.lineSeparator();
-        
-        ret.append("Node #").append(id).append(n);
-        ret.append("Raw coordinates: (").append((int)rawX).append(", ").append((int)rawY).append(")").append(n);
-        ret.append("Adjacent ids: ").append(n);
-        //streaming doesn't work here
-        for(int i : adjacentIds){
-            ret.append("* ").append(i).append(n);
-        }
-        ret.append("Labels: ").append(n);
-        labels.stream().forEach(l -> ret.append("* ").append(l).append(n));
-        
-        return ret.toString();
     }
     
     @Override
