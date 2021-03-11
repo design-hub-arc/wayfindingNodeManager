@@ -12,6 +12,7 @@ import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.gui.exportData.ExportMenu;
 import nodemanager.gui.importData.ImportMenu;
+import nodemanager.model.Graph;
 import nodemanager.node.Node;
 
 /**
@@ -77,12 +78,13 @@ public class ApplicationMenuBar extends JMenuBar {
         return ret;
     }
     private void resetData(){
+        Graph g = Graph.createDefault();
+        Session.setCurrentDataSet(g);
         Session.map.removeAllNodes();
         Node.removeAll();
-        Session.map.addNode(Node.updateNode(-1, 0, 0));
-        Session.map.addNode(Node.updateNode(-2, 100, 100));
+        g.getAllNodes().forEach(Session.map::addNode);
         Session.map.scaleTo(0, 0, 100, 100);
-        Session.map.setImage(new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)); //dummy image to prevent NullPointerException
+        Session.map.setImage(g.getMapImage());
     }
     
     private void trySelectNode(int id){

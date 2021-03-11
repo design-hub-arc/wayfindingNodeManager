@@ -2,6 +2,10 @@ package nodemanager.model;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import nodemanager.node.Node;
 
 /**
@@ -12,7 +16,7 @@ import nodemanager.node.Node;
 public class Graph {
     private BufferedImage mapImage;
     private final HashMap<Integer, Node> nodes;
-    private final HashMap<Integer, Integer> connections;
+    private final HashMap<Integer, HashSet<Integer>> connections;
     private final HashMap<String, Integer> labels;
     
     public Graph(){
@@ -22,17 +26,40 @@ public class Graph {
         labels = new HashMap<>();
     }
     
+    public final void addNode(Node n){
+        nodes.put(n.getId(), n);
+    }
+    
+    public final void addConnection(int fromId, int toId){
+        if(!connections.containsKey(fromId)){
+            connections.put(fromId, new HashSet<>());
+        }
+        if(!connections.containsKey(toId)){
+            connections.put(toId, new HashSet<>());
+        }
+        connections.get(fromId).add(toId);
+        connections.get(toId).add(fromId);
+    }
+    
+    public final void addLabel(String label, int id){
+        labels.put(label.toUpperCase(), id);
+    }
+    
+    public final List<Node> getAllNodes(){
+        return nodes.values().stream().collect(Collectors.toList());
+    }
+    
+    public final BufferedImage getMapImage(){
+        return mapImage;
+    }
+    
     public final Node getNodeById(int id){
         return nodes.get(id);
     }
     
     public final int[] getConnectionsById(int id){
-        return connections.entrySet().stream().filter((entry)->{
-            return entry.getKey() == id;
-        }).map((entry)->{
-            return entry.getValue();
-        }).mapToInt((i)->{
-            return i.intValue();
+        return connections.getOrDefault(id, new HashSet<>()).stream().mapToInt((integer)->{
+            return integer.intValue();
         }).toArray();
     }
     
@@ -82,5 +109,13 @@ public class Graph {
             sb.append(String.format("\t%s => %d%n", label, id));
         });
         return sb.toString();
+    }
+    
+    public static final Graph createDefault(){
+        Graph ret = new Graph();
+        ret.addNode(new Node(-1, 0, 0));
+        ret.addNode(new Node(-2, 100, 100));
+        ret.mapImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        return ret;
     }
 }

@@ -1,10 +1,14 @@
 package nodemanager.events;
 
+import nodemanager.Session;
 import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.node.Node;
 
 /**
  * Records when a node was created via the "add a node" button.
+ * 
+ * I can see this being problematic if it can create nodes with duplicate IDs
+ * 
  * @author Matt Crow
  */
 public class NodeCreateEvent extends EditEvent{
@@ -30,6 +34,6 @@ public class NodeCreateEvent extends EditEvent{
     @Override
     public void redo() {
         addedTo.addNode(nodeCreated);
-        Node.addNode(nodeCreated);
+        Session.getCurrentDataSet().addNode(nodeCreated);
     }
 }

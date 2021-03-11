@@ -47,7 +47,7 @@ public class Node {
         labels = new ArrayList<>();
         icon = new NodeIcon(this);
         
-        addNode(this);
+        //addNode(this);
         if(id >= nextId){
             nextId = id + 1;
         }
@@ -98,6 +98,7 @@ public class Node {
      * but this needs to be called to undo a NodeDeleteEvent
      * @param n the node to add. If a node with that ID already exists, erases the existing node
      */
+    /*
     public static void addNode(Node n){
         if(allNodes.containsKey(n.id)){
             //Update the node
@@ -111,7 +112,7 @@ public class Node {
         } else {
             allNodes.put(n.id, n);
         }
-    }
+    }*/
     
     /**
      * Removes a Node from the program, and severs any connections between this Node and those adjacent to it.
@@ -194,7 +195,7 @@ public class Node {
      */
     public void addAdjId(int i){
         if(Node.get(i) == null){
-            addNode(new Node(i));
+            //addNode(new Node(i));
         }
         if(!isAdjTo(i)){
            adjacentIds.add(i);

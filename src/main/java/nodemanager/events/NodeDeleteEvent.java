@@ -1,10 +1,14 @@
 package nodemanager.events;
 
+import nodemanager.Session;
 import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.node.Node;
 
 /**
  * Recorded when a node was deleted via the "delete this node" button
+ * 
+ * I can see this being problematic if it can create multiple nodes with the same ID
+ * 
  * @author Matt Crow
  */
 public class NodeDeleteEvent extends EditEvent{
@@ -18,7 +22,7 @@ public class NodeDeleteEvent extends EditEvent{
     
     @Override
     public void undo() {
-        Node.addNode(nodeDeleted);
+        Session.getCurrentDataSet().addNode(nodeDeleted);
         nodeDeleted.getAdjIds().forEach(id -> Node.get(id).addAdjId(nodeDeleted.id)); //reconnect
         removedFrom.addNode(nodeDeleted);
         removedFrom.repaint();

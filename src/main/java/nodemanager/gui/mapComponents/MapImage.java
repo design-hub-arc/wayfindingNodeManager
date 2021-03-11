@@ -278,6 +278,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
                 if (hoveringOver == null) {
                     Node n = new Node();
+                    
                     Node.updateNode(
                         n.id,
                         (int) scaler.inverseX(translateClickX(me.getX())),
