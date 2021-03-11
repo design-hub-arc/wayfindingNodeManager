@@ -13,7 +13,7 @@ import static java.lang.System.out;
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
-public class Node{
+public class Node {
     public final int id;
     
     /*
@@ -322,21 +322,8 @@ public class Node{
         return ret.toString();
     }
     
-    /**
-     * Prints this Node's data to the console
-     */
-    public void displayData(){
-        out.println(getDesc());
-    }
-    
-    /**
-     * Prints the data of all Nodes to the console
-     */
-    public static void logAll(){
-        out.println("*ALL NODES*");
-        for(Node n : allNodes.values()){
-            out.println("");
-            n.displayData();
-        }
+    @Override
+    public String toString(){
+        return String.format("Node#%d: (%d, %d)", id, rawX, rawY);
     }
 }

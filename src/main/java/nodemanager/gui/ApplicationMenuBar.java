@@ -56,6 +56,12 @@ public class ApplicationMenuBar extends JMenuBar {
         redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK));
         add(redo);
         
+        JMenuItem test = new JMenuItem("Test");
+        test.addActionListener((e)->{
+            System.out.println(Session.getCurrentDataSet());
+        });
+        add(test);
+        
         resetData();
     }
     
