@@ -3,7 +3,6 @@ package nodemanager.model;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import nodemanager.node.Node;

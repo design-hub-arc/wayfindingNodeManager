@@ -2,7 +2,6 @@ package nodemanager.node;
 
 import java.util.*;
 import nodemanager.gui.mapComponents.NodeIcon;
-import static java.lang.System.out;
 
 
 /**
@@ -47,7 +46,6 @@ public class Node {
         labels = new ArrayList<>();
         icon = new NodeIcon(this);
         
-        //addNode(this);
         if(id >= nextId){
             nextId = id + 1;
         }
@@ -75,6 +73,7 @@ public class Node {
      * @param y y coordinate
      * @return the node updated or created
      */
+    /*
     public static Node updateNode(int id, int x, int y){
         Node ret = null;
         if(allNodes.containsKey(id)){
@@ -88,7 +87,7 @@ public class Node {
         ret.getIcon().setPos(x, y);
         
         return ret;
-    }
+    }*/
     
     
     
@@ -169,6 +168,14 @@ public class Node {
     
     public final int getId(){
         return id;
+    }
+    
+    //todo: don't changes original x
+    public void setX(int x){
+        this.rawX = x;
+    }
+    public void setY(int y){
+        this.rawY = y;
     }
     
     /**

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import nodemanager.Session;
+import nodemanager.model.Graph;
 import nodemanager.node.Node;
 
 /**
@@ -69,9 +70,10 @@ public class NodeCoordFile extends AbstractCsvFile{
 
     @Override
     public void importData() {
+        Graph g = Session.getCurrentDataSet();
         nodes.forEach((n)->{
-            Node.updateNode(n.id, n.getX(), n.getY());
-            Session.map.addNode(Node.get(n.id));
+            g.addNode(n);
+            Session.map.addNode(n);
         });
         Session.map.refreshNodes();
     }
@@ -79,7 +81,7 @@ public class NodeCoordFile extends AbstractCsvFile{
     @Override
     public void exportData() {
         nodes.clear();
-        Node.getAll().forEach((n)->{
+        Session.getCurrentDataSet().getAllNodes().forEach((n)->{
             nodes.add(n);
         });
     }

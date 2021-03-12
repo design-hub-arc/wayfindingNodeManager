@@ -9,6 +9,7 @@ import nodemanager.node.Node;
 import nodemanager.*;
 import nodemanager.events.*;
 import nodemanager.gui.Scale;
+import nodemanager.model.Graph;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -213,8 +214,9 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      */
     public void refreshNodes() {
         removeAllNodes();
-        scaleTo(Node.get(-1).getX(), Node.get(-1).getY(), Node.get(-2).getX(), Node.get(-2).getY());
-        Node.getAll().forEach((n) -> addNode(n));
+        Graph g = Session.getCurrentDataSet();
+        scaleTo(g.getNodeById(-1).getX(), g.getNodeById(-1).getY(), g.getNodeById(-2).getX(), g.getNodeById(-2).getY());
+        g.getAllNodes().forEach(this::addNode);
         revalidate();
         repaint();
     }
@@ -278,12 +280,9 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
                 if (hoveringOver == null) {
                     Node n = new Node();
-                    
-                    Node.updateNode(
-                        n.id,
-                        (int) scaler.inverseX(translateClickX(me.getX())),
-                        (int) scaler.inverseY(translateClickY(me.getY()))
-                    );
+                    n.setX((int) scaler.inverseX(translateClickX(me.getX())));
+                    n.setY((int) scaler.inverseY(translateClickY(me.getY())));
+                    Session.getCurrentDataSet().addNode(n);
                     addNode(n);
                     Session.logAction(new NodeCreateEvent(n, this));
                     repaint();
