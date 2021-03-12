@@ -70,12 +70,6 @@ public class NodeDataPane extends JComponent{
             }
         });
         
-        //resets the NodeIcon to its position when it was initially imported
-        addOption("Reset position", () -> {
-            Session.logAction(new NodeMovedEvent(selectedNode, selectedNode.getIcon().getX(), selectedNode.getIcon().getY()));
-            selectedNode.getIcon().resetPos();
-        });
-        
         addOption("Add a connection", () -> {
             Session.setMode(Mode.ADD_CONNECTION);
         });

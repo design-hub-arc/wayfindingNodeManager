@@ -172,15 +172,7 @@ public class NodeIcon{
             y = s.y(scale.inverseY(y));
         }
         scale = s;
-    }
-    
-    /**
-     * Moves this component back to where it was when the Node was initially imported
-     */
-    public void resetPos(){
-        setPos(scale.x(node.getImportedX()), scale.y(node.getImportedY()));
-    }
-    
+    }    
     
     /**
      * Checks to see if the given points 
