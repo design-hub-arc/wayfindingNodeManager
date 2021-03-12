@@ -80,7 +80,6 @@ public class ApplicationMenuBar extends JMenuBar {
         Graph g = Graph.createDefault();
         Session.setCurrentDataSet(g);
         Session.map.removeAllNodes();
-        Node.removeAll();
         g.getAllNodes().forEach(Session.map::addNode);
         Session.map.scaleTo(0, 0, 100, 100);
         Session.map.setImage(g.getMapImage());

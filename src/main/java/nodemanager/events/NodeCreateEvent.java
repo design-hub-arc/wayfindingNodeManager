@@ -28,7 +28,7 @@ public class NodeCreateEvent extends EditEvent{
     @Override
     public void undo() {
         addedTo.removeNode(nodeCreated);
-        Node.removeNode(nodeCreated.id);
+        Session.getCurrentDataSet().removeNode(nodeCreated.id);
     }
 
     @Override

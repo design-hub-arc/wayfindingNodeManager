@@ -30,7 +30,7 @@ public class NodeDeleteEvent extends EditEvent{
 
     @Override
     public void redo() {
-        Node.removeNode(nodeDeleted.id);
+        Session.getCurrentDataSet().removeNode(nodeDeleted.id);
         removedFrom.removeNode(nodeDeleted);
         removedFrom.repaint();
     }

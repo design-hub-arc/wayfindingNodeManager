@@ -30,11 +30,6 @@ public class Node {
     private ArrayList<String> labels; //rooms, buildings, etc.
     private NodeIcon icon;
     
-    private static HashMap<Integer, Node> allNodes = new HashMap<>();
-    private static HashMap<String, Node> labelToNode = new HashMap<>(); //stores as uppercase label
-    
-    private static int nextId = 0;
-    
     public Node(int id, int x, int y){
         this.id = id;
         initialX = x;
@@ -46,70 +41,8 @@ public class Node {
         adjacentIds = new HashSet<>();
         labels = new ArrayList<>();
         icon = new NodeIcon(this);
-        
-        if(id >= nextId){
-            nextId = id + 1;
-        }
-    }
-    
-    /**
-     * Creates a "protoNode",
-     * which means all of its
-     * data hasn't yet been imported
-     * @param id the node's id
-     */
-    public Node(int id){
-        this(id, -1, -1);
-    }
-    
-    public Node(int x, int y){
-        this(nextId, x, y);
-    }
-    
-    public Node(){
-        this(nextId);
-    }
-    
-    
-    
-    
-    /**
-     * Removes a Node from the program, and severs any connections between this Node and those adjacent to it.
-     * Note that it doesn't modify the original spreadsheet
-     * @param id the ID of the Node to remove
-     */
-    public static void removeNode(int id){
-        /*
-        Node n = get(id);
-        if(n != null){
-            n.adjacentIds.stream().forEach(i -> get(i).adjacentIds.remove(Integer.valueOf(id)));
-        }*/
-        allNodes.remove(id);
-    }
-    
-    /**
-     * Clears the program's Node list.
-     * Doesn't modify the spreadsheet
-     */
-    public static void removeAll(){
-        allNodes.clear();
-        labelToNode.clear();
-        nextId = 0;
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    } 
+       
     public final int getId(){
         return id;
     }
@@ -164,13 +97,9 @@ public class Node {
      * @return whether or not the label was successfully added
      */
     public boolean addLabel(String s){
-        boolean ret = !labelToNode.containsKey(s.toUpperCase());
-        if(ret){
-            labelToNode.put(s.toUpperCase(), this);
-            labels.add(s);
-        }
-        
-        return ret;
+        labels.add(s.toUpperCase());
+               
+        return true;
     }
     
     
@@ -187,7 +116,7 @@ public class Node {
             if(labels.get(i).equalsIgnoreCase(s)){
                 found = true;
                 labels.remove(i);
-                labelToNode.remove(s.toUpperCase());
+                //labelToNode.remove(s.toUpperCase());
             }
         }
         return found;
@@ -264,87 +193,4 @@ public class Node {
     public String toString(){
         return String.format("Node#%d: (%d, %d)", id, x, y);
     }
-    
-    /**
-     * Use this in lieu of a constructor to avoid creating
-     * an excessive amount of nodes.
-     * If a node with the given ID doesn't exist, creates one.
-     * Updates the Node with the given x and y coordinates
-     * @param id the id of the node to update, or the node to create
-     * @param x the x coordinate of the node
-     * @param y y coordinate
-     * @return the node updated or created
-     */
-    /*
-    public static Node updateNode(int id, int x, int y){
-        Node ret = null;
-        if(allNodes.containsKey(id)){
-            ret = allNodes.get(id);
-        }
-        if(ret == null){
-            ret = new Node(id);
-        }
-        ret.rawX = x;
-        ret.rawY = y;
-        ret.getIcon().setPos(x, y);
-        
-        return ret;
-    }*/
-    
-    
-    
-    /**
-     * Adds a node to allNodes.
-     * The constructor does this automatically, 
-     * but this needs to be called to undo a NodeDeleteEvent
-     * @param n the node to add. If a node with that ID already exists, erases the existing node
-     */
-    /*
-    public static void addNode(Node n){
-        if(allNodes.containsKey(n.id)){
-            //Update the node
-            Node old = allNodes.get(n.id);
-            updateNode(old.id, n.getX(), n.getY());
-            n.getAdjIds().forEach((adjId)->old.addAdjId(adjId));
-            for(String label : n.getLabels()){
-                old.addLabel(label);
-            }
-            old.getIcon().nodePosUpdated();
-        } else {
-            allNodes.put(n.id, n);
-        }
-    }*/
-    
-    /**
-     * Get all Nodes
-     * @return a Collection of all Nodes
-     */
-    /*
-    public static Collection<Node> getAll(){
-        return allNodes.values();
-    }*/
-    
-    /**
-     * Gets a node with the given label, if one exists
-     * @param label the label to search for, ignoring case
-     * @return the node with the label, or null if none exists
-     * @throws NullPointerException if it returns null
-     */
-    /*
-    public static Node get(String label) throws NullPointerException{
-        return labelToNode.get(label.toUpperCase());
-    }*/
-    
-    
-    //how deal with not found?
-    /**
-     * Returns a Node with the given ID
-     * @param nodeId the ID to get a Node with
-     * @return the Node with the given ID, or null if one doesn't exist
-     * @throws NullPointerException 
-     */
-    /*
-    public static Node get(int nodeId) throws NullPointerException{
-        return allNodes.get(nodeId);
-    }*/
 }

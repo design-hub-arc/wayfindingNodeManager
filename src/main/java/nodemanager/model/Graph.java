@@ -19,15 +19,26 @@ public class Graph {
     private final HashMap<Integer, HashSet<Integer>> connections;
     private final HashMap<String, Integer> labels;
     
+    private int nextNodeId;
+    
     public Graph(){
         mapImage = null;
         nodes = new HashMap<>();
         connections = new HashMap<>();
         labels = new HashMap<>();
+        nextNodeId = 0;
     }
     
+    public final Node createNode(int x, int y){
+        Node n = new Node(nextNodeId, x, y);
+        nextNodeId++;
+        return n;
+    }
     public final void addNode(Node n){
         nodes.put(n.getId(), n);
+        if(n.getId() >= nextNodeId){
+            nextNodeId = n.getId() + 1;
+        }
     }
     
     public final void addConnection(int fromId, int toId){
@@ -47,6 +58,10 @@ public class Graph {
     
     public final void setMapImage(BufferedImage buff){
         this.mapImage = buff;
+    }
+    
+    public final void removeNode(int id){
+        this.nodes.remove(id);
     }
     
     public final void removeConnection(int fromId, int toId){
