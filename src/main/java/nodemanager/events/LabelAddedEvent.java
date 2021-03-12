@@ -1,5 +1,6 @@
 package nodemanager.events;
 
+import nodemanager.Session;
 import nodemanager.node.Node;
 
 /**
@@ -17,11 +18,11 @@ public class LabelAddedEvent extends EditEvent{
 
     @Override
     public void undo() {
-        addedTo.removeLabel(label);
+        Session.getCurrentDataSet().removeLabel(label);
     }
 
     @Override
     public void redo() {
-        addedTo.addLabel(label);
+        Session.getCurrentDataSet().addLabel(label, addedTo.getId());
     }
 }

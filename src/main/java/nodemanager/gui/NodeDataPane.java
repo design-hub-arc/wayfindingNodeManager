@@ -100,8 +100,9 @@ public class NodeDataPane extends JComponent{
             ip.askString(
                 "Enter the label to remove from this node: ",
                 (String label)->{
-                    if(selectedNode.removeLabel(label)){
-                        Session.logAction(new LabelRemovedEvent(selectedNode, label));
+                    Node labeled = Session.getCurrentDataSet().getNodeByLabel(label);
+                    if(Session.getCurrentDataSet().removeLabel(label)){
+                        Session.logAction(new LabelRemovedEvent(labeled, label));
                         selectNode(selectedNode); //reload node description
                     }
                 }
@@ -112,7 +113,7 @@ public class NodeDataPane extends JComponent{
     }
     
     private void tryAddLabel(String label){
-        if(selectedNode.addLabel(label)){
+        if(Session.getCurrentDataSet().addLabel(label, selectedNode.getId())){
             Session.logAction(new LabelAddedEvent(selectedNode, label));
             selectNode(selectedNode); //reload node description
         } else {

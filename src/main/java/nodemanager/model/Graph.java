@@ -53,8 +53,12 @@ public class Graph {
         connections.get(toId).add(fromId);
     }
     
-    public final void addLabel(String label, int id){
-        labels.put(label.toUpperCase(), id);
+    public final boolean addLabel(String label, int id){
+        boolean canAdd = !labels.containsKey(label.toUpperCase());
+        if(canAdd){
+            labels.put(label.toUpperCase(), id);
+        }
+        return canAdd; // no duplicate labels
     }
     
     public final void setMapImage(BufferedImage buff){
@@ -84,8 +88,8 @@ public class Graph {
         return removed;
     }
     
-    public final void removeLabel(String label){
-        this.labels.remove(label.toUpperCase());
+    public final boolean removeLabel(String label){
+        return this.labels.remove(label.toUpperCase()) != null;
     }
     
     public final List<Node> getAllNodes(){

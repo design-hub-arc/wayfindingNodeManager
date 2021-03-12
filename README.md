@@ -27,6 +27,8 @@ You can also zoom in and out using the mouse scroll wheel.
 
 Exit the current mode by using the ESC key
 
+Be sure to look in the text console after you choose where to save your data set
+
 ## Editting the application
 
 As stated above, this application was built using Netbeans 8.2 IDE, and can easily be opened in that version.
