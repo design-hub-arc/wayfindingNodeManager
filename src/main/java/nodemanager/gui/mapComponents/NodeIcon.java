@@ -2,6 +2,7 @@ package nodemanager.gui.mapComponents;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 import nodemanager.Session;
 import nodemanager.events.*;
 import nodemanager.gui.Scale;
@@ -201,16 +202,17 @@ public class NodeIcon{
     }
     
     public void mouseClicked(MouseEvent me) {
+        Graph g = Session.getCurrentDataSet();
         switch (Session.getMode()) {
             case NONE:
                 Session.selectNode(node);
                 break;
             case ADD_CONNECTION:
-                Session.selectedNode.addAdjId(node.id);
+                g.addConnection(Session.selectedNode.id, node.id);
                 Session.logAction(new ConnectionAddedEvent(Session.selectedNode.id, node.id));
                 break;
             case REMOVE_CONNECTION:
-                if(Session.selectedNode.removeAdj(node.id)){
+                if(g.removeConnection(Session.selectedNode.id, node.id)){
                     Session.logAction(new ConnectionRemovedEvent(Session.selectedNode.id, node.id));
                 }
                 break;
@@ -250,10 +252,9 @@ public class NodeIcon{
     public void drawAllLinks(Graphics g){
         if(drawLinks){
             Graph graph = Session.getCurrentDataSet();
-            node.getAdjIds()
-                .stream()
-                .map(id -> graph.getNodeById(id))
-                .forEach(node -> drawLink(g, node));
+            Arrays.stream(graph.getConnectionsById(id)).mapToObj((int id)-> {
+                return graph.getNodeById(id);
+            }).forEach((Node n) -> drawLink(g, n));
         }
     }
     

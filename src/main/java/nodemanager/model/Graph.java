@@ -1,6 +1,7 @@
 package nodemanager.model;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -62,15 +63,29 @@ public class Graph {
     
     public final void removeNode(int id){
         this.nodes.remove(id);
+        Arrays.stream(getConnectionsById(id)).forEach((adj)->{
+            this.removeConnection(id, adj);
+        });
+        Arrays.stream(getLabelsById(id)).forEach((label)->{
+            this.removeLabel(label);
+        });
     }
     
-    public final void removeConnection(int fromId, int toId){
+    public final boolean removeConnection(int fromId, int toId){
+        boolean removed = false;
         if(connections.containsKey(fromId)){
+            removed = true;
             connections.get(fromId).remove(toId);
         }
         if(connections.containsKey(toId)){
+            removed = true;
             connections.get(toId).remove(fromId);
         }
+        return removed;
+    }
+    
+    public final void removeLabel(String label){
+        this.labels.remove(label.toUpperCase());
     }
     
     public final List<Node> getAllNodes(){

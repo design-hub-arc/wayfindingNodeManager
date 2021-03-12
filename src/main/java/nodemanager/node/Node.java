@@ -10,7 +10,10 @@ import nodemanager.gui.mapComponents.NodeIcon;
  * x and y coordinates on both a "source plane" and a target Container element, 
  * and the IDs of Nodes connecting to it, known as "adjacent nodes"
  * 
+ * These adjacent nodes (edges) are stored in Graph
+ * 
  * @author Matt Crow (greengrappler12@gmail.com)
+ * @see nodemanager.model.Graph
  */
 public class Node {
     public final int id;
@@ -26,7 +29,6 @@ public class Node {
     private int x;
     private int y;
     
-    private HashSet<Integer> adjacentIds;
     private ArrayList<String> labels; //rooms, buildings, etc.
     private NodeIcon icon;
     
@@ -38,7 +40,6 @@ public class Node {
         this.y = y;
         icon = new NodeIcon(this);
         icon.setPos(x, y);
-        adjacentIds = new HashSet<>();
         labels = new ArrayList<>();
         icon = new NodeIcon(this);
     } 
@@ -78,18 +79,6 @@ public class Node {
         return this.initialY;
     }
     
-    /**
-     * Creates a connection between this Node and another.
-     * If a node with that id doesn't exist yet,
-     * creates a protoNode to hold the data
-     * @param i the ID of the Node to connect to
-     */
-    public void addAdjId(int i){
-        
-        if(!isAdjTo(i)){
-           adjacentIds.add(i);
-        }
-    }
     
     /**
      * Adds a label to this node
@@ -120,42 +109,6 @@ public class Node {
             }
         }
         return found;
-    }
-    
-    /**
-     * Severs a connection between this Node and another. Does nothing if no connection exists
-     * @param i the ID of the Node to disconnect from
-     * @return whether or not an adj was removed
-     */
-    public boolean removeAdj(int i){
-        Integer remId = i;
-        boolean ret = adjacentIds.contains(remId);
-        if(ret){
-            //Node connected = Node.get(i);
-            adjacentIds.remove(remId);
-            /*
-            if(connected.adjacentIds.contains(id)){
-                connected.removeAdj(id);
-            }*/
-        }
-        return ret;
-    }
-    
-    /**
-     * Checks to see if this Node connects to one with a given ID
-     * @param i the ID of the Node to check for a connection with
-     * @return whether or not the two Nodes connect
-     */
-    public boolean isAdjTo(int i){
-        return adjacentIds.contains(i);
-    }
-    
-    /**
-     * gives all adjacent Node ids
-     * @return a HashSet of all adjacent Node ids
-     */
-    public HashSet<Integer> getAdjIds(){
-        return adjacentIds;
     }
     
     public String[] getLabels(){
