@@ -2,7 +2,7 @@ package nodemanager.events;
 
 import nodemanager.Session;
 import nodemanager.gui.mapComponents.MapImage;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  * Recorded when a node was deleted via the "delete this node" button

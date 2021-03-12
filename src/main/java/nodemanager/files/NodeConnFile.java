@@ -1,7 +1,7 @@
 package nodemanager.files;
 
 import java.io.InputStream;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;

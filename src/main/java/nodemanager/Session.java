@@ -4,7 +4,7 @@ import nodemanager.gui.mapComponents.MapImage;
 import nodemanager.modes.ModeRescaleUpperLeft;
 import java.util.ArrayList;
 import nodemanager.events.EditEvent;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 import nodemanager.gui.*;
 import nodemanager.model.Graph;
 import nodemanager.modes.AbstractMode;

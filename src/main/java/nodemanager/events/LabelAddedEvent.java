@@ -1,7 +1,7 @@
 package nodemanager.events;
 
 import nodemanager.Session;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  * Created whenever a label is added to a node

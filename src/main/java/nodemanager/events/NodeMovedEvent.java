@@ -1,6 +1,8 @@
 package nodemanager.events;
 
-import nodemanager.node.Node;
+import nodemanager.Session;
+import nodemanager.gui.mapComponents.NodeIcon;
+import nodemanager.model.Node;
 
 /**
  * Records when a node is moved via the "move this node" button
@@ -23,18 +25,22 @@ public class NodeMovedEvent extends EditEvent{
     
     @Override
     public void undo() {
-        newX = moved.getIcon().getX();
-        newY = moved.getIcon().getY();
-        moved.getIcon().setPos(initialX, initialY);
-        moved.getIcon().respositionNode(); //need to do this, or scaleTo will override the undo
-        moved.getIcon().getHost().repaint();
+        NodeIcon icon = Session.map.getIcon(moved.getId());
+        newX = icon.getX();
+        newY = icon.getY();
+        icon.setPos(initialX, initialY);
+        moved.setX((int)icon.getScale().inverseX(icon.getX()));
+        moved.setY((int)icon.getScale().inverseY(icon.getY()));
+        icon.getHost().repaint();
     }
 
     @Override
     public void redo() {
-        moved.getIcon().setPos(newX, newY);
-        moved.getIcon().respositionNode();
-        moved.getIcon().getHost().repaint();
+        NodeIcon icon = Session.map.getIcon(moved.getId());
+        icon.setPos(newX, newY);
+        moved.setX((int)icon.getScale().inverseX(icon.getX()));
+        moved.setY((int)icon.getScale().inverseY(icon.getY()));
+        icon.getHost().repaint();
     }
     
 }

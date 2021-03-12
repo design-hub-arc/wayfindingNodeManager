@@ -6,8 +6,9 @@ import java.awt.event.*;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
+import nodemanager.gui.mapComponents.NodeIcon;
 import nodemanager.model.Graph;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -54,8 +55,8 @@ public class NodeDataPane extends JComponent{
                 //prevent user from deleting corner nodes
                 ip.warn("Cannot delete node with id of " + selectedNode.id);
             } else {
-                Session.logAction(new NodeDeleteEvent(selectedNode, selectedNode.getIcon().getHost()));
-                selectedNode.getIcon().getHost().removeNode(selectedNode);
+                Session.logAction(new NodeDeleteEvent(selectedNode, Session.map));
+                Session.map.removeNode(selectedNode);
                 Session.getCurrentDataSet().removeNode(selectedNode.id);
                 Session.selectNode(Session.getCurrentDataSet().getNodeById(-1));
             }
@@ -66,7 +67,8 @@ public class NodeDataPane extends JComponent{
                 ip.warn("Cannot move node with id of " + selectedNode.id);
             } else {
                 Session.setMode(Mode.MOVE);
-                Session.logAction(new NodeMovedEvent(selectedNode, selectedNode.getIcon().getX(), selectedNode.getIcon().getY()));
+                NodeIcon icon = Session.map.getIcon(selectedNode.id);
+                Session.logAction(new NodeMovedEvent(selectedNode, icon.getX(), icon.getY()));
             }
         });
         
@@ -146,8 +148,9 @@ public class NodeDataPane extends JComponent{
      * @param n the Node this should display the data for
      */
     public void selectNode(Node n){
+        NodeIcon icon = Session.map.getIcon(n.getId());
         if(hasNodeSelected){
-            selectedNode.getIcon().setDrawLinks(false);
+            icon.setDrawLinks(false);
         }
         hasNodeSelected = true;
         selectedNode = n;
@@ -161,8 +164,8 @@ public class NodeDataPane extends JComponent{
             infoView.getVerticalScrollBar().setValue(0);
         });
         
-        n.getIcon().setDrawLinks(true);
-        n.getIcon().getHost().repaint();
+        icon.setDrawLinks(true);
+        Session.map.repaint();
     }
     
     /**

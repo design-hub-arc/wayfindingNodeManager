@@ -12,7 +12,7 @@ import nodemanager.Session;
 import nodemanager.gui.exportData.ExportMenu;
 import nodemanager.gui.importData.ImportMenu;
 import nodemanager.model.Graph;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  *
@@ -139,10 +139,11 @@ public class ApplicationMenuBar extends JMenuBar {
         });
         m.add(chooseNodeSize);
         
+        
         JMenuItem showAllConn = new JMenuItem("Draw all connections");
         showAllConn.addActionListener((e) -> {
             Session.getCurrentDataSet().getAllNodes().forEach(node -> {
-                node.getIcon().setDrawLinks(true);
+                Session.map.getIcon(node.getId()).setDrawLinks(true);
             });
             parent.getBody().repaint();
         });
@@ -151,7 +152,7 @@ public class ApplicationMenuBar extends JMenuBar {
         JMenuItem hideAllConn = new JMenuItem("Hide all connections");
         hideAllConn.addActionListener((e) -> {
             Session.getCurrentDataSet().getAllNodes().forEach(node -> {
-                node.getIcon().setDrawLinks(false);
+                Session.map.getIcon(node.getId()).setDrawLinks(false);
             });
             parent.getBody().repaint();
         });

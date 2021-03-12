@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import nodemanager.Session;
 import nodemanager.model.Graph;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  * @author Matt Crow
@@ -38,9 +38,9 @@ public class NodeCoordFile extends AbstractCsvFile{
                     .append(NEWLINE)
                     .append(n.id)
                     .append(", ")
-                    .append(n.getIcon().getX())
+                    .append(n.getX())
                     .append(", ")
-                    .append(n.getIcon().getY());
+                    .append(n.getY());
         });
         return s.toString();
     }

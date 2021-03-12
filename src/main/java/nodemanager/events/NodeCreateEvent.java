@@ -2,7 +2,7 @@ package nodemanager.events;
 
 import nodemanager.Session;
 import nodemanager.gui.mapComponents.MapImage;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  * Records when a node was created via the "add a node" button.

@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.*;
 import java.util.*;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 import nodemanager.*;
 import nodemanager.events.*;
 import nodemanager.gui.Scale;
@@ -82,6 +82,10 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             }
         });
     }
+    
+    public final NodeIcon getIcon(int id){
+        return this.nodeIcons.get(id);
+    }
 
     /**
      * Converts a click on the MapImage to where the user would be clicking on
@@ -111,7 +115,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * @param n the Node to add to the MapImage
      */
     public void addNode(Node n) {
-        NodeIcon ni = n.getIcon();
+        NodeIcon ni = new NodeIcon(n);
         ni.scaleTo(scaler);
         ni.setHost(this);
         nodeIcons.put(n.id, ni);
@@ -295,22 +299,25 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 break;
             }
             case MOVE: {
-                Session.selectedNode.getIcon().respositionNode();
+                NodeIcon icon = getIcon(Session.selectedNode.getId());
+                Session.selectedNode.setX((int)icon.getScale().inverseX(icon.getX()));
+                Session.selectedNode.setY((int)icon.getScale().inverseY(icon.getY()));
                 Session.setMode(Mode.NONE);
                 break;
             }
             case RESCALE_UL: {
                 // sets the upper-left corner of the new map image clip
                 Session.setMode(Mode.RESCALE_LR);
-                Session.newMapX = g.getNodeById(-1).getIcon().getX();
-                Session.newMapY = g.getNodeById(-1).getIcon().getY();
+                NodeIcon icon = getIcon(-1);
+                Session.newMapX = icon.getX();
+                Session.newMapY = icon.getY();
                 break;
             }
             case RESCALE_LR: {
                 // sets the lower-right corner of the new map image clip
                 Session.setMode(Mode.NONE);
-                Session.newMapWidth = g.getNodeById(-2).getIcon().getX() - Session.newMapX;
-                Session.newMapHeight = g.getNodeById(-2).getIcon().getY() - Session.newMapY;
+                Session.newMapWidth = getIcon(-2).getX() - Session.newMapX;
+                Session.newMapHeight = getIcon(-2).getY() - Session.newMapY;
 
                 int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
 
@@ -371,7 +378,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
         switch(Session.getMode()){
             case MOVE: {
-                Session.selectedNode.getIcon().setPos(translateClickX(me.getX()), translateClickY(me.getY()));
+                getIcon(Session.selectedNode.getId()).setPos(translateClickX(me.getX()), translateClickY(me.getY()));
                 repaint();
                 break;
             }

@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import nodemanager.Session;
 import nodemanager.model.Graph;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  *

@@ -7,7 +7,7 @@ import nodemanager.Session;
 import nodemanager.events.*;
 import nodemanager.gui.Scale;
 import nodemanager.model.Graph;
-import nodemanager.node.Node;
+import nodemanager.model.Node;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -144,16 +144,7 @@ public class NodeIcon{
         x = xc;
         y = yc;
     }
-    
-    /**
-     * Updates this' node's position on the source.
-     * this way, we can differentiate between moving a node,
-     * and calling scaleTo
-     */
-    public void respositionNode(){
-        node.update();
-    }
-    
+        
     /**
      * Sets the scale this should be positioned based on,
      * @see Scale for more info
@@ -259,6 +250,7 @@ public class NodeIcon{
         Graphics2D g2d = (Graphics2D)g;
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(size / 2));
-        g2d.drawLine(getX(), getY(), n.getIcon().getX(), n.getIcon().getY());
+        NodeIcon other = this.getHost().getIcon(n.id);
+        g2d.drawLine(getX(), getY(), other.getX(), other.getY());
     }
 }
