@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import javax.swing.*;
 import nodemanager.files.AbstractWayfindingFile;
 import nodemanager.files.FileType;
+import nodemanager.model.Graph;
 
 /**
  * This will serve as the base for local- and drive import file choosers.
@@ -52,10 +53,10 @@ public abstract class AbstractFileCheckbox extends JComponent{
         return include.isSelected();
     }
     
-    public final void importIfSelected(){
+    public final void importIfSelected(Graph g){
         if(selectedFile != null && include.isSelected()){
             try {
-                selectedFile.importData();
+                selectedFile.importData(g);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

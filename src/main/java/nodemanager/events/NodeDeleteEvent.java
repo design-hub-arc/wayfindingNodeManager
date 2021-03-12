@@ -23,7 +23,7 @@ public class NodeDeleteEvent extends EditEvent{
     @Override
     public void undo() {
         Session.getCurrentDataSet().addNode(nodeDeleted);
-        nodeDeleted.getAdjIds().forEach(id -> Node.get(id).addAdjId(nodeDeleted.id)); //reconnect
+        //nodeDeleted.getAdjIds().forEach(id -> Node.get(id).addAdjId(nodeDeleted.id)); //reconnect
         removedFrom.addNode(nodeDeleted);
         removedFrom.repaint();
     }

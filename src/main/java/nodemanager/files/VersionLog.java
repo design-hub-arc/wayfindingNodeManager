@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import nodemanager.io.GoogleDriveUploader;
+import nodemanager.model.Graph;
 
 /**
  * Used to interact with the versions.csv file in the google drive.
@@ -210,7 +211,7 @@ public class VersionLog extends AbstractCsvFile{
     }
     
     @Override
-    public void importData() {}
+    public void importData(Graph g) {}
 
     @Override
     public void exportData() {}

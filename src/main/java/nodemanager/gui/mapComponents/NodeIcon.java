@@ -5,6 +5,7 @@ import java.awt.event.*;
 import nodemanager.Session;
 import nodemanager.events.*;
 import nodemanager.gui.Scale;
+import nodemanager.model.Graph;
 import nodemanager.node.Node;
 
 /**
@@ -176,8 +177,7 @@ public class NodeIcon{
      * Moves this component back to where it was when the Node was initially imported
      */
     public void resetPos(){
-        x = scale.x(node.getX());
-        y = scale.y(node.getY());
+        setPos(scale.x(node.getImportedX()), scale.y(node.getImportedY()));
     }
     
     
@@ -249,9 +249,10 @@ public class NodeIcon{
      */
     public void drawAllLinks(Graphics g){
         if(drawLinks){
+            Graph graph = Session.getCurrentDataSet();
             node.getAdjIds()
                 .stream()
-                .map(id -> Node.get(id))
+                .map(id -> graph.getNodeById(id))
                 .forEach(node -> drawLink(g, node));
         }
     }

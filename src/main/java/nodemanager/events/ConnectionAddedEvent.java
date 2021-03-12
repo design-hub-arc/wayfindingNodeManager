@@ -1,6 +1,6 @@
 package nodemanager.events;
 
-import nodemanager.node.Node;
+import nodemanager.Session;
 
 /**
  * Created when a connection between nodes is added
@@ -17,12 +17,12 @@ public class ConnectionAddedEvent extends EditEvent{
     
     @Override
     public void undo() {
-        Node.get(id1).removeAdj(id2);
+        Session.getCurrentDataSet().removeConnection(id1, id2);
     }
 
     @Override
     public void redo() {
-        Node.get(id1).addAdjId(id2);
+        Session.getCurrentDataSet().addConnection(id1, id2);
     }
     
 }

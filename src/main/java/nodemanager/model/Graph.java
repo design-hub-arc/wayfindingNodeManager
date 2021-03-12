@@ -3,6 +3,7 @@ package nodemanager.model;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import nodemanager.node.Node;
@@ -44,8 +45,35 @@ public class Graph {
         labels.put(label.toUpperCase(), id);
     }
     
+    public final void setMapImage(BufferedImage buff){
+        this.mapImage = buff;
+    }
+    
+    public final void removeConnection(int fromId, int toId){
+        if(connections.containsKey(fromId)){
+            connections.get(fromId).remove(toId);
+        }
+        if(connections.containsKey(toId)){
+            connections.get(toId).remove(fromId);
+        }
+    }
+    
     public final List<Node> getAllNodes(){
         return nodes.values().stream().collect(Collectors.toList());
+    }
+    
+    public final List<Integer[]> getAllConnections(){
+        LinkedList<Integer[]> pairs = new LinkedList<>();
+        connections.entrySet().forEach((entry)->{
+            entry.getValue().forEach((to) -> {
+                pairs.add(new Integer[]{entry.getKey(), to});
+            });
+        });
+        return pairs;
+    }
+    
+    public final List<String> getAllLabel(){
+        return labels.keySet().stream().collect(Collectors.toList());
     }
     
     public final BufferedImage getMapImage(){
@@ -54,6 +82,10 @@ public class Graph {
     
     public final Node getNodeById(int id){
         return nodes.get(id);
+    }
+    
+    public final Node getNodeByLabel(String label){
+        return nodes.get(labels.get(label.toUpperCase()));
     }
     
     public final int[] getConnectionsById(int id){

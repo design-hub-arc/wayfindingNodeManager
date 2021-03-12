@@ -14,9 +14,11 @@ import nodemanager.files.WayfindingManifest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.GoogleDriveUploader;
 import nodemanager.gui.ApplicationPage;
+import nodemanager.model.Graph;
 
 /**
  * Acts as the body of the import dialog whenever the user clicks the import from drive button.
@@ -78,7 +80,7 @@ public class DriveImportPage extends ApplicationPage {
             .addOnSucceed((s)->{
                 try {
                     man.setContents(s);
-                    importManifest(man);
+                    importManifest(man, Session.getCurrentDataSet());
                     msg.setText("Done!");
                 } catch (IOException ex) {
                     msg.setText(ex.getMessage());
@@ -147,11 +149,11 @@ public class DriveImportPage extends ApplicationPage {
         repaint();
     }
     
-    private void importManifest(WayfindingManifest man){
+    private void importManifest(WayfindingManifest man, Graph g){
         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
             try {
                 man.getFileFor(cb.getFileType()).addOnSucceed((file)->{
-                    file.importData();
+                    file.importData(g);
                 }).getExcecutingThread().join();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();

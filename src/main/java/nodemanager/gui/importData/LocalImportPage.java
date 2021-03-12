@@ -9,9 +9,11 @@ import java.io.IOException;
 import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
 import nodemanager.gui.ApplicationPage;
+import nodemanager.model.Graph;
 
 /**
  * The LocalImportPage is used to 
@@ -61,12 +63,12 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
                 )
         );
         fileCheckBoxes.forEach((box)->add(box));
-        
         JButton importAll = new JButton("Import the selected files");
         importAll.addActionListener((e)->{
+            Graph g = Session.getCurrentDataSet();
             for(FileCheckBox b : fileCheckBoxes){
                 //don't do lambda. Needs to do in order.
-                b.importIfSelected();
+                b.importIfSelected(g);
             }
             this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
         });

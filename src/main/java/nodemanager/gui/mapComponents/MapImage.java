@@ -50,7 +50,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
         clipX = 0;
         clipY = 0;
-
+        
         hoveringOver = null;
 
         setBackground(Color.BLACK);
@@ -273,6 +273,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             hoveringOver.mouseClicked(me);
         }
         
+        Graph g = Session.getCurrentDataSet();
+        
         switch(Session.getMode()){
             case ADD: {
                 // adds a Node where the user clicks,
@@ -299,15 +301,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             case RESCALE_UL: {
                 // sets the upper-left corner of the new map image clip
                 Session.setMode(Mode.RESCALE_LR);
-                Session.newMapX = Node.get(-1).getIcon().getX();
-                Session.newMapY = Node.get(-1).getIcon().getY();
+                Session.newMapX = g.getNodeById(-1).getIcon().getX();
+                Session.newMapY = g.getNodeById(-1).getIcon().getY();
                 break;
             }
             case RESCALE_LR: {
                 // sets the lower-right corner of the new map image clip
                 Session.setMode(Mode.NONE);
-                Session.newMapWidth = Node.get(-2).getIcon().getX() - Session.newMapX;
-                Session.newMapHeight = Node.get(-2).getIcon().getY() - Session.newMapY;
+                Session.newMapWidth = g.getNodeById(-2).getIcon().getX() - Session.newMapX;
+                Session.newMapHeight = g.getNodeById(-2).getIcon().getY() - Session.newMapY;
 
                 int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
 

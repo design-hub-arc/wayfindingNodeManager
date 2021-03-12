@@ -10,6 +10,7 @@ import java.util.HashMap;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
+import nodemanager.model.Graph;
 
 /**
  * The Manifest file is used by Wayfinding to specify which
@@ -133,11 +134,11 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
 
     @Override
-    public void importData() {
+    public void importData(Graph g) {
         urls.forEach((type, url)->{
             try {
                 getFileFor(type).addOnSucceed((file)->{
-                    file.importData();
+                    file.importData(g);
                 }).getExcecutingThread().join();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();

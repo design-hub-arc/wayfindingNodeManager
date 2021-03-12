@@ -5,6 +5,8 @@ import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import nodemanager.Session;
+import nodemanager.model.Graph;
 import nodemanager.node.Node;
 
 /**
@@ -59,22 +61,18 @@ public class NodeLabelFile extends AbstractCsvFile{
     }
 
     @Override
-    public void importData() {
+    public void importData(Graph g) {
         labelToId.forEach((label, id)->{
-            if(Node.get(id) == null){
-                new Node(id);
-            }
-            Node.get(id).addLabel(label);
+            g.addLabel(label, id);
         });
     }
 
     @Override
     public void exportData() {
         labelToId.clear();
-        Node.getAll().forEach((node)->{
-            for(String label : node.getLabels()){
-                labelToId.put(label, node.id);
-            }
+        Graph g = Session.getCurrentDataSet();
+        g.getAllLabel().forEach((label)->{
+            labelToId.put(label, g.getNodeByLabel(label).getId());
         });
     }
     

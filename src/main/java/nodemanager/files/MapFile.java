@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
 import nodemanager.Session;
+import nodemanager.model.Graph;
 
 
 /**
@@ -36,10 +37,11 @@ public class MapFile extends AbstractWayfindingFile{
     }
     
     @Override
-    public void importData(){
+    public void importData(Graph g){
         if(content == null){
             throw new NullPointerException("Content must be set before importing");
         }
+        Session.getCurrentDataSet().setMapImage(content);
         Session.map.setImage(content);
     }
 

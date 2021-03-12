@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import nodemanager.model.Graph;
 
 /**
  * The AbstractWayfindingFile class is used to 
@@ -124,6 +125,7 @@ public abstract class AbstractWayfindingFile {
     /**
      * Imports the data from this file into
      * the program
+     * @param g the Graph to import data into
      */
-    public abstract void importData();
+    public abstract void importData(Graph g);
 }

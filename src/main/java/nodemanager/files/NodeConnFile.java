@@ -6,6 +6,8 @@ import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.util.HashMap;
+import nodemanager.Session;
+import nodemanager.model.Graph;
 
 /**
  * Used to read/write the node connections file
@@ -68,25 +70,17 @@ public class NodeConnFile extends AbstractCsvFile{
     }
 
     @Override
-    public void importData() {
+    public void importData(Graph g) {
         connections.forEach((from, to)->{
-            if(Node.get(from) == null){
-                new Node(from);
-            }
-            if(Node.get(to) == null){
-                new Node(to);
-            }
-            Node.get(from).addAdjId(to);
+            g.addConnection(from, to);
         });
     }
 
     @Override
     public void exportData() {
         connections.clear();
-        Node.getAll().forEach((n) -> {
-            n.getAdjIds().forEach((i) -> {
-                connections.put(n.id, i);
-            });
+        Session.getCurrentDataSet().getAllConnections().forEach((Integer[] pair)->{
+            connections.put(pair[0], pair[1]);
         });
     }
     

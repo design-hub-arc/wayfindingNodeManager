@@ -3,7 +3,6 @@ package nodemanager.gui;
 import nodemanager.gui.mapComponents.NodeIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -88,7 +87,7 @@ public class ApplicationMenuBar extends JMenuBar {
     }
     
     private void trySelectNode(int id){
-        Node find = Node.get(id);
+        Node find = Session.getCurrentDataSet().getNodeById(id);
         if(find == null){
             InputConsole.getInstance().warn("Couldn't find a node with an id of " + id);
         } else {
@@ -97,7 +96,7 @@ public class ApplicationMenuBar extends JMenuBar {
     }
     
     private void trySelectNode(String label){
-        Node find = Node.get(label);
+        Node find = Session.getCurrentDataSet().getNodeByLabel(label);
         if(find == null){
             InputConsole.getInstance().warn("Cannot find node with label " + label);
         } else {
@@ -143,14 +142,18 @@ public class ApplicationMenuBar extends JMenuBar {
         
         JMenuItem showAllConn = new JMenuItem("Draw all connections");
         showAllConn.addActionListener((e) -> {
-            Node.getAll().forEach(node -> node.getIcon().setDrawLinks(true));
+            Session.getCurrentDataSet().getAllNodes().forEach(node -> {
+                node.getIcon().setDrawLinks(true);
+            });
             parent.getBody().repaint();
         });
         m.add(showAllConn);
         
         JMenuItem hideAllConn = new JMenuItem("Hide all connections");
         hideAllConn.addActionListener((e) -> {
-            Node.getAll().forEach(node -> node.getIcon().setDrawLinks(false));
+            Session.getCurrentDataSet().getAllNodes().forEach(node -> {
+                node.getIcon().setDrawLinks(false);
+            });
             parent.getBody().repaint();
         });
         m.add(hideAllConn);
