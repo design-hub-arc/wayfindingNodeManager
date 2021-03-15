@@ -322,10 +322,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 Session.newMapX = 0;
                 Session.newMapY = 0;
                 scaler.setOrigin(0, 0);
-
-                Session.logAction(new MapResizeEvent(representedGraph, this, buff, buff.getSubimage(clip[0], clip[1], clip[2], clip[3])));
-
-                setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
+                
+                BufferedImage sub = buff.getSubimage(clip[0], clip[1], clip[2], clip[3]);
+                Session.logAction(new MapResizeEvent(representedGraph, this, buff, sub));
+                
+                setImage(sub);
+                representedGraph.setMapImage(sub);
                 break;
             }
         }
