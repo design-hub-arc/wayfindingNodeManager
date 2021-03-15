@@ -8,6 +8,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import nodemanager.Mode;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.gui.exportData.ExportMenu;
 import nodemanager.gui.importData.ImportMenu;
@@ -58,7 +59,7 @@ public class ApplicationMenuBar extends JMenuBar {
         
         JMenuItem test = new JMenuItem("Test");
         test.addActionListener((e)->{
-            System.out.println(Session.getCurrentDataSet());
+            System.out.println(NodeManager.getInstance().getGraph());
         });
         add(test);
         
@@ -78,14 +79,20 @@ public class ApplicationMenuBar extends JMenuBar {
     }
     private void resetData(){
         Graph g = Graph.createDefault();
-        Session.setCurrentDataSet(g);
+        NodeManager.getInstance().setGraph(g);
         if(Session.map != null){
             Session.map.renderGraph(g);
         }
     }
     
     private void trySelectNode(int id){
-        Node find = Session.getCurrentDataSet().getNodeById(id);
+        Graph g = NodeManager.getInstance().getGraph();
+        Node find = null;
+        if(g == null){
+            InputConsole.getInstance().warn("Can't find nodes, as no graph has been imported");
+        } else {
+            find = g.getNodeById(id);
+        }
         if(find == null){
             InputConsole.getInstance().warn("Couldn't find a node with an id of " + id);
         } else {
@@ -94,9 +101,15 @@ public class ApplicationMenuBar extends JMenuBar {
     }
     
     private void trySelectNode(String label){
-        Node find = Session.getCurrentDataSet().getNodeByLabel(label);
+        Graph g = NodeManager.getInstance().getGraph();
+        Node find = null;
+        if(g == null){
+            InputConsole.getInstance().warn("Can't find nodes, as no graph has been imported");
+        } else {
+            find = g.getNodeByLabel(label);
+        }
         if(find == null){
-            InputConsole.getInstance().warn("Cannot find node with label " + label);
+            InputConsole.getInstance().warn("Couldn't find a node with a label of " + label);
         } else {
             Session.dataPane.selectNode(find);
         }
@@ -141,19 +154,25 @@ public class ApplicationMenuBar extends JMenuBar {
         
         JMenuItem showAllConn = new JMenuItem("Draw all connections");
         showAllConn.addActionListener((e) -> {
-            Session.getCurrentDataSet().getAllNodes().forEach(node -> {
-                Session.map.getIcon(node.getId()).setDrawLinks(true);
-            });
-            parent.getBody().repaint();
+            Graph g = NodeManager.getInstance().getGraph();
+            if(g != null){
+                g.getAllNodes().forEach(node -> {
+                    Session.map.getIcon(node.getId()).setDrawLinks(true);
+                });
+                parent.getBody().repaint();
+            }
         });
         m.add(showAllConn);
         
         JMenuItem hideAllConn = new JMenuItem("Hide all connections");
         hideAllConn.addActionListener((e) -> {
-            Session.getCurrentDataSet().getAllNodes().forEach(node -> {
-                Session.map.getIcon(node.getId()).setDrawLinks(false);
-            });
-            parent.getBody().repaint();
+            Graph g = NodeManager.getInstance().getGraph();
+            if(g != null){
+                g.getAllNodes().forEach(node -> {
+                    Session.map.getIcon(node.getId()).setDrawLinks(false);
+                });
+                parent.getBody().repaint();
+            }
         });
         m.add(hideAllConn);
 

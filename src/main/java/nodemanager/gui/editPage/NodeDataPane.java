@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import nodemanager.Mode;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.events.*;
 import nodemanager.gui.InputConsole;
@@ -58,8 +59,9 @@ public class NodeDataPane extends JComponent{
             } else {
                 Session.logAction(new NodeDeleteEvent(selectedNode, Session.map));
                 Session.map.removeNode(selectedNode);
-                Session.getCurrentDataSet().removeNode(selectedNode.id);
-                Session.selectNode(Session.getCurrentDataSet().getNodeById(-1));
+                Graph g = NodeManager.getInstance().getGraph();
+                g.removeNode(selectedNode.id);
+                Session.selectNode(g.getNodeById(-1));
             }
         });
         
@@ -97,8 +99,9 @@ public class NodeDataPane extends JComponent{
             ip.askString(
                 "Enter the label to remove from this node: ",
                 (String label)->{
-                    Node labeled = Session.getCurrentDataSet().getNodeByLabel(label);
-                    if(Session.getCurrentDataSet().removeLabel(label)){
+                    Graph g = NodeManager.getInstance().getGraph();
+                    Node labeled = g.getNodeByLabel(label);
+                    if(g.removeLabel(label)){
                         Session.logAction(new LabelRemovedEvent(labeled, label));
                         selectNode(selectedNode); //reload node description
                     }
@@ -110,7 +113,8 @@ public class NodeDataPane extends JComponent{
     }
     
     private void tryAddLabel(String label){
-        if(Session.getCurrentDataSet().addLabel(label, selectedNode.getId())){
+        Graph g = NodeManager.getInstance().getGraph();
+        if(g.addLabel(label, selectedNode.getId())){
             Session.logAction(new LabelAddedEvent(selectedNode, label));
             selectNode(selectedNode); //reload node description
         } else {
@@ -156,7 +160,7 @@ public class NodeDataPane extends JComponent{
         hasNodeSelected = true;
         selectedNode = n;
         
-        Graph dataSet = Session.getCurrentDataSet();
+        Graph dataSet = NodeManager.getInstance().getGraph();
         if(dataSet != null){
             nodeInfo.setText(dataSet.getDescriptionForNode(n.getId()));
         }

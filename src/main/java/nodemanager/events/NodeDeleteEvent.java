@@ -1,7 +1,7 @@
 package nodemanager.events;
 
-import nodemanager.Session;
 import nodemanager.gui.editPage.mapComponents.MapImage;
+import nodemanager.model.Graph;
 import nodemanager.model.Node;
 
 /**
@@ -15,22 +15,23 @@ public class NodeDeleteEvent extends EditEvent{
     private final Node nodeDeleted;
     private final MapImage removedFrom;
     
-    public NodeDeleteEvent(Node n, MapImage m){
+    public NodeDeleteEvent(Graph g, Node n, MapImage m){
+        super(g);
         nodeDeleted = n;
         removedFrom = m;
     }
     
     @Override
-    public void undo() {
-        Session.getCurrentDataSet().addNode(nodeDeleted);
+    public void undoImpl(Graph g) {
+        g.addNode(nodeDeleted);
         //nodeDeleted.getAdjIds().forEach(id -> Node.get(id).addAdjId(nodeDeleted.id)); //reconnect
         removedFrom.addNode(nodeDeleted);
         removedFrom.repaint();
     }
 
     @Override
-    public void redo() {
-        Session.getCurrentDataSet().removeNode(nodeDeleted.id);
+    public void redoImpl(Graph g) {
+        g.removeNode(nodeDeleted.id);
         removedFrom.removeNode(nodeDeleted);
         removedFrom.repaint();
     }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import nodemanager.events.EditEvent;
 import nodemanager.model.Node;
 import nodemanager.gui.*;
-import nodemanager.model.Graph;
 import nodemanager.modes.AbstractMode;
 import nodemanager.modes.ModeAddConnection;
 import nodemanager.modes.ModeMove;
@@ -39,13 +38,10 @@ public class Session {
     public static int newMapHeight = 0;
     public static boolean isSaved = true;
     
-    // the model
-    private static Graph currentDataSet;
-    
     // the view
     public static MapImage map = null;
     
-    //used to undo actions
+    //used to undoImpl actions
     private static final ArrayList<EditEvent> ACTIONS = new ArrayList<>();
     private static int actionIdx = -1; //the most recent action index
     
@@ -86,18 +82,6 @@ public class Session {
     
     public final static Mode getMode(){
         return mode;
-    }
-    
-    public static final Graph getCurrentDataSet(){
-        return currentDataSet;
-    }
-    
-    public static final void setCurrentDataSet(Graph g){
-        currentDataSet = g;
-    }
-    
-    public static final void notifyDataSetUpdated(){
-        // probably should do something here
     }
     
     public static void logAction(EditEvent e){
