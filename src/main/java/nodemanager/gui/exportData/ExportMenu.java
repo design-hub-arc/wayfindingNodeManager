@@ -9,9 +9,11 @@ import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.files.MapFile;
 import java.io.IOException;
+import nodemanager.NodeManager;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.ApplicationMenuBar;
 import nodemanager.gui.InputConsole;
+import nodemanager.model.Graph;
 
 
 /**
@@ -51,8 +53,9 @@ public class ExportMenu extends JMenu{
     }
     
     private void saveCurrentDataset(String exportName, String parentDir){
+        Graph g = NodeManager.getInstance().getGraph();
         NodeCoordFile coords = new NodeCoordFile(exportName);
-        coords.exportData();
+        coords.exportData(g);
         try {
             coords.createFile(parentDir);
         } catch (IOException ex) {
@@ -60,7 +63,7 @@ public class ExportMenu extends JMenu{
         }
         
         NodeConnFile conns = new NodeConnFile(exportName);
-        conns.exportData();
+        conns.exportData(g);
         try {
             conns.createFile(parentDir);
         } catch (IOException ex) {
@@ -68,7 +71,7 @@ public class ExportMenu extends JMenu{
         }
         
         NodeLabelFile labels = new NodeLabelFile(exportName);
-        labels.exportData();
+        labels.exportData(g);
         try {
             labels.createFile(parentDir);
         } catch (IOException ex) {
@@ -76,7 +79,7 @@ public class ExportMenu extends JMenu{
         }
         
         MapFile map = new MapFile(exportName);
-        map.exportData();
+        map.exportData(g);
         try {
             map.createFile(parentDir);
         } catch (IOException ex) {

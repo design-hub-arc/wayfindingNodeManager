@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import nodemanager.NodeManager;
 import nodemanager.exceptions.NoPermissionException;
 import nodemanager.exceptions.VersionLogAccessException;
+import nodemanager.model.Graph;
 
 /**
  * Used to upload files to the google drive.
@@ -141,6 +143,8 @@ public class GoogleDriveUploader{
     }
     
     public static final DriveIOOp<File> uploadManifest(WayfindingManifest man, String folderId){
+        Graph g = NodeManager.getInstance().getGraph();
+        
         try {
             createSubfolder(folderId, man.getTitle()).addOnSucceed((folder)->{
                 man.setDriveFolderId(folder.getId());
@@ -149,9 +153,9 @@ public class GoogleDriveUploader{
             ex.printStackTrace();
         }
 
-        man.exportData();
+        man.exportData(g);
         try {
-            man.uploadContents().getExcecutingThread().join();
+            man.uploadContents(g).getExcecutingThread().join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }

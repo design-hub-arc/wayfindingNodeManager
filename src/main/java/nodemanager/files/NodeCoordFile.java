@@ -78,9 +78,9 @@ public class NodeCoordFile extends AbstractCsvFile{
     }
 
     @Override
-    public void exportData() {
+    public void exportData(Graph g) {
         nodes.clear();
-        Session.getCurrentDataSet().getAllNodes().forEach((n)->{
+        g.getAllNodes().forEach((n)->{
             nodes.add(n);
         });
     }

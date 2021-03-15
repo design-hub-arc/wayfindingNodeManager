@@ -14,6 +14,7 @@ import nodemanager.files.WayfindingManifest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.GoogleDriveUploader;
@@ -80,7 +81,7 @@ public class DriveImportPage extends ApplicationPage {
             .addOnSucceed((s)->{
                 try {
                     man.setContents(s);
-                    importManifest(man, Session.getCurrentDataSet());
+                    importManifest(man, NodeManager.getInstance().getGraph());
                     msg.setText("Done!");
                 } catch (IOException ex) {
                     msg.setText(ex.getMessage());

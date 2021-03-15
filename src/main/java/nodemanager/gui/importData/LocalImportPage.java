@@ -9,6 +9,7 @@ import java.io.IOException;
 import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
@@ -65,7 +66,7 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
         fileCheckBoxes.forEach((box)->add(box));
         JButton importAll = new JButton("Import the selected files");
         importAll.addActionListener((e)->{
-            Graph g = Session.getCurrentDataSet();
+            Graph g = NodeManager.getInstance().getGraph();
             for(FileCheckBox b : fileCheckBoxes){
                 //don't do lambda. Needs to do in order.
                 b.importIfSelected(g);

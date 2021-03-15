@@ -1,12 +1,11 @@
 package nodemanager.files;
 
 import java.io.InputStream;
-import nodemanager.model.Node;
 import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.util.HashMap;
-import nodemanager.Session;
+import nodemanager.NodeManager;
 import nodemanager.model.Graph;
 
 /**
@@ -77,9 +76,9 @@ public class NodeConnFile extends AbstractCsvFile{
     }
 
     @Override
-    public void exportData() {
+    public void exportData(Graph g) {
         connections.clear();
-        Session.getCurrentDataSet().getAllConnections().forEach((Integer[] pair)->{
+        g.getAllConnections().forEach((Integer[] pair)->{
             connections.put(pair[0], pair[1]);
         });
     }

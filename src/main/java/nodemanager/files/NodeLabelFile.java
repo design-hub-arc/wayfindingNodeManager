@@ -68,9 +68,8 @@ public class NodeLabelFile extends AbstractCsvFile{
     }
 
     @Override
-    public void exportData() {
+    public void exportData(Graph g) {
         labelToId.clear();
-        Graph g = Session.getCurrentDataSet();
         g.getAllLabel().forEach((label)->{
             labelToId.put(label, g.getNodeByLabel(label).getId());
         });

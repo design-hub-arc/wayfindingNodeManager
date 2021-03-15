@@ -148,35 +148,36 @@ public class WayfindingManifest extends AbstractCsvFile{
 
     
     @Override
-    public void exportData() {
+    public void exportData(Graph g) {
         attachedFiles.clear();
         urls.clear();
         
         NodeCoordFile coords = new NodeCoordFile(title);
-        coords.exportData();
+        coords.exportData(g);
         attachedFiles.put(FileType.NODE_COORD, coords);
         
         NodeConnFile conn = new NodeConnFile(title);
-        conn.exportData();
+        conn.exportData(g);
         attachedFiles.put(FileType.NODE_CONN, conn);
         
         NodeLabelFile labels = new NodeLabelFile(title);
-        labels.exportData();
+        labels.exportData(g);
         attachedFiles.put(FileType.LABEL, labels);
         
         MapFile map = new MapFile(title);
-        map.exportData();
+        map.exportData(g);
         attachedFiles.put(FileType.MAP_IMAGE, map);
     }
     
     /**
      * Uploads the contents of the program to the drive,
      * then populates this with the urls of those new files.
+     * @param g the Graph to upload
      * @return 
      */
-    public DriveIOOp<Boolean> uploadContents(){
+    public DriveIOOp<Boolean> uploadContents(Graph g){
         if(attachedFiles.isEmpty()){
-            exportData();
+            exportData(g);
         }
         return new DriveIOOp<Boolean>(){
             @Override

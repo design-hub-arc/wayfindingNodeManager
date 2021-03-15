@@ -119,8 +119,9 @@ public abstract class AbstractWayfindingFile {
     /**
      * Exports the current state of the program
      * into this file's contents
+     * @param g the Graph to export
      */
-    public abstract void exportData();
+    public abstract void exportData(Graph g);
     
     /**
      * Imports the data from this file into

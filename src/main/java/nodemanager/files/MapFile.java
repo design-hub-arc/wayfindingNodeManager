@@ -42,13 +42,13 @@ public class MapFile extends AbstractWayfindingFile{
         if(content == null){
             throw new NullPointerException("Content must be set before importing");
         }
-        Session.getCurrentDataSet().setMapImage(content);
+        g.setMapImage(content);
         //Session.map.setImage(content);
     }
 
     @Override
-    public void exportData() {
-        content = NodeManager.getInstance().getGraph().getMapImage();
+    public void exportData(Graph g) {
+        content = g.getMapImage();
     }
     
     @Override

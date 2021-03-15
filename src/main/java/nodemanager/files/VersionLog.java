@@ -214,7 +214,7 @@ public class VersionLog extends AbstractCsvFile{
     public void importData(Graph g) {}
 
     @Override
-    public void exportData() {}
+    public void exportData(Graph g) {}
     
     
     /*
