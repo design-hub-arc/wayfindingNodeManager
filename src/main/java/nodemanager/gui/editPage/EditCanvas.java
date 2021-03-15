@@ -1,9 +1,11 @@
-package nodemanager.gui;
+package nodemanager.gui.editPage;
 
-import nodemanager.gui.mapComponents.MapImage;
+import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.*;
 import javax.swing.*;
 import java.awt.*;
+import nodemanager.gui.ApplicationBody;
+import nodemanager.gui.ApplicationPage;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)

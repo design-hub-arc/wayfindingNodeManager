@@ -1,6 +1,7 @@
 package nodemanager;
 
-import nodemanager.gui.mapComponents.MapImage;
+import nodemanager.gui.editPage.NodeDataPane;
+import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.modes.ModeRescaleUpperLeft;
 import java.util.ArrayList;
 import nodemanager.events.EditEvent;

@@ -1,4 +1,4 @@
-package nodemanager.gui;
+package nodemanager.gui.editPage;
 
 import javax.swing.*;
 import java.awt.*;

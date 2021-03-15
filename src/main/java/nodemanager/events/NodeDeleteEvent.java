@@ -1,7 +1,7 @@
 package nodemanager.events;
 
 import nodemanager.Session;
-import nodemanager.gui.mapComponents.MapImage;
+import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.model.Node;
 
 /**

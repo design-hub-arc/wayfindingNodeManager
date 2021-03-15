@@ -1,6 +1,6 @@
 package nodemanager.gui;
 
-import nodemanager.gui.mapComponents.NodeIcon;
+import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenu;

@@ -1,4 +1,4 @@
-package nodemanager.gui;
+package nodemanager.gui.editPage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +6,8 @@ import java.awt.event.*;
 import nodemanager.Mode;
 import nodemanager.Session;
 import nodemanager.events.*;
-import nodemanager.gui.mapComponents.NodeIcon;
+import nodemanager.gui.InputConsole;
+import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
 

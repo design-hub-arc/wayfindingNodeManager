@@ -1,4 +1,4 @@
-package nodemanager.gui.mapComponents;
+package nodemanager.gui.editPage.mapComponents;
 
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;

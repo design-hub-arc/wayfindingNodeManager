@@ -1,4 +1,4 @@
-package nodemanager.gui;
+package nodemanager.gui.editPage.mapComponents;
 
 /**
  * Scale is used to scale a collection of points to any other scale.

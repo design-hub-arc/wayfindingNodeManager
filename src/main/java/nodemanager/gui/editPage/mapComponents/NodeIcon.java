@@ -1,11 +1,10 @@
-package nodemanager.gui.mapComponents;
+package nodemanager.gui.editPage.mapComponents;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
 import nodemanager.Session;
 import nodemanager.events.*;
-import nodemanager.gui.Scale;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
 

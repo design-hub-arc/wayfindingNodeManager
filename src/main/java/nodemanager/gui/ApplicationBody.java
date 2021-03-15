@@ -1,5 +1,6 @@
 package nodemanager.gui;
 
+import nodemanager.gui.editPage.EditCanvas;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
