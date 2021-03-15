@@ -184,18 +184,18 @@ public class NodeIcon{
     }
     
     public void mouseClicked(MouseEvent me) {
-        Graph g = Session.getCurrentDataSet();
+        Graph g = onImage.getGraph();
         switch (Session.getMode()) {
             case NONE:
                 Session.selectNode(node);
                 break;
             case ADD_CONNECTION:
                 g.addConnection(Session.selectedNode.id, node.id);
-                Session.logAction(new ConnectionAddedEvent(Session.selectedNode.id, node.id));
+                Session.logAction(new ConnectionAddedEvent(g, Session.selectedNode.id, node.id));
                 break;
             case REMOVE_CONNECTION:
                 if(g.removeConnection(Session.selectedNode.id, node.id)){
-                    Session.logAction(new ConnectionRemovedEvent(Session.selectedNode.id, node.id));
+                    Session.logAction(new ConnectionRemovedEvent(g, Session.selectedNode.id, node.id));
                 }
                 break;
             default:
@@ -233,7 +233,7 @@ public class NodeIcon{
      */
     public void drawAllLinks(Graphics g){
         if(drawLinks){
-            Graph graph = Session.getCurrentDataSet();
+            Graph graph = onImage.getGraph();
             Arrays.stream(graph.getConnectionsById(id)).mapToObj((int id)-> {
                 return graph.getNodeById(id);
             }).forEach((Node n) -> drawLink(g, n));

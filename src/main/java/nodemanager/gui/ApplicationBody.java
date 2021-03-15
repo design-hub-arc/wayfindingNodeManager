@@ -11,10 +11,12 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import nodemanager.Mode;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.gui.exportData.ExportBody;
 import nodemanager.gui.importData.DriveImportPage;
 import nodemanager.gui.importData.LocalImportPage;
+import nodemanager.model.Graph;
 
 /**
  *
@@ -84,8 +86,9 @@ public class ApplicationBody extends JPanel{
     public final void editPage(){
         EditCanvas editPage = new EditCanvas(this);
         Session.map = editPage.getMapImage();
-        if(Session.getCurrentDataSet() != null){
-            editPage.renderGraph(Session.getCurrentDataSet());
+        Graph g = NodeManager.getInstance().getGraph();
+        if(g != null){
+            editPage.renderGraph(g);
         }
         setPage(editPage);
     }

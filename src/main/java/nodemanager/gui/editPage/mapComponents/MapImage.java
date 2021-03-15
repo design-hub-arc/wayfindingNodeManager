@@ -22,6 +22,8 @@ import nodemanager.model.Graph;
  *
  */
 public class MapImage extends JLabel implements MouseListener, MouseMotionListener {
+    private Graph representedGraph;
+    
     private BufferedImage buff;
     private final Scale scaler;
     private final HashMap<Integer, NodeIcon> nodeIcons; // the node icons this is displaying
@@ -71,7 +73,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         addMouseWheelListener(new MapZoomer(this));
     }
     
+    protected final Graph getGraph(){
+        return representedGraph;
+    }
+    
     public final void renderGraph(Graph g){
+        representedGraph = g;
         removeAllNodes();
         setImage(g.getMapImage());
         scaleTo(g.getNodeById(-1).getX(), g.getNodeById(-1).getY(), g.getNodeById(-2).getX(), g.getNodeById(-2).getY());
@@ -204,22 +211,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void scaleTo(double x1, double y1, double x2, double y2) {
         scaler.rescale(x1, y1, x2, y2);
     }
-    
-    
-    /**
-     * Invoked by ImportMenu after importing the node file.
-     * Sets the node icons on the map image to match the newly imported nodes.
-     * 
-     * Move this to map later?
-     */
-    public void refreshNodes() {
-        removeAllNodes();
-        Graph g = Session.getCurrentDataSet();
-        scaleTo(g.getNodeById(-1).getX(), g.getNodeById(-1).getY(), g.getNodeById(-2).getX(), g.getNodeById(-2).getY());
-        g.getAllNodes().forEach(this::addNode);
-        revalidate();
-        repaint();
-    }
 
     /**
      * 
@@ -273,21 +264,19 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             hoveringOver.mouseClicked(me);
         }
         
-        Graph g = Session.getCurrentDataSet();
-        
         switch(Session.getMode()){
             case ADD: {
                 // adds a Node where the user clicks,
                 // unless they click on an existing node
                 NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
                 if (hoveringOver == null) {
-                    Node n = Session.getCurrentDataSet().createNode(
+                    Node n = representedGraph.createNode(
                         (int) scaler.inverseX(translateClickX(me.getX())), 
                         (int) scaler.inverseY(translateClickY(me.getY()))
                     );
-                    Session.getCurrentDataSet().addNode(n);
+                    representedGraph.addNode(n);
                     addNode(n);
-                    Session.logAction(new NodeCreateEvent(n, this));
+                    Session.logAction(new NodeCreateEvent(representedGraph, n, this));
                     repaint();
                 } else {
                     Session.setMode(Mode.NONE);
@@ -334,7 +323,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 Session.newMapY = 0;
                 scaler.setOrigin(0, 0);
 
-                Session.logAction(new MapResizeEvent(this, buff, buff.getSubimage(clip[0], clip[1], clip[2], clip[3])));
+                Session.logAction(new MapResizeEvent(representedGraph, this, buff, buff.getSubimage(clip[0], clip[1], clip[2], clip[3])));
 
                 setImage(buff.getSubimage(clip[0], clip[1], clip[2], clip[3]));
                 break;
