@@ -6,16 +6,12 @@ import javax.swing.*;
 import java.awt.*;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.ApplicationPage;
+import nodemanager.model.Graph;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 public class EditCanvas extends ApplicationPage {
-
-    /**
-     * EditCanvas is the main JPanel used by the program
-     */
-    
     private final JComponent body;
     private final Sidebar sideBar;
 
@@ -54,5 +50,12 @@ public class EditCanvas extends ApplicationPage {
         repaint();
     }
     
+    public final MapImage getMapImage(){
+        return map;
+    }
     
+    public final void renderGraph(Graph g){
+        map.renderGraph(g);
+        repaint();
+    }
 }

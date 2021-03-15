@@ -5,12 +5,15 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.function.Supplier;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import nodemanager.Mode;
 import nodemanager.Session;
+import nodemanager.gui.exportData.ExportBody;
+import nodemanager.gui.importData.DriveImportPage;
 import nodemanager.gui.importData.LocalImportPage;
 
 /**
@@ -18,7 +21,7 @@ import nodemanager.gui.importData.LocalImportPage;
  * @author Matt
  */
 public class ApplicationBody extends JPanel{
-    private final HashMap<String, ApplicationPage> pages;
+    private final HashMap<String, Supplier<ApplicationPage>> pages;
     
     private final JPanel contentArea;
     
@@ -31,10 +34,10 @@ public class ApplicationBody extends JPanel{
     
     public ApplicationBody(){
         pages = new HashMap<>();
-        pages.put(EDIT, new EditCanvas(this));
-        pages.put(LOCAL_IMPORT, new LocalImportPage(this));
-        //pages.put(REMOTE_IMPORT, new DriveImportPage(this));
-        //pages.put(REMOTE_EXPORT, new ExportBody(this));
+        pages.put(EDIT, ()-> new EditCanvas(this));
+        pages.put(LOCAL_IMPORT, ()-> new LocalImportPage(this));
+        pages.put(REMOTE_IMPORT, ()-> new DriveImportPage(this));
+        pages.put(REMOTE_EXPORT, ()-> new ExportBody(this));
         currentPage = null;
         
         setLayout(new BorderLayout());
@@ -61,14 +64,29 @@ public class ApplicationBody extends JPanel{
     }
     
     public final void switchToPage(String pageName){
-        if(pages.containsKey(pageName)){
-            contentArea.removeAll();
-            currentPage = pages.get(pageName);
-            contentArea.add(currentPage);
-            revalidate();
-            repaint();
+        if(pageName.equalsIgnoreCase(EDIT)){
+            editPage();
+        }else if(pages.containsKey(pageName)){
+            setPage(pages.get(pageName).get());
         } else {
             throw new IllegalArgumentException();
         }
+    }
+    
+    private void setPage(ApplicationPage page){
+        contentArea.removeAll();
+        currentPage = page;
+        contentArea.add(currentPage);
+        revalidate();
+        repaint();
+    }
+    
+    public final void editPage(){
+        EditCanvas editPage = new EditCanvas(this);
+        Session.map = editPage.getMapImage();
+        if(Session.getCurrentDataSet() != null){
+            editPage.renderGraph(Session.getCurrentDataSet());
+        }
+        setPage(editPage);
     }
 }

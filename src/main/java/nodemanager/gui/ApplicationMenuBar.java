@@ -79,10 +79,9 @@ public class ApplicationMenuBar extends JMenuBar {
     private void resetData(){
         Graph g = Graph.createDefault();
         Session.setCurrentDataSet(g);
-        Session.map.removeAllNodes();
-        g.getAllNodes().forEach(Session.map::addNode);
-        Session.map.scaleTo(0, 0, 100, 100);
-        Session.map.setImage(g.getMapImage());
+        if(Session.map != null){
+            Session.map.renderGraph(g);
+        }
     }
     
     private void trySelectNode(int id){

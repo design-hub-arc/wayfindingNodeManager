@@ -72,9 +72,9 @@ public class NodeCoordFile extends AbstractCsvFile{
     public void importData(Graph g) {
         nodes.forEach((n)->{
             g.addNode(n);
-            Session.map.addNode(n);
+            //Session.map.addNode(n);
         });
-        Session.map.refreshNodes();
+        //Session.map.refreshNodes();
     }
 
     @Override

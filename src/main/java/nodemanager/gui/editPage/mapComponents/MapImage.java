@@ -56,7 +56,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         
         setFocusable(true);
         
-        registerControls();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent ce) {
+                resize();
+            }
+        });
         
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -64,22 +69,14 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         addMouseListener(panner);
         addMouseMotionListener(panner);
         addMouseWheelListener(new MapZoomer(this));
-        
-        Session.map = this;
     }
-
     
-    /**
-     * Adds the controls to the map image, 
-     * and registers all the mouse listeners
-     */
-    private void registerControls() {
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent ce) {
-                resize();
-            }
-        });
+    public final void renderGraph(Graph g){
+        removeAllNodes();
+        setImage(g.getMapImage());
+        scaleTo(g.getNodeById(-1).getX(), g.getNodeById(-1).getY(), g.getNodeById(-2).getX(), g.getNodeById(-2).getY());
+        g.getAllNodes().forEach(this::addNode);
+        resizeNodeIcons();
     }
     
     public final NodeIcon getIcon(int id){
