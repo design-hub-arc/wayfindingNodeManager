@@ -4,6 +4,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import nodemanager.gui.NodeManagerWindow;
 import nodemanager.model.Graph;
+import nodemanager.events.EventLog;
 
 
 /**
@@ -14,11 +15,13 @@ import nodemanager.model.Graph;
 
 public class NodeManager {
     private Graph graph;
+    private final EventLog log;
     
     private static NodeManager instance;
     
     private NodeManager(){
         graph = Graph.createDefault();
+        log = new EventLog();
     }
     
     public static final NodeManager getInstance(){
@@ -34,6 +37,10 @@ public class NodeManager {
     
     public final Graph getGraph(){
         return graph;
+    }
+    
+    public final EventLog getLog(){
+        return log;
     }
     
     public final void launchGui(){

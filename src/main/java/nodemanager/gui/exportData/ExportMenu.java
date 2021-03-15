@@ -85,6 +85,8 @@ public class ExportMenu extends JMenu{
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        
+        NodeManager.getInstance().getLog().clear();
     }
     
     private JMenuItem exportManifest(){

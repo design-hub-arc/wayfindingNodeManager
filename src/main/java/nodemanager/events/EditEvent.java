@@ -8,7 +8,7 @@ import nodemanager.model.Graph;
  * a subclass of Edit Event, then call 
  * <hr>
  * <code>
- * Session.logAction(event);
+ * NodeManager.getInstance().getLog().log(event);
  * </code>
  * <hr>
  To record it. When overriding this class, 

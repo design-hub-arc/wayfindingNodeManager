@@ -36,14 +36,9 @@ public class Session {
     public static int newMapY = 0;
     public static int newMapWidth = 0;
     public static int newMapHeight = 0;
-    public static boolean isSaved = true;
     
     // the view
     public static MapImage map = null;
-    
-    //used to undoImpl actions
-    private static final ArrayList<EditEvent> ACTIONS = new ArrayList<>();
-    private static int actionIdx = -1; //the most recent action index
     
     public static void selectNode(Node n){
         selectedNode = n;
@@ -82,39 +77,5 @@ public class Session {
     
     public final static Mode getMode(){
         return mode;
-    }
-    
-    public static void logAction(EditEvent e){
-        ACTIONS.add(e);
-        actionIdx = ACTIONS.size() - 1;
-        Session.isSaved = false;
-    }
-    
-    /**
-     * Called after uploading the manifest.
-     * Clears all actions
-    */
-    public static void purgeActions(){
-        ACTIONS.clear();
-        actionIdx = -1;
-        Session.isSaved = true;
-    }
-    
-    public static void undoLastAction(){
-        if(actionIdx >= 0){
-            ACTIONS.get(actionIdx).undo();
-            actionIdx--;
-        }
-        if(actionIdx == -1){
-            //no actions, so nothing to save
-            Session.isSaved = true;
-        }
-    }
-    public static void redoLastAction(){
-        if(actionIdx < ACTIONS.size() - 1){
-            actionIdx++;
-            ACTIONS.get(actionIdx).redo();
-            Session.isSaved = false;
-        }
     }
 }

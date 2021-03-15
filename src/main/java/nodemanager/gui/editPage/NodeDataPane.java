@@ -58,7 +58,7 @@ public class NodeDataPane extends JComponent{
                 ip.warn("Cannot delete node with id of " + selectedNode.id);
             } else {
                 Graph g = NodeManager.getInstance().getGraph();
-                Session.logAction(new NodeDeleteEvent(g, selectedNode, Session.map));
+                NodeManager.getInstance().getLog().log(new NodeDeleteEvent(g, selectedNode, Session.map));
                 Session.map.removeNode(selectedNode);
                 g.removeNode(selectedNode.id);
                 Session.selectNode(g.getNodeById(-1));
@@ -72,7 +72,7 @@ public class NodeDataPane extends JComponent{
                 Graph g = NodeManager.getInstance().getGraph();
                 Session.setMode(Mode.MOVE);
                 NodeIcon icon = Session.map.getIcon(selectedNode.id);
-                Session.logAction(new NodeMovedEvent(g, selectedNode, icon.getX(), icon.getY()));
+                NodeManager.getInstance().getLog().log(new NodeMovedEvent(g, selectedNode, icon.getX(), icon.getY()));
             }
         });
         
@@ -103,7 +103,7 @@ public class NodeDataPane extends JComponent{
                     Graph g = NodeManager.getInstance().getGraph();
                     Node labeled = g.getNodeByLabel(label);
                     if(g.removeLabel(label)){
-                        Session.logAction(new LabelRemovedEvent(g, labeled, label));
+                        NodeManager.getInstance().getLog().log(new LabelRemovedEvent(g, labeled, label));
                         selectNode(selectedNode); //reload node description
                     }
                 }
@@ -116,7 +116,7 @@ public class NodeDataPane extends JComponent{
     private void tryAddLabel(String label){
         Graph g = NodeManager.getInstance().getGraph();
         if(g.addLabel(label, selectedNode.getId())){
-            Session.logAction(new LabelAddedEvent(g, selectedNode, label));
+            NodeManager.getInstance().getLog().log(new LabelAddedEvent(g, selectedNode, label));
             selectNode(selectedNode); //reload node description
         } else {
             InputConsole.getInstance().warn(String.format("Label '%s' is already in use.", label));

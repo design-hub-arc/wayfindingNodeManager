@@ -276,7 +276,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                     );
                     representedGraph.addNode(n);
                     addNode(n);
-                    Session.logAction(new NodeCreateEvent(representedGraph, n, this));
+                    NodeManager.getInstance().getLog().log(new NodeCreateEvent(representedGraph, n, this));
                     repaint();
                 } else {
                     Session.setMode(Mode.NONE);
@@ -324,7 +324,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 scaler.setOrigin(0, 0);
                 
                 BufferedImage sub = buff.getSubimage(clip[0], clip[1], clip[2], clip[3]);
-                Session.logAction(new MapResizeEvent(representedGraph, this, buff, sub));
+                NodeManager.getInstance().getLog().log(new MapResizeEvent(representedGraph, this, buff, sub));
                 
                 setImage(sub);
                 representedGraph.setMapImage(sub);

@@ -4,6 +4,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 
 /**
@@ -22,7 +23,8 @@ public class NodeManagerWindow extends JFrame{
         addWindowListener(new WindowAdapter(){
             @Override
             public void windowClosing(WindowEvent we) {
-                boolean close = Session.isSaved || JOptionPane.showConfirmDialog(
+                boolean close = NodeManager.getInstance().getLog().isSaved() 
+                    || JOptionPane.showConfirmDialog(
                         self, 
                         "You might have unsaved work, are you sure you want to exit?", 
                         "Warning", 

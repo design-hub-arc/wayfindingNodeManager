@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.io.IOException;
 import javax.swing.*;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.*;
@@ -107,8 +108,8 @@ public final class ExportBody extends ApplicationPage {
         repaint();
         WayfindingManifest newMan = new WayfindingManifest(name.getText());
         GoogleDriveUploader.uploadManifest(newMan, folder.getText()).addOnSucceed((f)->{
-            msg.setText("Upload complete!");            
-            Session.purgeActions();
+            msg.setText("Upload complete!");
+            NodeManager.getInstance().getLog().clear();
             v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
             GoogleDriveUploader.revise(v).addOnFail((err)->{
                 msg.setText(err.getMessage());

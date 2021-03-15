@@ -3,6 +3,7 @@ package nodemanager.gui.editPage.mapComponents;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
+import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.events.*;
 import nodemanager.model.Graph;
@@ -191,11 +192,11 @@ public class NodeIcon{
                 break;
             case ADD_CONNECTION:
                 g.addConnection(Session.selectedNode.id, node.id);
-                Session.logAction(new ConnectionAddedEvent(g, Session.selectedNode.id, node.id));
+                NodeManager.getInstance().getLog().log(new ConnectionAddedEvent(g, Session.selectedNode.id, node.id));
                 break;
             case REMOVE_CONNECTION:
                 if(g.removeConnection(Session.selectedNode.id, node.id)){
-                    Session.logAction(new ConnectionRemovedEvent(g, Session.selectedNode.id, node.id));
+                    NodeManager.getInstance().getLog().log(new ConnectionRemovedEvent(g, Session.selectedNode.id, node.id));
                 }
                 break;
             default:

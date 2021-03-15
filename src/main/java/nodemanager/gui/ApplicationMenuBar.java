@@ -45,14 +45,14 @@ public class ApplicationMenuBar extends JMenuBar {
         
         JMenuItem undo = new JMenuItem("Undo");
         undo.addActionListener((ActionEvent e) -> {
-            Session.undoLastAction();
+            NodeManager.getInstance().getLog().undo();
         });
         undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK));
         add(undo);
         
         JMenuItem redo = new JMenuItem("Redo");
         redo.addActionListener((ActionEvent e) -> {
-            Session.redoLastAction();
+            NodeManager.getInstance().getLog().redo();
         });
         redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK));
         add(redo);
@@ -83,6 +83,7 @@ public class ApplicationMenuBar extends JMenuBar {
         if(Session.map != null){
             Session.map.renderGraph(g);
         }
+        NodeManager.getInstance().getLog().clear();
     }
     
     private void trySelectNode(int id){
