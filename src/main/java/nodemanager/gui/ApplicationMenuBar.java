@@ -14,6 +14,7 @@ import nodemanager.gui.exportData.ExportMenu;
 import nodemanager.gui.importData.ImportMenu;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
+import nodemanager.modes.ModeNewNode;
 
 /**
  *
@@ -33,7 +34,7 @@ public class ApplicationMenuBar extends JMenuBar {
         
         JMenuItem addNodeButton = new JMenuItem("Add a new Node");
         addNodeButton.addActionListener((ActionEvent e) -> {
-            Session.setMode(Mode.ADD);
+            NodeManager.getInstance().setMode(new ModeNewNode());
         });
         add(addNodeButton);
         

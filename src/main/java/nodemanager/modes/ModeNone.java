@@ -10,7 +10,7 @@ import nodemanager.gui.editPage.mapComponents.MapImage;
 public final class ModeNone extends AbstractMode {
 
     public ModeNone() {
-        super("");
+        super("(back to no mode)");
     }
 
     @Override

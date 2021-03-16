@@ -6,6 +6,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import nodemanager.gui.NodeManagerWindow;
 import nodemanager.model.Graph;
 import nodemanager.events.EventLog;
+import nodemanager.gui.InputConsole;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.modes.AbstractMode;
 import nodemanager.modes.ModeNone;
@@ -49,12 +50,16 @@ public class NodeManager {
         if(mode == null){
             mode = new ModeNone();
         }
+        if(this.mode != mode){
+            // only print message when changing modes
+            InputConsole.getInstance().writeMessage(String.format("%s", mode.getMessage()));
+        }
         this.mode = mode;
     }
     
     public final void mapClicked(MapImage map, MouseEvent me){
         if(this.mode != null){
-            this.mode = this.mode.mapImageClicked(map, me);
+            this.setMode(this.mode.mapImageClicked(map, me));
         }
     }
     

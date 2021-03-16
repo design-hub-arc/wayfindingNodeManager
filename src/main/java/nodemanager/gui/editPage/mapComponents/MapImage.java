@@ -73,7 +73,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         addMouseWheelListener(new MapZoomer(this));
     }
     
-    protected final Graph getGraph(){
+    public final Graph getGraph(){
         return representedGraph;
     }
     
@@ -89,7 +89,14 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public final NodeIcon getIcon(int id){
         return this.nodeIcons.get(id);
     }
-
+    
+    public final Point mouseClickToNodeSpace(Point mouseClick){
+        return new Point(
+            (int)scaler.inverseX(translateClickX(mouseClick.x)),
+            (int)scaler.inverseY(translateClickY(mouseClick.y))
+        );
+    }
+    
     /**
      * Converts a click on the MapImage to where the user would be clicking on
      * the actual image
@@ -225,7 +232,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * @throws NullPointerException if the mouse isn't over a node.
      * @return the NodeIcon the mouse is over
      */
-    private NodeIcon hoveredNodeIcon(int mouseX, int mouseY) throws NullPointerException {
+    public final NodeIcon hoveredNodeIcon(int mouseX, int mouseY) throws NullPointerException {
         int x = translateClickX(mouseX);
         int y = translateClickY(mouseY);
         return nodeIcons.values().stream().filter(icon -> {
@@ -267,24 +274,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
         
         switch(Session.getMode()){
-            case ADD: {
-                // adds a Node where the user clicks,
-                // unless they click on an existing node
-                NodeIcon hoveringOver = this.hoveredNodeIcon(me.getX(), me.getY());
-                if (hoveringOver == null) {
-                    Node n = representedGraph.createNode(
-                        (int) scaler.inverseX(translateClickX(me.getX())), 
-                        (int) scaler.inverseY(translateClickY(me.getY()))
-                    );
-                    representedGraph.addNode(n);
-                    addNode(n);
-                    NodeManager.getInstance().getLog().log(new NodeCreateEvent(representedGraph, n, this));
-                    repaint();
-                } else {
-                    Session.setMode(Mode.NONE);
-                }
-                break;
-            }
             case MOVE: {
                 NodeIcon icon = getIcon(Session.selectedNode.getId());
                 Session.selectedNode.setX((int)icon.getScale().inverseX(icon.getX()));
