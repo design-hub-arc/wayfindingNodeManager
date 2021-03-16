@@ -11,6 +11,7 @@ import nodemanager.gui.InputConsole;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
+import nodemanager.modes.ModeMove;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -70,7 +71,7 @@ public class NodeDataPane extends JComponent{
                 ip.warn("Cannot move node with id of " + selectedNode.id);
             } else {
                 Graph g = NodeManager.getInstance().getGraph();
-                Session.setMode(Mode.MOVE);
+                NodeManager.getInstance().setMode(new ModeMove(selectedNode));
                 NodeIcon icon = Session.map.getIcon(selectedNode.id);
                 NodeManager.getInstance().getLog().log(new NodeMovedEvent(g, selectedNode, icon.getX(), icon.getY()));
             }

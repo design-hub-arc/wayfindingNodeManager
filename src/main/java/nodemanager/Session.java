@@ -50,9 +50,6 @@ public class Session {
     public static void setMode(Mode m){
         mode = m;
         switch(m){
-            case MOVE:
-                newMode = new ModeMove();
-                break;
             case ADD_CONNECTION:
                 newMode = new ModeAddConnection(selectedNode.id);
                 break;

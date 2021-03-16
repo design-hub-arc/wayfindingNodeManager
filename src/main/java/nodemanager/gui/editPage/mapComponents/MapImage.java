@@ -274,13 +274,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
         
         switch(Session.getMode()){
-            case MOVE: {
-                NodeIcon icon = getIcon(Session.selectedNode.getId());
-                Session.selectedNode.setX((int)icon.getScale().inverseX(icon.getX()));
-                Session.selectedNode.setY((int)icon.getScale().inverseY(icon.getY()));
-                Session.setMode(Mode.NONE);
-                break;
-            }
             case RESCALE_UL: {
                 // sets the upper-left corner of the new map image clip
                 Session.setMode(Mode.RESCALE_LR);
@@ -355,11 +348,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
 
         switch(Session.getMode()){
-            case MOVE: {
-                getIcon(Session.selectedNode.getId()).setPos(translateClickX(me.getX()), translateClickY(me.getY()));
-                repaint();
-                break;
-            }
             case RESCALE_UL: {
                 double shiftX = translateClickX(me.getX());
                 double shiftY = translateClickY(me.getY());
