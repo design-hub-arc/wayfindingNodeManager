@@ -165,8 +165,10 @@ public class Graph {
             sb.append(String.format("\t%d => %s%n", id, node.toString()));
         });
         sb.append("* Connections:\n");
-        connections.forEach((from, to)->{
-            sb.append(String.format("\t%d => %d%n", from, to));
+        connections.forEach((from, conns)->{
+            conns.forEach((to)->{
+                sb.append(String.format("\t%d => %d%n", from.intValue(), to));
+            });
         });
         sb.append("* Labels:\n");
         labels.forEach((label, id)->{

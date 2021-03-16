@@ -11,6 +11,7 @@ import nodemanager.gui.InputConsole;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
+import nodemanager.modes.ModeAddConnection;
 import nodemanager.modes.ModeMove;
 
 /**
@@ -78,7 +79,11 @@ public class NodeDataPane extends JComponent{
         });
         
         addOption("Add a connection", () -> {
-            Session.setMode(Mode.ADD_CONNECTION);
+            if(this.selectedNode.getId() >= 0){
+                NodeManager.getInstance().setMode(new ModeAddConnection(this.selectedNode.getId()));
+            } else {
+                ip.warn(String.format("Cannot add connections to node %d", selectedNode.getId()));
+            }
         });
         
         addOption("Remove a connection", () -> {

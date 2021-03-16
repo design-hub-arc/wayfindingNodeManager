@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
 import nodemanager.gui.ApplicationPage;

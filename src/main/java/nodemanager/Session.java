@@ -3,14 +3,9 @@ package nodemanager;
 import nodemanager.gui.editPage.NodeDataPane;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.modes.ModeRescaleUpperLeft;
-import java.util.ArrayList;
-import nodemanager.events.EditEvent;
 import nodemanager.model.Node;
 import nodemanager.gui.*;
 import nodemanager.modes.AbstractMode;
-import nodemanager.modes.ModeAddConnection;
-import nodemanager.modes.ModeMove;
-import nodemanager.modes.ModeNewNode;
 import nodemanager.modes.ModeNone;
 import nodemanager.modes.ModeRemoveConnection;
 import nodemanager.modes.ModeRescaleLowerRight;
@@ -50,9 +45,6 @@ public class Session {
     public static void setMode(Mode m){
         mode = m;
         switch(m){
-            case ADD_CONNECTION:
-                newMode = new ModeAddConnection(selectedNode.id);
-                break;
             case REMOVE_CONNECTION:
                 newMode = new ModeRemoveConnection(selectedNode.id);
                 break;
