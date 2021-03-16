@@ -1,5 +1,6 @@
 package nodemanager;
 
+import java.awt.Point;
 import nodemanager.gui.editPage.NodeDataPane;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.modes.ModeRescaleUpperLeft;
@@ -28,8 +29,6 @@ public class Session {
     public static NodeDataPane dataPane = null;
     public static int newMapX = 0;
     public static int newMapY = 0;
-    public static int newMapWidth = 0;
-    public static int newMapHeight = 0;
     
     // the view
     public static MapImage map = null;
@@ -44,12 +43,9 @@ public class Session {
     public static void setMode(Mode m){
         mode = m;
         switch(m){
-            case RESCALE_UL:
-                newMode = new ModeRescaleUpperLeft();
-                break;
-            case RESCALE_LR:
-                newMode = new ModeRescaleLowerRight();
-                break;
+            //case RESCALE_LR:
+                //newMode = new ModeRescaleLowerRight(new Point(newMapX, newMapY));
+              //  break;
             default:
                 newMode = new ModeNone();
                 break;

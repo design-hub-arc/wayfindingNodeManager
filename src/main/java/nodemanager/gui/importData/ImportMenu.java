@@ -6,6 +6,7 @@ import nodemanager.*;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.ApplicationMenuBar;
 import nodemanager.gui.InputConsole;
+import nodemanager.modes.ModeRescaleUpperLeft;
 
 /**
  * This is used by EditCanvas to provide options for loading data into the program.
@@ -52,7 +53,7 @@ public class ImportMenu extends JMenu{
     private JMenuItem resizeMapMenu(){
         JMenuItem resize = new JMenuItem("Resize map image");
         resize.addActionListener((ActionEvent e) -> {
-            Session.setMode(Mode.RESCALE_UL);    
+            NodeManager.getInstance().setMode(new ModeRescaleUpperLeft());
         });
         return resize;
     }

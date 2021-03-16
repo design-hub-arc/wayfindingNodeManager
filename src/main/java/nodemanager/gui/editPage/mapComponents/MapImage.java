@@ -104,7 +104,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * @param x mouse click x coordinate
      * @return the x coordinate on the image where the user would have clicked
      */
-    private int translateClickX(int x) {
+    public final int translateClickX(int x) {
         return (int) ((x + clipX) / zoom);
     }
 
@@ -115,7 +115,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
      * @param y mouse click y coordinate
      * @return the y coordinate on the image where the user would have clicked
      */
-    private int translateClickY(int y) {
+    public final int translateClickY(int y) {
         return (int) ((y + clipY) / zoom);
     }
 
@@ -206,7 +206,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipY = 0;
         resize();
     }
-
+    
+    public final void setScaleOrigin(int clickX, int clickY){
+        scaler.setOrigin(
+            translateClickX(clickX), 
+            translateClickY(clickY)
+        );
+        resizeNodeIcons();
+    }
+    
     /**
      * Scales the coordinate conversion to two points
      *
@@ -274,6 +282,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
         
         switch(Session.getMode()){
+            /*
             case RESCALE_UL: {
                 // sets the upper-left corner of the new map image clip
                 Session.setMode(Mode.RESCALE_LR);
@@ -281,15 +290,15 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 Session.newMapX = icon.getX();
                 Session.newMapY = icon.getY();
                 break;
-            }
-            case RESCALE_LR: {
+            }*/
+            //case RESCALE_LR: {
                 // sets the lower-right corner of the new map image clip
-                Session.setMode(Mode.NONE);
-                Session.newMapWidth = getIcon(-2).getX() - Session.newMapX;
-                Session.newMapHeight = getIcon(-2).getY() - Session.newMapY;
+                //Session.setMode(Mode.NONE);
+                //Session.newMapWidth = getIcon(-2).getX() - Session.newMapX;
+                //Session.newMapHeight = getIcon(-2).getY() - Session.newMapY;
 
-                int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
-
+                //int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
+                /*
                 if (clip[0] < 0) {
                     clip[0] = 0;
                 }
@@ -304,7 +313,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 }
 
                 Session.newMapX = 0;
-                Session.newMapY = 0;
+                Session.newMapY = 0;*/
+            /*
                 scaler.setOrigin(0, 0);
                 
                 BufferedImage sub = buff.getSubimage(clip[0], clip[1], clip[2], clip[3]);
@@ -313,7 +323,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 setImage(sub);
                 representedGraph.setMapImage(sub);
                 break;
-            }
+            }*/
         }
         repaint();
     }
@@ -348,18 +358,20 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         }
 
         switch(Session.getMode()){
+            /*
             case RESCALE_UL: {
                 double shiftX = translateClickX(me.getX());
                 double shiftY = translateClickY(me.getY());
                 scaler.setOrigin((int)shiftX, (int)shiftY);
                 resizeNodeIcons();
                 break;
-            }
+            }*/
+            /*
             case RESCALE_LR: {
                 scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
                 resizeNodeIcons();
                 break;
-            }
+            }*/
         }
     }
 }

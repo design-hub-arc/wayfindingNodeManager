@@ -2,6 +2,7 @@ package nodemanager.modes;
 
 import java.awt.event.MouseEvent;
 import nodemanager.gui.editPage.mapComponents.MapImage;
+import nodemanager.gui.editPage.mapComponents.NodeIcon;
 
 /**
  *
@@ -15,7 +16,9 @@ public class ModeRescaleUpperLeft extends AbstractMode {
 
     @Override
     public AbstractMode mapImageClicked(MapImage mapImage, MouseEvent me) {
-        return this;
+        mapImage.setScaleOrigin(me.getX(), me.getY());
+        
+        return new ModeRescaleLowerRight(me.getPoint());
     }
 
 }

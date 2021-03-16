@@ -22,7 +22,5 @@ some classes have event listeners that check the current mode to decide how to a
 see MapImage and NodeIcon
 */
 public enum Mode {
-    NONE,
-    RESCALE_UL,
-    RESCALE_LR
+    NONE
 }
