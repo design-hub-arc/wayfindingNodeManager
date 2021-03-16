@@ -23,7 +23,6 @@ see MapImage and NodeIcon
 */
 public enum Mode {
     NONE,
-    REMOVE_CONNECTION,
     RESCALE_UL,
     RESCALE_LR
 }

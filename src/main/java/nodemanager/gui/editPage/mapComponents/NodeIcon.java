@@ -190,11 +190,6 @@ public class NodeIcon{
             case NONE:
                 Session.selectNode(node);
                 break;
-            case REMOVE_CONNECTION:
-                if(g.removeConnection(Session.selectedNode.id, node.id)){
-                    NodeManager.getInstance().getLog().log(new ConnectionRemovedEvent(g, Session.selectedNode.id, node.id));
-                }
-                break;
             default:
                 break;
         }

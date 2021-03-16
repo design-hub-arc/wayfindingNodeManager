@@ -29,10 +29,12 @@ public class ModeAddConnection extends AbstractMode {
         NodeIcon clickedOn = mapImage.hoveredNodeIcon(me.getX(), me.getY());
         if(clickedOn != null){
             Graph g = mapImage.getGraph();
-            g.addConnection(nodeId, clickedOn.getNode().getId());
-            NodeManager.getInstance().getLog().log(new ConnectionAddedEvent(g, nodeId, clickedOn.getNode().getId()));
-            mapImage.repaint();
-            if(me.getButton() > 1){
+            if(g.addConnection(nodeId, clickedOn.getNode().getId())){
+                NodeManager.getInstance().getLog().log(new ConnectionAddedEvent(g, nodeId, clickedOn.getNode().getId()));
+                mapImage.repaint();
+            }
+            
+            if(me.getButton() > 1){ // right click
                 newMode = new ModeAddConnection(clickedOn.getNode().getId());
             }
         }

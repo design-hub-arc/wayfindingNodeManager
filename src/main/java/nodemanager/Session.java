@@ -7,7 +7,6 @@ import nodemanager.model.Node;
 import nodemanager.gui.*;
 import nodemanager.modes.AbstractMode;
 import nodemanager.modes.ModeNone;
-import nodemanager.modes.ModeRemoveConnection;
 import nodemanager.modes.ModeRescaleLowerRight;
 
 /**
@@ -45,9 +44,6 @@ public class Session {
     public static void setMode(Mode m){
         mode = m;
         switch(m){
-            case REMOVE_CONNECTION:
-                newMode = new ModeRemoveConnection(selectedNode.id);
-                break;
             case RESCALE_UL:
                 newMode = new ModeRescaleUpperLeft();
                 break;

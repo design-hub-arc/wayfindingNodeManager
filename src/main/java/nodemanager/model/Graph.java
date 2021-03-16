@@ -41,15 +41,20 @@ public class Graph {
         }
     }
     
-    public final void addConnection(int fromId, int toId){
+    public final boolean addConnection(int fromId, int toId){
+        boolean added = false;
         if(!connections.containsKey(fromId)){
             connections.put(fromId, new HashSet<>());
+            added = true;
         }
         if(!connections.containsKey(toId)){
             connections.put(toId, new HashSet<>());
+            added = true;
         }
         connections.get(fromId).add(toId);
         connections.get(toId).add(fromId);
+        
+        return added;
     }
     
     public final boolean addLabel(String label, int id){

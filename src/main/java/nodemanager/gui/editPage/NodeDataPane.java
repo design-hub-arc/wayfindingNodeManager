@@ -13,6 +13,7 @@ import nodemanager.model.Graph;
 import nodemanager.model.Node;
 import nodemanager.modes.ModeAddConnection;
 import nodemanager.modes.ModeMove;
+import nodemanager.modes.ModeRemoveConnection;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -87,7 +88,11 @@ public class NodeDataPane extends JComponent{
         });
         
         addOption("Remove a connection", () -> {
-            Session.setMode(Mode.REMOVE_CONNECTION);
+            if(this.selectedNode.getId() >= 0){
+                NodeManager.getInstance().setMode(new ModeRemoveConnection(this.selectedNode.getId()));
+            } else {
+                ip.warn(String.format("Cannot remove connections from node %d", selectedNode.getId()));
+            }
         });
         
         addOption("Add a label", () -> {
