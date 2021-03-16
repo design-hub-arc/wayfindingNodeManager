@@ -260,6 +260,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     @Override
     public void mouseClicked(MouseEvent me) {
         
+        NodeManager.getInstance().mapClicked(this, me); // for now
+        
         if (hoveringOver != null) {
             hoveringOver.mouseClicked(me);
         }
