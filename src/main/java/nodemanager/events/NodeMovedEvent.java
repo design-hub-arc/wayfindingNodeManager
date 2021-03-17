@@ -31,8 +31,8 @@ public class NodeMovedEvent extends EditEvent{
         newX = icon.getX();
         newY = icon.getY();
         icon.setPos(initialX, initialY);
-        moved.setX((int)icon.getScale().inverseX(icon.getX()));
-        moved.setY((int)icon.getScale().inverseY(icon.getY()));
+        moved.setX((int)icon.getScale().mapXToNodeX(icon.getX()));
+        moved.setY((int)icon.getScale().mapYToNodeY(icon.getY()));
         icon.getHost().repaint();
     }
 
@@ -40,8 +40,8 @@ public class NodeMovedEvent extends EditEvent{
     public void redoImpl(Graph g) {
         NodeIcon icon = Session.map.getIcon(moved.getId());
         icon.setPos(newX, newY);
-        moved.setX((int)icon.getScale().inverseX(icon.getX()));
-        moved.setY((int)icon.getScale().inverseY(icon.getY()));
+        moved.setX((int)icon.getScale().mapXToNodeX(icon.getX()));
+        moved.setY((int)icon.getScale().mapYToNodeY(icon.getY()));
         icon.getHost().repaint();
     }
     

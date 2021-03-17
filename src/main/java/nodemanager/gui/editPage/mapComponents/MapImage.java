@@ -97,8 +97,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     
     public final Point mouseClickToNodeSpace(Point mouseClick){
         return new Point(
-            (int)scaler.inverseX(translateClickX(mouseClick.x)),
-            (int)scaler.inverseY(translateClickY(mouseClick.y))
+            (int)scaler.mapXToNodeX(translateClickX(mouseClick.x)),
+            (int)scaler.mapYToNodeY(translateClickY(mouseClick.y))
         );
     }
     
@@ -194,7 +194,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public final void resize() {
         zoom = 1.0;
         if(buff != null){
-            scaler.setSize(buff.getWidth(), buff.getHeight());
+            scaler.setMapSize(buff.getWidth(), buff.getHeight());
         }
         resizeNodeIcons();
     }
@@ -210,14 +210,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipX = 0;
         clipY = 0;
         resize();
-    }
-    
-    public final void setScaleOrigin(int clickX, int clickY){
-        scaler.setOrigin(
-            translateClickX(clickX), 
-            translateClickY(clickY)
-        );
-        resizeNodeIcons();
     }
     
     /**
@@ -358,7 +350,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
             }*/
             /*
             case RESCALE_LR: {
-                scaler.setSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
+                scaler.setMapSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
                 resizeNodeIcons();
                 break;
             }*/

@@ -2,29 +2,32 @@ package nodemanager.gui.editPage.mapComponents;
 
 /**
  * Scale is used to scale a collection of points to any other scale.
- * When scaling points, the program states that the upper-leftmost point in the collection is positioned at (0, 0) on the scaling destination.
- * similarly, the point (sourceWidth, sourceHeight) is positioned at (destinationWidth, destinationHeight).
- * Given this relationship, each point in the collection is a set percentage of the way across and down the scaling destination's coordinate system.
+ * (namely, Nodes to a map image)
+ * When scaling points, the program states that the upper-leftmost point in the 
+ * collection is positioned at (0, 0) on the scaling destination. Similarly, the 
+ * point (nodeSpaceWidth, nodeSpaceHeight) is positioned at (mapWidth, mapHeight).
+ * Given this relationship, each point in the collection is a set percentage of 
+ * the way across and down the scaling destination's coordinate system.
  */
 
 public class Scale {
-    private double minX;
-    private double minY;
-    private double maxX;
-    private double maxY;
-    private double sourceWidth;
-    private double sourceHeight;
+    private double nodeSpaceMinX;
+    private double nodeSpaceMinY;
+    private double nodeSpaceMaxX;
+    private double nodeSpaceMaxY;
+    private double nodeSpaceWidth;
+    private double nodeSpaceHeight;
     
-    private double destinationWidth;
-    private double destinationHeight;
+    private double mapWidth;
+    private double mapHeight;
     private int shiftX; //shifts the origin of the destination plane
     private int shiftY;
     
     /**
-     * @param minx : the horizontal component of the upper-leftmost point of the item(s) you want to scale
-     * @param miny : the vertical component of the upper-leftmost point of the item(s) you want to scale
-     * @param maxx : the horizontal component of the lower-rightmost point of the item(s) you want to scale
-     * @param maxy : the vertical component of the lower-rightmost point of the item(s) you want to scale
+     * @param minx : the horizontal component of the upper-leftmost point of the nodes you want to scale
+     * @param miny : the vertical component of the upper-leftmost point of the nodes you want to scale
+     * @param maxx : the horizontal component of the lower-rightmost point of the nodes you want to scale
+     * @param maxy : the vertical component of the lower-rightmost point of the nodes you want to scale
      */
     public Scale(double minx, double miny, double maxx, double maxy){
         rescale(minx, miny, maxx, maxy); 
@@ -34,29 +37,29 @@ public class Scale {
     }
     
     /**
-     * @param minx : the horizontal component of the upper-leftmost point of the item(s) you want to scale
-     * @param miny : the vertical component of the upper-leftmost point of the item(s) you want to scale
-     * @param maxx : the horizontal component of the lower-rightmost point of the item(s) you want to scale
-     * @param maxy : the vertical component of the lower-rightmost point of the item(s) you want to scale
+     * @param minx : the horizontal component of the upper-leftmost point of the nodes you want to scale
+     * @param miny : the vertical component of the upper-leftmost point of the nodes you want to scale
+     * @param maxx : the horizontal component of the lower-rightmost point of the nodes you want to scale
+     * @param maxy : the vertical component of the lower-rightmost point of the nodes you want to scale
      */
     public void rescale(double minx, double miny, double maxx, double maxy){
-        minX = minx;
-        minY = miny;
-        maxX = maxx;
-        maxY = maxy;
-        sourceWidth = maxX - minX;
-        sourceHeight = maxY - minY;
+        nodeSpaceMinX = minx;
+        nodeSpaceMinY = miny;
+        nodeSpaceMaxX = maxx;
+        nodeSpaceMaxY = maxy;
+        nodeSpaceWidth = nodeSpaceMaxX - nodeSpaceMinX;
+        nodeSpaceHeight = nodeSpaceMaxY - nodeSpaceMinY;
         shiftX = 0;
         shiftY = 0;
     }
     
     /**
-     * @param w : the destination width to scale points to
-     * @param h : the destination height to scale points to
+     * @param w : the map width to scale points to
+     * @param h : the map height to scale points to
      */
-    public void setSize(int w, int h){
-        destinationWidth = w;
-        destinationHeight = h;
+    public void setMapSize(int w, int h){
+        mapWidth = w;
+        mapHeight = h;
     }
     
     /**
@@ -73,18 +76,18 @@ public class Scale {
      * @param x : the horizontal component of a point within the source point collection you want to scale
      * @return the equivalent x-coordinate on the destination plane
      */
-    public int x(double x){
-        double percLeft = (x - minX) / sourceWidth;
-        return (int)(percLeft * destinationWidth) + shiftX;
+    public int nodeXToMapX(double x){
+        double percLeft = (x - nodeSpaceMinX) / nodeSpaceWidth;
+        return (int)(percLeft * mapWidth) + shiftX;
     }
     
     /**
      * @param y : the vertical component of a point within the source point collection you want to scale
      * @return the equivalent y-coordinate on the destination plane
      */
-    public int y(double y){
-        double percDown = (y - minY) / sourceHeight;
-        return (int)(percDown * destinationHeight) + shiftY;
+    public int nodeYToMapY(double y){
+        double percDown = (y - nodeSpaceMinY) / nodeSpaceHeight;
+        return (int)(percDown * mapHeight) + shiftY;
     }
     
     /**
@@ -92,8 +95,8 @@ public class Scale {
      * @param x : an x-coordinate on the destination plane
      * @return the corresponding vertical component of a point on the source plane
      */
-    public double inverseX(int x){
-        return minX + (sourceWidth * (x - shiftX)) / destinationWidth;
+    public double mapXToNodeX(int x){
+        return nodeSpaceMinX + (nodeSpaceWidth * (x - shiftX)) / mapWidth;
     }
     
     /**
@@ -101,21 +104,21 @@ public class Scale {
      * @param y : an y-coordinate on the destination plane
      * @return the corresponding horizontal component of a point on the source plane
      */
-    public double inverseY(int y){
-        return minY + (sourceHeight * (y - shiftY)) / destinationHeight;
+    public double mapYToNodeY(int y){
+        return nodeSpaceMinY + (nodeSpaceHeight * (y - shiftY)) / mapHeight;
     }
     
     //testing function
     public static void main(String[] args){
         Scale s = new Scale(0, 5, 290, 100);
-        s.setSize(500, 37);
+        s.setMapSize(500, 37);
         s.setOrigin(50, 50);
         
         int val;
         for(int i = 0; i < 999999; i++){
             s.setOrigin(i, i);
-            val = s.x(315);
-            if(s.inverseX(val) - 315 > 5){
+            val = s.nodeXToMapX(315);
+            if(s.mapXToNodeX(val) - 315 > 5){
                 System.out.println("Fail: " + 315 + " " + val);
             }
         }

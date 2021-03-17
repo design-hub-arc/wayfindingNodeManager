@@ -148,15 +148,15 @@ public class NodeIcon{
      */
     public void scaleTo(Scale s){
         if(true || scale == null){
-            x = s.x(node.getX());
-            y = s.y(node.getY());
+            x = s.nodeXToMapX(node.getX());
+            y = s.nodeYToMapY(node.getY());
         } else {
             //this is causing problems, but I need it to work or user will have to repos nodes after scaleto is called
-            if(scale.inverseX(x) - s.inverseX(s.x(scale.inverseX(x))) != 0.0){
-                System.out.println("Moving from " + scale.inverseX(x) + " to " + s.inverseX(s.x(scale.inverseX(x))));
+            if(scale.mapXToNodeX(x) - s.mapXToNodeX(s.nodeXToMapX(scale.mapXToNodeX(x))) != 0.0){
+                System.out.println("Moving from " + scale.mapXToNodeX(x) + " to " + s.mapXToNodeX(s.nodeXToMapX(scale.mapXToNodeX(x))));
             }
-            x = s.x(scale.inverseX(x));
-            y = s.y(scale.inverseY(y));
+            x = s.nodeXToMapX(scale.mapXToNodeX(x));
+            y = s.nodeYToMapY(scale.mapYToNodeY(y));
         }
         scale = s;
     }    
