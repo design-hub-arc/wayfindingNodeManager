@@ -32,15 +32,11 @@ public class MapResizeEvent extends EditEvent{
     public void undoImpl(Graph g) {
         resized.setImage(origImage);
         g.setMapImage(origImage);
-        Session.newMapX = 0;
-        Session.newMapY = 0;
     }
     
     @Override
     public void redoImpl(Graph g){
         resized.setImage(newImage);
         g.setMapImage(newImage);
-        Session.newMapX = 0;
-        Session.newMapY = 0;
     }
 }

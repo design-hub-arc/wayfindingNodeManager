@@ -97,7 +97,7 @@ public class ApplicationMenuBar extends JMenuBar {
         if(find == null){
             InputConsole.getInstance().warn("Couldn't find a node with an id of " + id);
         } else {
-            Session.dataPane.selectNode(find);
+            NodeManager.getInstance().getNodeDataPane().selectNode(find);
         }
     }
     
@@ -112,7 +112,7 @@ public class ApplicationMenuBar extends JMenuBar {
         if(find == null){
             InputConsole.getInstance().warn("Couldn't find a node with a label of " + label);
         } else {
-            Session.dataPane.selectNode(find);
+            NodeManager.getInstance().getNodeDataPane().selectNode(find);
         }
     }
     

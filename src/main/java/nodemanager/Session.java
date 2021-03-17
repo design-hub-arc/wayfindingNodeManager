@@ -17,18 +17,6 @@ import nodemanager.model.Node;
 * it is significantly better than passing a Session object to every object the program creates
 */
 public class Session {
-    public static Node selectedNode = null;
-    public static NodeDataPane dataPane = null;
-    public static int newMapX = 0;
-    public static int newMapY = 0;
-    
     // the view
     public static MapImage map = null;
-    
-    public static void selectNode(Node n){
-        selectedNode = n;
-        if(dataPane != null){
-            dataPane.selectNode(n);
-        }
-    }
 }

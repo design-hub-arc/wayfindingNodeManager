@@ -63,7 +63,7 @@ public class NodeDataPane extends JComponent{
                 NodeManager.getInstance().getLog().log(new NodeDeleteEvent(g, selectedNode, Session.map));
                 Session.map.removeNode(selectedNode);
                 g.removeNode(selectedNode.id);
-                Session.selectNode(g.getNodeById(-1));
+                selectNode(g.getNodeById(-1));
             }
         });
         

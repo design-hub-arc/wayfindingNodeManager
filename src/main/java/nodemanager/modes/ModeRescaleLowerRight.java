@@ -52,7 +52,6 @@ public class ModeRescaleLowerRight extends AbstractMode {
         NodeManager.getInstance().getLog().log(new MapResizeEvent(mapImage.getGraph(), mapImage, buff, cropped));
         mapImage.setImage(cropped);
         mapImage.getGraph().setMapImage(cropped);
-        mapImage.resize(); // rescales to it's new size
         mapImage.repaint();
         return new ModeNone();
     }

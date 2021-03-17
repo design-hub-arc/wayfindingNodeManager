@@ -1,7 +1,7 @@
 package nodemanager.modes;
 
 import java.awt.event.MouseEvent;
-import nodemanager.Session;
+import nodemanager.NodeManager;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
 
@@ -19,7 +19,7 @@ public final class ModeNone extends AbstractMode {
     public AbstractMode mapImageClicked(MapImage mapImage, MouseEvent me) {
         NodeIcon clicked = mapImage.hoveredNodeIcon(me.getX(), me.getY());
         if(clicked != null){
-            Session.selectNode(clicked.getNode());
+            NodeManager.getInstance().getNodeDataPane().selectNode(clicked.getNode());
         }
         return this;
     }

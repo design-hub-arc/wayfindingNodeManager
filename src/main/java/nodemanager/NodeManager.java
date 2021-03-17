@@ -7,6 +7,7 @@ import nodemanager.gui.NodeManagerWindow;
 import nodemanager.model.Graph;
 import nodemanager.events.EventLog;
 import nodemanager.gui.InputConsole;
+import nodemanager.gui.editPage.NodeDataPane;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.modes.AbstractMode;
 import nodemanager.modes.ModeNone;
@@ -22,6 +23,7 @@ public class NodeManager {
     private Graph graph;
     private AbstractMode mode;
     private final EventLog log;
+    private NodeDataPane dataPane; // don't like this. Need GUI manager
     
     private static NodeManager instance;
     
@@ -29,6 +31,7 @@ public class NodeManager {
         graph = Graph.createDefault();
         mode = new ModeNone();
         log = new EventLog();
+        dataPane = null;
     }
     
     public static final NodeManager getInstance(){
@@ -65,6 +68,14 @@ public class NodeManager {
     
     public final EventLog getLog(){
         return log;
+    }
+    
+    public final void setNodeDataPane(NodeDataPane ndp){
+        dataPane = ndp;
+    }
+    
+    public final NodeDataPane getNodeDataPane(){
+        return dataPane;
     }
     
     public final void launchGui(){
