@@ -21,11 +21,12 @@ public class ModeRescaleLowerRight extends AbstractMode {
 
     @Override
     public AbstractMode mapImageClicked(MapImage mapImage, MouseEvent me) {
+        Point p = mapImage.mouseClickToNodeSpace(me.getPoint());
         int[] clip = new int[]{
             upperLeft.x,
             upperLeft.y,
-            me.getX() - upperLeft.x,
-            me.getY() - upperLeft.y
+            p.x - upperLeft.x,
+            p.y - upperLeft.y
         }; 
         
         BufferedImage buff = mapImage.getImage();
@@ -45,10 +46,10 @@ public class ModeRescaleLowerRight extends AbstractMode {
         
         mapImage.setScaleOrigin(0, 0);
         mapImage.scaleTo(
-            mapImage.translateClickX(clip[0]), 
-            mapImage.translateClickY(clip[1]), 
-            mapImage.translateClickX(clip[2]), 
-            mapImage.translateClickY(clip[3])
+            (clip[0]), 
+            (clip[1]), 
+            (clip[2]), 
+            (clip[3])
         );
         mapImage.setScaleOrigin(0, 0); // resizes node icons
         

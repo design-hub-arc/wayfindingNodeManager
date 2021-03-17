@@ -3,9 +3,7 @@ package nodemanager.gui.editPage.mapComponents;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
-import nodemanager.NodeManager;
 import nodemanager.Session;
-import nodemanager.events.*;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
 
