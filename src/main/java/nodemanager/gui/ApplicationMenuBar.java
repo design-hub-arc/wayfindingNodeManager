@@ -154,25 +154,15 @@ public class ApplicationMenuBar extends JMenuBar {
         
         JMenuItem showAllConn = new JMenuItem("Draw all connections");
         showAllConn.addActionListener((e) -> {
-            Graph g = NodeManager.getInstance().getGraph();
-            if(g != null){
-                g.getAllNodes().forEach(node -> {
-                    NodeManager.getInstance().getMap().getIcon(node.getId()).setDrawLinks(true);
-                });
-                parent.getBody().repaint();
-            }
+            NodeManager.getInstance().getMap().setDrawAllConnections(true);
+            parent.getBody().repaint();
         });
         m.add(showAllConn);
         
         JMenuItem hideAllConn = new JMenuItem("Hide all connections");
         hideAllConn.addActionListener((e) -> {
-            Graph g = NodeManager.getInstance().getGraph();
-            if(g != null){
-                g.getAllNodes().forEach(node -> {
-                    NodeManager.getInstance().getMap().getIcon(node.getId()).setDrawLinks(false);
-                });
-                parent.getBody().repaint();
-            }
+            NodeManager.getInstance().getMap().setDrawAllConnections(false);
+            parent.getBody().repaint();
         });
         m.add(hideAllConn);
 

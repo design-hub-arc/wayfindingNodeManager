@@ -1,6 +1,7 @@
 package nodemanager.events;
 
 import nodemanager.NodeManager;
+import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
@@ -27,7 +28,8 @@ public class NodeMovedEvent extends EditEvent{
     
     @Override
     public void undoImpl(Graph g) {
-        NodeIcon icon = NodeManager.getInstance().getMap().getIcon(moved.getId());
+        MapImage map = NodeManager.getInstance().getMap();
+        NodeIcon icon = map.getIcon(moved.getId());
         newX = icon.getX();
         newY = icon.getY();
         icon.setPos(initialX, initialY);

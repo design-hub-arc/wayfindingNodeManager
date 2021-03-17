@@ -26,8 +26,12 @@ public class ModeMove extends AbstractMode {
         Point newCoords = mapImage.mouseClickToNodeSpace(me.getPoint());
         movingNode.setX(newCoords.x);
         movingNode.setY(newCoords.y);
-        mapIcon.nodePosUpdated();
+        
+        Point iconCoords = mapImage.nodeCoordToMapSpace(newCoords);
+        mapIcon.setPos(
+            iconCoords.x,
+            iconCoords.y
+        );
         return new ModeNone();
     }
-
 }

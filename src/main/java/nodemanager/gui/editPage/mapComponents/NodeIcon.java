@@ -6,12 +6,7 @@ import nodemanager.model.Graph;
 import nodemanager.model.Node;
 
 /**
- * @author Matt Crow (greengrappler12@gmail.com)
- */
-
-
-
-/**
+ * 
  * NodeIcons are used to visually display Nodes on a MapImage, 
  * as well as respond to mouse clicks.
  * 
@@ -20,6 +15,8 @@ import nodemanager.model.Node;
  * but since NodeIcons need to be constantly repositioned,
  * java doesn't like that.
  * Solving the problem: the Mode objects handle mouse clicks
+ * 
+ * @author Matt Crow (greengrappler12@gmail.com)
  */
 public class NodeIcon{
     public final Node node;
@@ -120,17 +117,6 @@ public class NodeIcon{
     }
     
     /**
-     * Notifies this that it's node
-     * was just imported into the 
-     * program, so this needs to update
-     * this' coordinates
-     */
-    public void nodePosUpdated(){
-        x = node.getX();
-        y = node.getY();
-    }
-    
-    /**
      * Sets the position of this icon on the map image.
      * Note that this does not edit this' node
      * @param xc the x-coordinate on the map
@@ -147,17 +133,8 @@ public class NodeIcon{
      * @param s the Scale to set position off of
      */
     public void scaleTo(Scale s){
-        if(true || scale == null){
-            x = s.nodeXToMapX(node.getX());
-            y = s.nodeYToMapY(node.getY());
-        } else {
-            //this is causing problems, but I need it to work or user will have to repos nodes after scaleto is called
-            if(scale.mapXToNodeX(x) - s.mapXToNodeX(s.nodeXToMapX(scale.mapXToNodeX(x))) != 0.0){
-                System.out.println("Moving from " + scale.mapXToNodeX(x) + " to " + s.mapXToNodeX(s.nodeXToMapX(scale.mapXToNodeX(x))));
-            }
-            x = s.nodeXToMapX(scale.mapXToNodeX(x));
-            y = s.nodeYToMapY(scale.mapYToNodeY(y));
-        }
+        x = s.nodeXToMapX(node.getX());
+        y = s.nodeYToMapY(node.getY());
         scale = s;
     }    
     
@@ -198,7 +175,7 @@ public class NodeIcon{
      * @param g the Graphics context to draw on
      */
     public void drawAllLinks(Graphics g){
-        if(drawLinks){
+        if(drawLinks || onImage.getDrawAllConnections()){
             Graph graph = onImage.getGraph();
             Arrays.stream(graph.getConnectionsById(id)).mapToObj((int id)-> {
                 return graph.getNodeById(id);

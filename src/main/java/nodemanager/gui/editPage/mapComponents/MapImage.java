@@ -7,7 +7,6 @@ import java.awt.event.*;
 import java.util.*;
 import nodemanager.model.Node;
 import nodemanager.*;
-import nodemanager.events.*;
 import nodemanager.model.Graph;
 
 /**
@@ -21,7 +20,7 @@ import nodemanager.model.Graph;
  * set of coordinates
  *
  */
-public class MapImage extends JLabel implements MouseListener, MouseMotionListener {
+public class MapImage extends JLabel implements MouseListener {
     private Graph representedGraph;
     
     private BufferedImage buff;
@@ -35,8 +34,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     private int clipX;
     private int clipY;
     private double zoom;
-
-    private NodeIcon hoveringOver;
+    
+    private boolean drawAllConns;
 
     /**
      * Initially, does not have any image or scale.
@@ -52,7 +51,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         clipX = 0;
         clipY = 0;
         
-        hoveringOver = null;
+        drawAllConns = false;
 
         setBackground(Color.BLACK);
         
@@ -66,7 +65,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         });
         
         addMouseListener(this);
-        addMouseMotionListener(this);
         MapPanner panner = new MapPanner(this);
         addMouseListener(panner);
         addMouseMotionListener(panner);
@@ -95,10 +93,25 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         return this.nodeIcons.get(id);
     }
     
+    public final void setDrawAllConnections(boolean b){
+        this.drawAllConns = b;
+    }
+    
+    public final boolean getDrawAllConnections(){
+        return drawAllConns;
+    }
+    
     public final Point mouseClickToNodeSpace(Point mouseClick){
         return new Point(
             (int)scaler.mapXToNodeX(translateClickX(mouseClick.x)),
             (int)scaler.mapYToNodeY(translateClickY(mouseClick.y))
+        );
+    }
+    
+    public final Point nodeCoordToMapSpace(Point nodeCoord){
+        return new Point(
+            scaler.nodeXToMapX(nodeCoord.x),
+            scaler.nodeYToMapY(nodeCoord.y)
         );
     }
     
@@ -271,53 +284,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        
         NodeManager.getInstance().mapClicked(this, me); // for now
-                
-        //switch(Session.getMode()){
-            /*
-            case RESCALE_UL: {
-                // sets the upper-left corner of the new map image clip
-                Session.setMode(Mode.RESCALE_LR);
-                NodeIcon icon = getIcon(-1);
-                Session.newMapX = icon.getX();
-                Session.newMapY = icon.getY();
-                break;
-            }*/
-            //case RESCALE_LR: {
-                // sets the lower-right corner of the new map image clip
-                //Session.setMode(Mode.NONE);
-                //Session.newMapWidth = getIcon(-2).getX() - Session.newMapX;
-                //Session.newMapHeight = getIcon(-2).getY() - Session.newMapY;
-
-                //int[] clip = new int[]{Session.newMapX, Session.newMapY, Session.newMapWidth, Session.newMapHeight};
-                /*
-                if (clip[0] < 0) {
-                    clip[0] = 0;
-                }
-                if (clip[1] < 0) {
-                    clip[1] = 0;
-                }
-                if (clip[2] > buff.getWidth() - clip[0]) {
-                    clip[2] = buff.getWidth() - clip[0];
-                }
-                if (clip[3] > buff.getHeight() - clip[1]) {
-                    clip[3] = buff.getHeight() - clip[1];
-                }
-
-                Session.newMapX = 0;
-                Session.newMapY = 0;*/
-            /*
-                scaler.setOrigin(0, 0);
-                
-                BufferedImage sub = buff.getSubimage(clip[0], clip[1], clip[2], clip[3]);
-                NodeManager.getInstance().getLog().log(new MapResizeEvent(representedGraph, this, buff, sub));
-                
-                setImage(sub);
-                representedGraph.setMapImage(sub);
-                break;
-            }*/
-        //}
         repaint();
     }
 
@@ -332,28 +299,4 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseExited(MouseEvent e) {}
-    
-    @Override
-    public void mouseDragged(MouseEvent e) {}
-
-    @Override
-    public void mouseMoved(MouseEvent me) {
-        
-        //switch(Session.getMode()){
-            /*
-            case RESCALE_UL: {
-                double shiftX = translateClickX(me.getX());
-                double shiftY = translateClickY(me.getY());
-                scaler.setOrigin((int)shiftX, (int)shiftY);
-                resizeNodeIcons();
-                break;
-            }*/
-            /*
-            case RESCALE_LR: {
-                scaler.setMapSize(translateClickX(me.getX() - Session.newMapX), translateClickY(me.getY() - Session.newMapY));
-                resizeNodeIcons();
-                break;
-            }*/
-        //}
-    }
 }
