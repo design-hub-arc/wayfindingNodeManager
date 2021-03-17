@@ -14,16 +14,22 @@ import nodemanager.modes.ModeNone;
 
 
 /**
- * Moving towards using this as a controller
+ * Using this as a controller
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
 
 public class NodeManager {
+    // the model
     private Graph graph;
+    
+    // the view
+    private MapImage map;
+    
     private AbstractMode mode;
     private final EventLog log;
     private NodeDataPane dataPane; // don't like this. Need GUI manager
+    private NodeManagerWindow gui;
     
     private static NodeManager instance;
     
@@ -32,6 +38,8 @@ public class NodeManager {
         mode = new ModeNone();
         log = new EventLog();
         dataPane = null;
+        map = null;
+        gui = null;
     }
     
     public static final NodeManager getInstance(){
@@ -47,6 +55,17 @@ public class NodeManager {
     
     public final Graph getGraph(){
         return graph;
+    }
+    
+    public final void setMap(MapImage map){
+        if(map == null){
+            throw new NullPointerException();
+        }
+        this.map = map;
+    }
+    
+    public final MapImage getMap(){
+        return map;
     }
     
     public final void setMode(AbstractMode mode){
@@ -79,7 +98,7 @@ public class NodeManager {
     }
     
     public final void launchGui(){
-        new NodeManagerWindow();
+        gui = new NodeManagerWindow();
     }
     
     /**

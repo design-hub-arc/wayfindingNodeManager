@@ -2,7 +2,6 @@ package nodemanager.modes;
 
 import java.awt.event.MouseEvent;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.events.ConnectionAddedEvent;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
@@ -13,7 +12,8 @@ import nodemanager.model.Graph;
  * @author Matt
  */
 public class ModeAddConnection extends AbstractMode {
-    private int nodeId;
+    private final int nodeId;
+    
     public ModeAddConnection(int id){
         super(String.format(
             "Click on another node to connect it to node %d\n"

@@ -8,7 +8,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.gui.exportData.ExportMenu;
 import nodemanager.gui.importData.ImportMenu;
 import nodemanager.model.Graph;
@@ -80,8 +79,8 @@ public class ApplicationMenuBar extends JMenuBar {
     private void resetData(){
         Graph g = Graph.createDefault();
         NodeManager.getInstance().setGraph(g);
-        if(Session.map != null){
-            Session.map.renderGraph(g);
+        if(NodeManager.getInstance().getMap() != null){
+            NodeManager.getInstance().getMap().renderGraph(g);
         }
         NodeManager.getInstance().getLog().clear();
     }
@@ -158,7 +157,7 @@ public class ApplicationMenuBar extends JMenuBar {
             Graph g = NodeManager.getInstance().getGraph();
             if(g != null){
                 g.getAllNodes().forEach(node -> {
-                    Session.map.getIcon(node.getId()).setDrawLinks(true);
+                    NodeManager.getInstance().getMap().getIcon(node.getId()).setDrawLinks(true);
                 });
                 parent.getBody().repaint();
             }
@@ -170,7 +169,7 @@ public class ApplicationMenuBar extends JMenuBar {
             Graph g = NodeManager.getInstance().getGraph();
             if(g != null){
                 g.getAllNodes().forEach(node -> {
-                    Session.map.getIcon(node.getId()).setDrawLinks(false);
+                    NodeManager.getInstance().getMap().getIcon(node.getId()).setDrawLinks(false);
                 });
                 parent.getBody().repaint();
             }

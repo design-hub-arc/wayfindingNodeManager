@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.GoogleDriveUploader;
 import nodemanager.gui.ApplicationPage;

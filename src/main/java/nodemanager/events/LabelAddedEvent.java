@@ -1,6 +1,5 @@
 package nodemanager.events;
 
-import nodemanager.Session;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
 

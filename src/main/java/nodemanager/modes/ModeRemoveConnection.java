@@ -2,7 +2,6 @@ package nodemanager.modes;
 
 import java.awt.event.MouseEvent;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.events.ConnectionRemovedEvent;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
@@ -13,7 +12,7 @@ import nodemanager.model.Graph;
  * @author Matt
  */
 public class ModeRemoveConnection extends AbstractMode {
-    private int nodeId;
+    private final int nodeId;
     
     public ModeRemoveConnection(int nodeId) {
         super(String.format(

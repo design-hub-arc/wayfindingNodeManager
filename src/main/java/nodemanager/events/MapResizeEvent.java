@@ -1,7 +1,6 @@
 package nodemanager.events;
 
 import java.awt.image.BufferedImage;
-import nodemanager.Session;
 import nodemanager.gui.editPage.mapComponents.MapImage;
 import nodemanager.model.Graph;
 

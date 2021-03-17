@@ -8,7 +8,6 @@ import java.awt.event.ItemEvent;
 import java.io.IOException;
 import javax.swing.*;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.*;
 import nodemanager.gui.ApplicationPage;

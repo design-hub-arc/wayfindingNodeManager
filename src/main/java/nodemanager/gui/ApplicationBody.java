@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.gui.exportData.ExportBody;
 import nodemanager.gui.importData.DriveImportPage;
 import nodemanager.gui.importData.LocalImportPage;
@@ -23,6 +22,7 @@ import nodemanager.modes.ModeNone;
  * @author Matt
  */
 public class ApplicationBody extends JPanel{
+    // remove this later
     private final HashMap<String, Supplier<ApplicationPage>> pages;
     
     private final JPanel contentArea;
@@ -85,7 +85,7 @@ public class ApplicationBody extends JPanel{
     
     public final void editPage(){
         EditCanvas editPage = new EditCanvas(this);
-        Session.map = editPage.getMapImage();
+        NodeManager.getInstance().setMap(editPage.getMapImage());
         Graph g = NodeManager.getInstance().getGraph();
         if(g != null){
             editPage.renderGraph(g);

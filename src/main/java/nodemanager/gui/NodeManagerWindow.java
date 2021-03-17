@@ -5,7 +5,6 @@ import java.awt.event.WindowAdapter;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 
 /**
  * Basic JFrame used to host the EditCanvas

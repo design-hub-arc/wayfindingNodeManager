@@ -3,8 +3,6 @@ package nodemanager.files;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
-import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.model.Graph;
 
 

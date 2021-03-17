@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import nodemanager.NodeManager;
-import nodemanager.Session;
 import nodemanager.events.*;
 import nodemanager.gui.InputConsole;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
@@ -60,8 +59,8 @@ public class NodeDataPane extends JComponent{
                 ip.warn("Cannot delete node with id of " + selectedNode.id);
             } else {
                 Graph g = NodeManager.getInstance().getGraph();
-                NodeManager.getInstance().getLog().log(new NodeDeleteEvent(g, selectedNode, Session.map));
-                Session.map.removeNode(selectedNode);
+                NodeManager.getInstance().getLog().log(new NodeDeleteEvent(g, selectedNode, NodeManager.getInstance().getMap()));
+                NodeManager.getInstance().getMap().removeNode(selectedNode);
                 g.removeNode(selectedNode.id);
                 selectNode(g.getNodeById(-1));
             }
@@ -73,7 +72,7 @@ public class NodeDataPane extends JComponent{
             } else {
                 Graph g = NodeManager.getInstance().getGraph();
                 NodeManager.getInstance().setMode(new ModeMove(selectedNode));
-                NodeIcon icon = Session.map.getIcon(selectedNode.id);
+                NodeIcon icon = NodeManager.getInstance().getMap().getIcon(selectedNode.id);
                 NodeManager.getInstance().getLog().log(new NodeMovedEvent(g, selectedNode, icon.getX(), icon.getY()));
             }
         });
@@ -164,9 +163,9 @@ public class NodeDataPane extends JComponent{
      * @param n the Node this should display the data for
      */
     public void selectNode(Node n){
-        NodeIcon icon = Session.map.getIcon(n.getId());
+        NodeIcon icon = NodeManager.getInstance().getMap().getIcon(n.getId());
         if(hasNodeSelected){
-            Session.map.getIcon(selectedNode.getId()).setDrawLinks(false);
+            NodeManager.getInstance().getMap().getIcon(selectedNode.getId()).setDrawLinks(false);
         }
         hasNodeSelected = true;
         selectedNode = n;
@@ -181,7 +180,7 @@ public class NodeDataPane extends JComponent{
         });
         
         icon.setDrawLinks(true);
-        Session.map.repaint();
+        NodeManager.getInstance().getMap().repaint();
     }
     
     /**

@@ -1,6 +1,6 @@
 package nodemanager.events;
 
-import nodemanager.Session;
+import nodemanager.NodeManager;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
@@ -27,7 +27,7 @@ public class NodeMovedEvent extends EditEvent{
     
     @Override
     public void undoImpl(Graph g) {
-        NodeIcon icon = Session.map.getIcon(moved.getId());
+        NodeIcon icon = NodeManager.getInstance().getMap().getIcon(moved.getId());
         newX = icon.getX();
         newY = icon.getY();
         icon.setPos(initialX, initialY);
@@ -38,7 +38,7 @@ public class NodeMovedEvent extends EditEvent{
 
     @Override
     public void redoImpl(Graph g) {
-        NodeIcon icon = Session.map.getIcon(moved.getId());
+        NodeIcon icon = NodeManager.getInstance().getMap().getIcon(moved.getId());
         icon.setPos(newX, newY);
         moved.setX((int)icon.getScale().mapXToNodeX(icon.getX()));
         moved.setY((int)icon.getScale().mapYToNodeY(icon.getY()));
