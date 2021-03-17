@@ -16,11 +16,11 @@ public class ModeRescaleUpperLeft extends AbstractMode {
 
     @Override
     public AbstractMode mapImageClicked(MapImage mapImage, MouseEvent me) {
-        // problem: me is where the user clicked on the COMPONENT not on the MAP IMAGE
-        Point p = mapImage.mouseClickToNodeSpace(me.getPoint());
-        //mapImage.setScaleOrigin(p.x, p.y);
-        
-        return new ModeRescaleLowerRight(me.getPoint());
+        // translates from where the component is clicked to a coordinate on the image
+        return new ModeRescaleLowerRight(new Point(
+            mapImage.translateClickX(me.getX()),
+            mapImage.translateClickY(me.getY())
+        ));
     }
 
 }

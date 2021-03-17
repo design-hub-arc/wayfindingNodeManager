@@ -167,7 +167,6 @@ public class NodeDataPane extends JComponent{
         NodeIcon icon = Session.map.getIcon(n.getId());
         if(hasNodeSelected){
             Session.map.getIcon(selectedNode.getId()).setDrawLinks(false);
-            icon.setDrawLinks(false);
         }
         hasNodeSelected = true;
         selectedNode = n;

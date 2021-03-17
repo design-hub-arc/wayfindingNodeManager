@@ -81,7 +81,12 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
         representedGraph = g;
         removeAllNodes();
         setImage(g.getMapImage());
-        scaleTo(g.getNodeById(-1).getX(), g.getNodeById(-1).getY(), g.getNodeById(-2).getX(), g.getNodeById(-2).getY());
+        scaleTo(
+            g.getNodeById(-1).getX(), 
+            g.getNodeById(-1).getY(), 
+            g.getNodeById(-2).getX(), 
+            g.getNodeById(-2).getY()
+        );
         g.getAllNodes().forEach(this::addNode);
         resizeNodeIcons();
     }
@@ -186,7 +191,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     /**
      * Called whenever this component is resized. Repositions all the NodeIcons.
      */
-    private void resize() {
+    public final void resize() {
         zoom = 1.0;
         if(buff != null){
             scaler.setSize(buff.getWidth(), buff.getHeight());

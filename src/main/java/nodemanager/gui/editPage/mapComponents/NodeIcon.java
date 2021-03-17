@@ -19,7 +19,7 @@ import nodemanager.model.Node;
  * That is because this would have to be a component to do so,
  * but since NodeIcons need to be constantly repositioned,
  * java doesn't like that.
- * Solving the problem: MapImage will pass click events to this' mouse event listeners.
+ * Solving the problem: the Mode objects handle mouse clicks
  */
 public class NodeIcon{
     public final Node node;
