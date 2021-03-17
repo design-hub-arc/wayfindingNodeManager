@@ -276,12 +276,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
     public void mouseClicked(MouseEvent me) {
         
         NodeManager.getInstance().mapClicked(this, me); // for now
-        
-        if (hoveringOver != null) {
-            hoveringOver.mouseClicked(me);
-        }
-        
-        switch(Session.getMode()){
+                
+        //switch(Session.getMode()){
             /*
             case RESCALE_UL: {
                 // sets the upper-left corner of the new map image clip
@@ -324,7 +320,7 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 representedGraph.setMapImage(sub);
                 break;
             }*/
-        }
+        //}
         repaint();
     }
 
@@ -345,19 +341,8 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseMoved(MouseEvent me) {
-        NodeIcon oldOver = hoveringOver;
-        hoveringOver = hoveredNodeIcon(me.getX(), me.getY());
-
-        if (oldOver != hoveringOver) {
-            if (hoveringOver != null) {
-                hoveringOver.mouseEntered(me);
-            }
-            if (oldOver != null) {
-                oldOver.mouseExited(me);
-            }
-        }
-
-        switch(Session.getMode()){
+        
+        //switch(Session.getMode()){
             /*
             case RESCALE_UL: {
                 double shiftX = translateClickX(me.getX());
@@ -372,6 +357,6 @@ public class MapImage extends JLabel implements MouseListener, MouseMotionListen
                 resizeNodeIcons();
                 break;
             }*/
-        }
+        //}
     }
 }

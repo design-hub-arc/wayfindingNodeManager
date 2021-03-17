@@ -10,13 +10,13 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import nodemanager.Mode;
 import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.gui.exportData.ExportBody;
 import nodemanager.gui.importData.DriveImportPage;
 import nodemanager.gui.importData.LocalImportPage;
 import nodemanager.model.Graph;
+import nodemanager.modes.ModeNone;
 
 /**
  *
@@ -58,7 +58,7 @@ public class ApplicationBody extends JPanel{
         this.getActionMap().put("exit cmd", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Session.setMode(Mode.NONE);
+                NodeManager.getInstance().setMode(new ModeNone());
             }
         });
         

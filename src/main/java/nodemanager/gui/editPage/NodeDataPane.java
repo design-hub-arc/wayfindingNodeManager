@@ -3,7 +3,6 @@ package nodemanager.gui.editPage;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import nodemanager.Mode;
 import nodemanager.NodeManager;
 import nodemanager.Session;
 import nodemanager.events.*;
@@ -167,6 +166,7 @@ public class NodeDataPane extends JComponent{
     public void selectNode(Node n){
         NodeIcon icon = Session.map.getIcon(n.getId());
         if(hasNodeSelected){
+            Session.map.getIcon(selectedNode.getId()).setDrawLinks(false);
             icon.setDrawLinks(false);
         }
         hasNodeSelected = true;

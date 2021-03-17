@@ -1,9 +1,7 @@
 package nodemanager.gui.editPage.mapComponents;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.Arrays;
-import nodemanager.Session;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
 
@@ -181,28 +179,6 @@ public class NodeIcon{
     public void setDrawLinks(boolean b) {
         drawLinks = b;
     }
-    
-    public void mouseClicked(MouseEvent me) {
-        Graph g = onImage.getGraph();
-        switch (Session.getMode()) {
-            case NONE:
-                Session.selectNode(node);
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void mouseEntered(MouseEvent me) {
-        //drawLinks = true;
-        //make this change to being displayed as node data
-    }
-    
-    public void mouseExited(MouseEvent me) {
-        //drawLinks = false;
-        //make revert to displayed as node icon
-    }
-    
     
     /**
      * Draws this on a Graphics object

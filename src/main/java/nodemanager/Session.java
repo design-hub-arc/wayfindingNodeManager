@@ -1,14 +1,8 @@
 package nodemanager;
 
-import java.awt.Point;
 import nodemanager.gui.editPage.NodeDataPane;
 import nodemanager.gui.editPage.mapComponents.MapImage;
-import nodemanager.modes.ModeRescaleUpperLeft;
 import nodemanager.model.Node;
-import nodemanager.gui.*;
-import nodemanager.modes.AbstractMode;
-import nodemanager.modes.ModeNone;
-import nodemanager.modes.ModeRescaleLowerRight;
 
 /**
  * @author Matt Crow (greengrappler12@gmail.com)
@@ -23,8 +17,6 @@ import nodemanager.modes.ModeRescaleLowerRight;
 * it is significantly better than passing a Session object to every object the program creates
 */
 public class Session {
-    private static Mode mode = Mode.NONE;
-    private static AbstractMode newMode = new ModeNone();
     public static Node selectedNode = null;
     public static NodeDataPane dataPane = null;
     public static int newMapX = 0;
@@ -38,22 +30,5 @@ public class Session {
         if(dataPane != null){
             dataPane.selectNode(n);
         }
-    }
-    
-    public static void setMode(Mode m){
-        mode = m;
-        switch(m){
-            //case RESCALE_LR:
-                //newMode = new ModeRescaleLowerRight(new Point(newMapX, newMapY));
-              //  break;
-            default:
-                newMode = new ModeNone();
-                break;
-        }
-        InputConsole.getInstance().writeMessage(String.format("Current mode: \n* %s\n(%s)", m.toString(), newMode.getMessage()));
-    }
-    
-    public final static Mode getMode(){
-        return mode;
     }
 }
