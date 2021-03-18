@@ -43,23 +43,6 @@ public class NodeLabelFile extends AbstractCsvFile{
     }
 
     @Override
-    public void setContents(InputStream s) throws IOException {
-        labelToId.clear();
-        String contents = StreamReaderUtil.readStream(s);
-        String[] rows = contents.split("\\n");
-        
-        String[] line;
-        String label;
-        int id;
-        for(int i = 1; i < rows.length; i++){
-            line = rows[i].split(",");
-            label = line[0].trim();
-            id = Integer.parseInt(line[1].trim());
-            labelToId.put(label, id);
-        }
-    }
-
-    @Override
     public void importData(Graph g) {
         labelToId.forEach((label, id)->{
             g.addLabel(label, id);

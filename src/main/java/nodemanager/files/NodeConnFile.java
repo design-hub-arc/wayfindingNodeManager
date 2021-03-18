@@ -44,30 +44,6 @@ public class NodeConnFile extends AbstractCsvFile{
         return s.toString();
     }
 
-    /**
-     * 
-     * @param s an InputStream from a connection file
-     * @throws java.io.IOException
-     */
-    @Override
-    public void setContents(InputStream s) throws IOException {
-        connections.clear();
-        
-        String fileContents = StreamReaderUtil.readStream(s);
-        String[] lines = fileContents.split("\\n");
-        
-        String[] line;
-        int id1;
-        int id2;
-        //skip header
-        for(int i = 1; i < lines.length; i++){
-            line = lines[i].split(",");
-            id1 = Integer.parseInt(line[0].trim());
-            id2 = Integer.parseInt(line[1].trim());
-            connections.put(id1, id2);
-        }
-    }
-
     @Override
     public void importData(Graph g) {
         connections.forEach((from, to)->{

@@ -101,15 +101,6 @@ public abstract class AbstractWayfindingFile {
     }
     
     /**
-     * Reads the contents of an InputStream,
-     * then sets the contents of this file
-     * @param s the inputstream from either a local file, or the Google Drive
-     * 
-     * @throws java.io.IOException if any errors occur when reading the stream
-     */
-    public abstract void setContents(InputStream s) throws IOException;
-    
-    /**
      * Writes the contents of this to a file on the user's computer.
      *  
      * @param f the file to write to.

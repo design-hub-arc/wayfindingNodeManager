@@ -58,7 +58,7 @@ public class WayfindingManifest extends AbstractCsvFile{
         return urls.containsKey(fileType);
     }
     
-    public final DriveIOOp<AbstractWayfindingFile> getFileFor(FileType fileType){
+    public final DriveIOOp<AbstractWayfindingFile> importFileFor(FileType fileType, Graph g){
         DriveIOOp<AbstractWayfindingFile> ret;
         
         if(attachedFiles.containsKey(fileType)){
@@ -83,7 +83,7 @@ public class WayfindingManifest extends AbstractCsvFile{
 
                     GoogleDriveUploader.download(id).addOnSucceed((in)->{
                         try {
-                            file.setContents(in);
+                            file.readGraphDataFromFile(g, in);
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
@@ -103,25 +103,6 @@ public class WayfindingManifest extends AbstractCsvFile{
     }
     
     @Override
-    public void setContents(InputStream s) throws IOException {
-        attachedFiles.clear();
-        urls.clear();
-        
-        String contents = StreamReaderUtil.readStream(s);
-        String[] lines = contents.split("\\n");
-        
-        String[] line;
-        FileType type;
-        String url;
-        for(int i = 1; i < lines.length; i++){
-            line = lines[i].split(",");
-            type = FileType.fromTitle(line[0].trim());
-            url = line[1].trim();
-            urls.put(type, url);
-        }
-    }
-    
-    @Override
     public String getContentsToWrite() {
         StringBuilder sb = new StringBuilder("Data, URL");
         urls.entrySet().forEach((entry) -> {
@@ -138,9 +119,7 @@ public class WayfindingManifest extends AbstractCsvFile{
     public void importData(Graph g) {
         urls.forEach((type, url)->{
             try {
-                getFileFor(type).addOnSucceed((file)->{
-                    file.importData(g);
-                }).getExcecutingThread().join();
+                importFileFor(type, g).getExcecutingThread().join();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
@@ -200,7 +179,25 @@ public class WayfindingManifest extends AbstractCsvFile{
 
     @Override
     public void readGraphDataFromFile(Graph g, InputStream in) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // gather URLs
+        attachedFiles.clear();
+        urls.clear();
+        
+        String contents = StreamReaderUtil.readStream(in);
+        String[] lines = contents.split("\\n");
+        
+        String[] line;
+        FileType type;
+        String url;
+        for(int i = 1; i < lines.length; i++){
+            line = lines[i].split(",");
+            type = FileType.fromTitle(line[0].trim());
+            url = line[1].trim();
+            urls.put(type, url);
+        }
+        
+        // download the files
+        importData(g);
     }
 
     @Override

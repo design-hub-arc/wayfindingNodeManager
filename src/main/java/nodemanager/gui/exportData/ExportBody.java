@@ -85,7 +85,7 @@ public final class ExportBody extends ApplicationPage {
     private void downloadVersionLog(){
         GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
             try {
-                v.setContents(stream);
+                v.readGraphDataFromFile(null, stream);
                 for(String option : v.getTypes()){
                     selectType.addItem(option);
                 }

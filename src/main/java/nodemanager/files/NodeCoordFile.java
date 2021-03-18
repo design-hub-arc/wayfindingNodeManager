@@ -45,29 +45,6 @@ public class NodeCoordFile extends AbstractCsvFile{
         return s.toString();
     }
 
-    /**
-     * Reads an InputStream, creating new Nodes based on the data.
-     * @param s an InputStream from a node file
-     */
-    @Override
-    public void setContents(InputStream s) throws IOException {
-        nodes.clear();
-        String contents = StreamReaderUtil.readStream(s);
-        String[] rows = contents.split("\\n");
-        
-        String[] line;
-        int id;
-        int x;
-        int y;
-        for(int i = 1; i < rows.length; i++){
-            line = rows[i].split(",");
-            id = Integer.parseInt(line[0].trim());
-            x = Integer.parseInt(line[1].trim());
-            y = Integer.parseInt(line[2].trim());
-            nodes.add(new Node(id, x, y));
-        }
-    }
-
     @Override
     public void importData(Graph g) {
         nodes.forEach((n)->{

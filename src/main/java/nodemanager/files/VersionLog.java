@@ -178,39 +178,7 @@ public class VersionLog extends AbstractCsvFile{
         return sb.toString();
     }
     
-    /**
-     * Reads the contents of the given InputStream,
-     * and sets the contents of this VersionLog to match.
-     * 
-     * @param s the contents of the version log on Google Drive
-     * @throws java.io.IOException if an error occurs while reading the stream
-     */
-    @Override
-    public void setContents(InputStream s) throws IOException {
-        exports.clear();
-        
-        String content = StreamReaderUtil.readStream(s);
-        String[] rows = content.split("\\n");
-        
-        //locate columns
-        HashMap<Integer, String> columnToType = new HashMap<>();
-        String[] headers = rows[0].split(",");
-        for(int i = 0; i < headers.length; i++){
-            columnToType.put(i, headers[i].trim());
-        }
-        
-        //populate exports
-        String[] row;
-        for(int rowNum = 1; rowNum < rows.length; rowNum++){
-            row = rows[rowNum].split(",");
-            for(int column = 0; column < row.length; column++){
-                if(!"".equals(row[column].trim())){
-                    //not empty
-                    addExport(columnToType.get(column), row[column].trim());
-                }
-            }
-        }
-    }
+    
     
     @Override
     public void importData(Graph g) {}
@@ -218,6 +186,13 @@ public class VersionLog extends AbstractCsvFile{
     @Override
     public void exportData(Graph g) {}
     
+    /**
+     * Reads the contents of the given InputStream,
+     * and sets the contents of this VersionLog to match.
+     * 
+     * @param in the contents of the version log on Google Drive
+     * @throws java.io.IOException if an error occurs while reading the stream
+     */
     @Override
     public void readGraphDataFromFile(Graph g, InputStream in) throws IOException {
         exports.clear();
@@ -284,7 +259,7 @@ public class VersionLog extends AbstractCsvFile{
         VersionLog v = new VersionLog();
         GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
             try {
-                v.setContents(stream);
+                v.readGraphDataFromFile(null, stream);
                 System.out.println(v.getContentsToWrite());
                 
                 //GoogleDriveUploader.revise(v);

@@ -88,13 +88,9 @@ public class DriveImportPage extends ApplicationPage {
             WayfindingManifest man = new WayfindingManifest();
             GoogleDriveUploader.download(nameToUrl.get((String)exportSelector.getSelectedItem()))
             .addOnSucceed((s)->{
-                try {
-                    man.setContents(s);
-                    importManifest(man, NodeManager.getInstance().getGraph());
-                    msg.setText("Done!");
-                } catch (IOException ex) {
-                    msg.setText(ex.getMessage());
-                }
+                // problem: doesn't have URLs yet
+                importManifest(man, NodeManager.getInstance().getGraph());
+                msg.setText("Done!");
             }).addOnFail((err)->{
                 msg.setText(err.getMessage());
             });
@@ -104,7 +100,7 @@ public class DriveImportPage extends ApplicationPage {
         v = new VersionLog();
         GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
             try {
-                v.setContents(stream);
+                v.readGraphDataFromFile(null, stream);
                 importVersionLog(v);
                 msg.setText("Ready to import!");
             } catch (IOException ex) {
@@ -159,12 +155,10 @@ public class DriveImportPage extends ApplicationPage {
         repaint();
     }
     
-    private void importManifest(WayfindingManifest man, Graph g){
+    private void importManifest(WayfindingManifest man, Graph g) {
         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
             try {
-                man.getFileFor(cb.getFileType()).addOnSucceed((file)->{
-                    file.importData(g);
-                }).getExcecutingThread().join();
+                man.importFileFor(cb.getFileType(), g).getExcecutingThread().join();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }

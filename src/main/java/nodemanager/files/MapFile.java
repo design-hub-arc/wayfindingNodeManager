@@ -21,11 +21,6 @@ public class MapFile extends AbstractWayfindingFile{
     public MapFile(){
         this("temp");
     }
-
-    @Override
-    public void setContents(InputStream s) throws IOException {
-        content = ImageIO.read(ImageIO.createImageInputStream(s));
-    }
     
     @Override
     public void writeToFile(File f) throws IOException{
