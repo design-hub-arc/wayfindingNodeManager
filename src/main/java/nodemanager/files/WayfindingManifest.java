@@ -4,6 +4,7 @@ import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -195,5 +196,15 @@ public class WayfindingManifest extends AbstractCsvFile{
                 return true;
             }
         };
+    }
+
+    @Override
+    public void readGraphDataFromFile(Graph g, InputStream in) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void writeGraphDataToFile(Graph g, OutputStream out) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

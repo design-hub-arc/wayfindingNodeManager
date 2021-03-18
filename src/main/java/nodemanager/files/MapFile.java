@@ -53,4 +53,15 @@ public class MapFile extends AbstractWayfindingFile{
     public String toString(){
         return "MapFile " + content;
     }
+
+    @Override
+    public void readGraphDataFromFile(Graph g, InputStream in) throws IOException {
+        BufferedImage mapImage = ImageIO.read(in);
+        g.setMapImage(mapImage);
+    }
+
+    @Override
+    public void writeGraphDataToFile(Graph g, OutputStream out) throws IOException {
+        ImageIO.write(g.getMapImage(), FILE_FORMAT, out);
+    }
 }

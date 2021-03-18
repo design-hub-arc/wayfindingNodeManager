@@ -3,6 +3,7 @@ package nodemanager.files;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import nodemanager.model.Graph;
 
@@ -129,4 +130,25 @@ public abstract class AbstractWayfindingFile {
      * @param g the Graph to import data into
      */
     public abstract void importData(Graph g);
+    
+    
+    /**
+     * Reads this file type's data from the given InputStream, and adds it to
+     * the given graph.
+     * 
+     * @param g
+     * @param in
+     * @throws IOException 
+     */
+    public abstract void readGraphDataFromFile(Graph g, InputStream in) throws IOException;
+    
+    /**
+     * Writes the contents of the given Graph relevant to this file type to the
+     * given OutputStream
+     * 
+     * @param g
+     * @param out
+     * @throws IOException 
+     */
+    public abstract void writeGraphDataToFile(Graph g, OutputStream out) throws IOException;   
 }

@@ -4,9 +4,11 @@ import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import nodemanager.io.GoogleDriveUploader;
+import nodemanager.io.StreamWriterUtil;
 import nodemanager.model.Graph;
 
 /**
@@ -216,6 +218,62 @@ public class VersionLog extends AbstractCsvFile{
     @Override
     public void exportData(Graph g) {}
     
+    @Override
+    public void readGraphDataFromFile(Graph g, InputStream in) throws IOException {
+        exports.clear();
+        
+        String content = StreamReaderUtil.readStream(in);
+        String[] rows = content.split("\\n");
+        
+        //locate columns
+        HashMap<Integer, String> columnToType = new HashMap<>();
+        String[] headers = rows[0].split(",");
+        for(int i = 0; i < headers.length; i++){
+            columnToType.put(i, headers[i].trim());
+        }
+        
+        //populate exports
+        String[] row;
+        for(int rowNum = 1; rowNum < rows.length; rowNum++){
+            row = rows[rowNum].split(",");
+            for(int column = 0; column < row.length; column++){
+                if(!"".equals(row[column].trim())){
+                    //not empty
+                    addExport(columnToType.get(column), row[column].trim());
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void writeGraphDataToFile(Graph g, OutputStream out) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        
+        ArrayList<String> versions = new ArrayList<>(exports.keySet());
+        
+        sb.append(String.join(", ", versions));
+        
+        int maxUrls = 0; //maximum URLs any one version has
+        for(ArrayList<String> al : exports.values()){
+            if(al.size() > maxUrls){
+                maxUrls = al.size();
+            }
+        }
+        
+        String[] newRow;
+        ArrayList<String> vUrls; //version's URLs
+        for(int i = 0; i < maxUrls; i++){
+            sb.append(NEWLINE);
+            newRow = new String[exports.size()]; //number of columns
+            for(int j = 0; j < exports.size(); j++){
+                vUrls = exports.get(versions.get(j));
+                //           prevent out of bounds               blank if that version doesn't have an i'th URL
+                newRow[j] = (vUrls.size() > i) ? vUrls.get(i) : "";
+            }
+            sb.append(String.join(", ", newRow));
+        }
+        StreamWriterUtil.writeStream(out, sb.toString());
+    }
     
     /*
     Test methods
