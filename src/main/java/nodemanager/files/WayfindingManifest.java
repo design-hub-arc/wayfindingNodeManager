@@ -1,5 +1,6 @@
 package nodemanager.files;
 
+import com.google.api.services.drive.model.File;
 import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import nodemanager.exceptions.NoPermissionException;
 import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
@@ -81,14 +83,13 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
                     AbstractWayfindingFileHelper file = AbstractWayfindingFileHelper.fromType("manifestFile", fileType);
                     String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
 
-                    GoogleDriveUploader.download(id).addOnSucceed((in)->{
-                        try {
-                            file.readGraphDataFromFile(g, in);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        attachedFiles.put(fileType, file); //cache the file
-                    }).getExcecutingThread().join();
+                    try {
+                        InputStream in = GoogleDriveUploader.download(id);
+                        file.readGraphDataFromFile(g, in);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    attachedFiles.put(fileType, file); //cache the file
 
                     return file;
                 }
@@ -135,12 +136,13 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
             public Boolean perform() throws Exception {
                 attachedFiles.forEach((type, file)->{
                     try {
-                        GoogleDriveUploader.uploadFile(g, file, driveFolderId).addOnSucceed((f)->{
-                            urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
-                        }).getExcecutingThread().join();
-                    } catch (InterruptedException ex) {
+                        File f = GoogleDriveUploader.uploadFile(g, file, driveFolderId);
+                        urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
+                    } catch (IOException ex) {
                         ex.printStackTrace();
-                    }
+                    } catch (NoPermissionException ex) {
+                        ex.printStackTrace();
+                    } 
                 });
                 
                 return true;

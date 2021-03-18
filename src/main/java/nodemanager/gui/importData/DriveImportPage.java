@@ -12,6 +12,7 @@ import nodemanager.files.FileType;
 import nodemanager.files.VersionLog;
 import nodemanager.files.WayfindingManifest;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import nodemanager.NodeManager;
@@ -86,28 +87,27 @@ public class DriveImportPage extends ApplicationPage {
         importButton.addActionListener((e)->{            
             msg.setText("Beginning download...");
             WayfindingManifest man = new WayfindingManifest();
-            GoogleDriveUploader.download(nameToUrl.get((String)exportSelector.getSelectedItem()))
-            .addOnSucceed((s)->{
+            try {
+                InputStream s = GoogleDriveUploader.download(nameToUrl.get((String)exportSelector.getSelectedItem()));
                 // problem: doesn't have URLs yet
                 importManifest(man, NodeManager.getInstance().getGraph());
                 msg.setText("Done!");
-            }).addOnFail((err)->{
+            } catch(Exception err){
                 msg.setText(err.getMessage());
-            });
+            }
         });
         add(importButton);
         
         v = new VersionLog();
-        GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            try {
-                v.readGraphDataFromFile(null, stream);
-                importVersionLog(v);
-                msg.setText("Ready to import!");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                msg.setText("an error occurred while downloading the version log");
-            }
-        });
+        try {
+            InputStream stream  = GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID);
+            v.readGraphDataFromFile(null, stream);
+            importVersionLog(v);
+            msg.setText("Ready to import!");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            msg.setText("an error occurred while downloading the version log");
+        }
         
         updateExportSelector();
     }
@@ -135,14 +135,13 @@ public class DriveImportPage extends ApplicationPage {
         String selectedType = (String)wayfindingTypeSelector.getSelectedItem();
         String[] exportUrls = v.getExportsFor(selectedType);
         final LinkedList<String> exportNames = new LinkedList<>();
-        
+        String fileName;
         for(String url : exportUrls){
             try {
-                GoogleDriveUploader.getFileName(url).addOnSucceed((fileName)->{
-                    nameToUrl.put(fileName, url);
-                    exportNames.addFirst(fileName); //orders from newest to oldest
-                }).getExcecutingThread().join();
-            } catch (InterruptedException ex) {
+                fileName = GoogleDriveUploader.getFileName(url);
+                nameToUrl.put(fileName, url);
+                exportNames.addFirst(fileName); //orders from newest to oldest
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }

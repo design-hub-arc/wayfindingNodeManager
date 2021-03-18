@@ -214,15 +214,14 @@ public class VersionLog extends AbstractWayfindingFileHelper {
     
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
-        GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            try {
-                v.readGraphDataFromFile(null, stream);
-                v.writeGraphDataToFile(null, System.out);
-                
-                //GoogleDriveUploader.revise(v);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
+        try {
+            InputStream stream = GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID);
+            v.readGraphDataFromFile(null, stream);
+            v.writeGraphDataToFile(null, System.out);
+
+            //GoogleDriveUploader.revise(v);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }
