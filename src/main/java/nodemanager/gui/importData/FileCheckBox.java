@@ -1,13 +1,11 @@
 package nodemanager.gui.importData;
 
-import nodemanager.files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFileHelper;
 import java.awt.GridLayout;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.files.FileType;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  * Used by LocalImportBody to allow the user to choose what wayfinding files to import.
@@ -18,7 +16,7 @@ public class FileCheckBox extends AbstractFileCheckbox{
     private final JTextField fileName;
     private final JButton select;
     
-    public FileCheckBox(FileType t, AbstractWayfindingFile fileHelper){
+    public FileCheckBox(FileType t, AbstractWayfindingFileHelper fileHelper){
         super(t, fileHelper);
         setLayout(new GridLayout(1, 3));
         
@@ -41,8 +39,6 @@ public class FileCheckBox extends AbstractFileCheckbox{
     
     @Override
     public void selectFile(File f) {
-        //AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(f.getName(), getFileType());
-        //wayfindingFile.setContents(new FileInputStream(f));
         super.selectFile(f);
         fileName.setText(f.getAbsolutePath());
     }

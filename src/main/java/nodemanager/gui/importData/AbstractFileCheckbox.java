@@ -4,7 +4,7 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileInputStream;
 import javax.swing.*;
-import nodemanager.files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFileHelper;
 import nodemanager.files.FileType;
 import nodemanager.model.Graph;
 
@@ -18,7 +18,7 @@ import nodemanager.model.Graph;
 public abstract class AbstractFileCheckbox extends JComponent{
     private final FileType fileType;
     private final JCheckBox include;
-    private final AbstractWayfindingFile fileHelper;
+    private final AbstractWayfindingFileHelper fileHelper;
     private File selectedFile;
 
     /**
@@ -26,7 +26,7 @@ public abstract class AbstractFileCheckbox extends JComponent{
      * @param t What type of file this allows the user to select
      * @param fileHelper the Object to help this import or export files
      */
-    public AbstractFileCheckbox(FileType t, AbstractWayfindingFile fileHelper){
+    public AbstractFileCheckbox(FileType t, AbstractWayfindingFileHelper fileHelper){
         super();
         setLayout(new GridLayout(1, 1));
         fileType = t;

@@ -1,7 +1,7 @@
 package nodemanager.io;
 
 import nodemanager.files.VersionLog;
-import nodemanager.files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFileHelper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -102,13 +102,13 @@ public class GoogleDriveUploader{
      * @param folderId the id of the folder to upload to
      * @return a DriveIOOp. See DriveIOOp for how to use this
      */
-    public static DriveIOOp<File> uploadFile(AbstractWayfindingFile f, String folderId){
+    public static DriveIOOp<File> uploadFile(Graph g, AbstractWayfindingFileHelper f, String folderId){
         DriveIOOp<File> upload = new DriveIOOp<File>(){
             @Override
             public File perform() throws Exception {
                 File googleFile = null;
                 try{
-                    java.io.File localFileToUpload = f.createTempFile();
+                    java.io.File localFileToUpload = f.writeToTempFile(g);
                     
                     googleFile = new File();
                     FileContent content = new FileContent(f.getType().getMimeType(), localFileToUpload);
@@ -153,14 +153,13 @@ public class GoogleDriveUploader{
             ex.printStackTrace();
         }
 
-        man.exportData(g);
         try {
             man.uploadContents(g).getExcecutingThread().join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
         
-        return uploadFile(man, man.getDriveFolderId());
+        return uploadFile(g, man, man.getDriveFolderId());
     }
     
     public static final DriveIOOp<File> revise(VersionLog vl){
@@ -170,7 +169,7 @@ public class GoogleDriveUploader{
                 File ret = null;
                 try{
                     ret = drive.files().get(VersionLog.DEFAULT_VERSION_LOG_ID).execute();
-                    java.io.File localFileToUpdate = vl.createTempFile();
+                    java.io.File localFileToUpdate = vl.writeToTempFile(null);
                     drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
                 } catch(IOException e){
                     if(e instanceof GoogleJsonResponseException){

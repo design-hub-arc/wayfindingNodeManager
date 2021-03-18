@@ -1,6 +1,7 @@
 package nodemanager.files;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,8 +9,8 @@ import java.nio.file.Paths;
 import nodemanager.model.Graph;
 
 /**
- * The AbstractWayfindingFile class is used to 
- * serve as the base for the various data files
+ * The AbstractWayfindingFileHelper class is used to 
+ * serve as the base for helping read and write the various data files
  * created by the program, and used by the Wayfinding 
  * program.
  * 
@@ -20,7 +21,7 @@ import nodemanager.model.Graph;
  * 
  * @author Matt Crow (greengrappler12@gmail.com)
  */
-public abstract class AbstractWayfindingFile {
+public abstract class AbstractWayfindingFileHelper {
     private final String name;
     private final FileType type; 
     
@@ -31,7 +32,7 @@ public abstract class AbstractWayfindingFile {
      * @param title what to call this file when it is saved or uploaded to the drive
      * @param t what type of file this will connect to. Used to get file extention and MIME type.
      */
-    public AbstractWayfindingFile(String title, FileType t){
+    public AbstractWayfindingFileHelper(String title, FileType t){
         name = title;
         type = t;
     }
@@ -44,20 +45,20 @@ public abstract class AbstractWayfindingFile {
      * @param t the file type to create.
      * @return an object inheriting from AbstractWayfindingFile
      */
-    public static AbstractWayfindingFile fromType(String name, FileType t){
-        AbstractWayfindingFile ret = null;
+    public static AbstractWayfindingFileHelper fromType(String name, FileType t){
+        AbstractWayfindingFileHelper ret = null;
         switch(t){
             case NODE_COORD:
-                ret = new NodeCoordFile(name);
+                ret = new NodeCoordFileHelper(name);
                 break;
             case NODE_CONN:
-                ret = new NodeConnFile(name);
+                ret = new NodeConnFileHelper(name);
                 break;
             case LABEL:
-                ret = new NodeLabelFile(name);
+                ret = new NodeLabelFileHelper(name);
                 break;
             case MAP_IMAGE:
-                ret = new MapFile(name);
+                ret = new MapFileHelper(name);
                 break;
             case MANIFEST:
                 ret = new WayfindingManifest(name);
@@ -87,42 +88,19 @@ public abstract class AbstractWayfindingFile {
         return name + "." + type.getFileExtention();
     }
     
-    public final File createTempFile() throws IOException{
+    public final File writeToTempFile(Graph g) throws IOException{
         File temp = File.createTempFile(name, type.getFileExtention());
         temp.deleteOnExit();
-        writeToFile(temp);
+        this.writeGraphDataToFile(g, new FileOutputStream(temp));
         return temp;
     }
     
-    public final File createFile(String parentDirectory) throws IOException{
+    public final File writeToFileUnderParent(Graph g, String parentDirectory) throws IOException{
         File f = Paths.get(parentDirectory, getFileName()).toFile();
-        writeToFile(f);
+        this.writeGraphDataToFile(g, new FileOutputStream(f));
         return f;
     }
-    
-    /**
-     * Writes the contents of this to a file on the user's computer.
-     *  
-     * @param f the file to write to.
-     * @throws java.io.IOException if an error occurs
-     */
-    public abstract void writeToFile(File f) throws IOException;
-    
-    /**
-     * Exports the current state of the program
-     * into this file's contents
-     * @param g the Graph to export
-     */
-    public abstract void exportData(Graph g);
-    
-    /**
-     * Imports the data from this file into
-     * the program
-     * @param g the Graph to import data into
-     */
-    public abstract void importData(Graph g);
-    
-    
+        
     /**
      * Reads this file type's data from the given InputStream, and adds it to
      * the given graph.

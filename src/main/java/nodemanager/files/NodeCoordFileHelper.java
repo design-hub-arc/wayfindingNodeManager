@@ -5,66 +5,20 @@ import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import nodemanager.model.Graph;
 import nodemanager.model.Node;
 
 /**
  * @author Matt Crow
  */
-public class NodeCoordFile extends AbstractCsvFile{
-    private final ArrayList<Node> nodes;
+public class NodeCoordFileHelper extends AbstractWayfindingFileHelper {
     
-    public NodeCoordFile(String title){
+    public NodeCoordFileHelper(String title){
         super(title + "NodeCoords", FileType.NODE_COORD);
-        nodes = new ArrayList<>();
     }
     
-    public NodeCoordFile(){
+    public NodeCoordFileHelper(){
         this("temp");
-    }
-
-    /**
-     * generates the contents of a csv file containing the data of all the nodes used by the program.
-     * The csv has three columns: the node's ID, and the x and y coordinates of that node's icon on the canvas
-     * each row is a separate node.
-     * @return the file's contents
-     */
-    @Override
-    public final String getContentsToWrite(){
-        StringBuilder s = new StringBuilder("id, x, y");
-        nodes.forEach((n) -> {
-            s
-                    .append(NEWLINE)
-                    .append(n.id)
-                    .append(", ")
-                    .append(n.getX())
-                    .append(", ")
-                    .append(n.getY());
-        });
-        return s.toString();
-    }
-
-    @Override
-    public void importData(Graph g) {
-        nodes.forEach((n)->{
-            g.addNode(n);
-            //Session.map.addNode(n);
-        });
-        //Session.map.refreshNodes();
-    }
-
-    @Override
-    public void exportData(Graph g) {
-        nodes.clear();
-        g.getAllNodes().forEach((n)->{
-            nodes.add(n);
-        });
-    }
-    
-    @Override
-    public String toString(){
-        return getContentsToWrite();
     }
 
     @Override

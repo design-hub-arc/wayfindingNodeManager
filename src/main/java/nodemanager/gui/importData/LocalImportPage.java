@@ -10,10 +10,10 @@ import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import nodemanager.NodeManager;
-import nodemanager.files.MapFile;
-import nodemanager.files.NodeConnFile;
-import nodemanager.files.NodeCoordFile;
-import nodemanager.files.NodeLabelFile;
+import nodemanager.files.MapFileHelper;
+import nodemanager.files.NodeConnFileHelper;
+import nodemanager.files.NodeCoordFileHelper;
+import nodemanager.files.NodeLabelFileHelper;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
 import nodemanager.gui.ApplicationPage;
@@ -46,28 +46,24 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
         selectedFolder.setEditable(false);
         add(selectedFolder);
         
-        fileCheckBoxes.add( 
-            new FileCheckBox(
+        fileCheckBoxes.add(new FileCheckBox(
                 FileType.NODE_COORD,
-                new NodeCoordFile()
+                new NodeCoordFileHelper()
             )
         );
-        fileCheckBoxes.add( 
-            new FileCheckBox(
+        fileCheckBoxes.add(new FileCheckBox(
                 FileType.NODE_CONN,
-                new NodeConnFile()
+                new NodeConnFileHelper()
             )
         );
-        fileCheckBoxes.add( 
-            new FileCheckBox(
+        fileCheckBoxes.add(new FileCheckBox(
                 FileType.LABEL,
-                new NodeLabelFile()
+                new NodeLabelFileHelper()
             )
         );
-        fileCheckBoxes.add( 
-            new FileCheckBox(
+        fileCheckBoxes.add(new FileCheckBox(
                 FileType.MAP_IMAGE,
-                new MapFile()
+                new MapFileHelper()
             )
         );
         fileCheckBoxes.forEach((box)->add(box));

@@ -22,10 +22,10 @@ import nodemanager.model.Graph;
  * 
  * @author Matt Crow
  */
-public class WayfindingManifest extends AbstractCsvFile{
+public class WayfindingManifest extends AbstractWayfindingFileHelper {
     private final String title;
     private String driveFolderId;
-    private final HashMap<FileType, AbstractWayfindingFile> attachedFiles;
+    private final HashMap<FileType, AbstractWayfindingFileHelper> attachedFiles;
     private final HashMap<FileType, String> urls;
     
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_DATE_TIME;
@@ -58,13 +58,13 @@ public class WayfindingManifest extends AbstractCsvFile{
         return urls.containsKey(fileType);
     }
     
-    public final DriveIOOp<AbstractWayfindingFile> importFileFor(FileType fileType, Graph g){
-        DriveIOOp<AbstractWayfindingFile> ret;
+    public final DriveIOOp<AbstractWayfindingFileHelper> importFileFor(FileType fileType, Graph g){
+        DriveIOOp<AbstractWayfindingFileHelper> ret;
         
         if(attachedFiles.containsKey(fileType)){
-            ret = new DriveIOOp<AbstractWayfindingFile>(){
+            ret = new DriveIOOp<AbstractWayfindingFileHelper>(){
                 @Override
-                public AbstractWayfindingFile perform() throws Exception {
+                public AbstractWayfindingFileHelper perform() throws Exception {
                     return attachedFiles.get(fileType);
                 }
             };
@@ -75,10 +75,10 @@ public class WayfindingManifest extends AbstractCsvFile{
                 throw new NullPointerException(String.format("No file set for type '%s'", fileType.getTitle()));
             }
             //download the file
-            ret = new DriveIOOp<AbstractWayfindingFile>() {
+            ret = new DriveIOOp<AbstractWayfindingFileHelper>() {
                 @Override
-                public AbstractWayfindingFile perform() throws Exception {
-                    AbstractWayfindingFile file = AbstractWayfindingFile.fromType("manifestFile", fileType);
+                public AbstractWayfindingFileHelper perform() throws Exception {
+                    AbstractWayfindingFileHelper file = AbstractWayfindingFileHelper.fromType("manifestFile", fileType);
                     String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
 
                     GoogleDriveUploader.download(id).addOnSucceed((in)->{
@@ -102,50 +102,21 @@ public class WayfindingManifest extends AbstractCsvFile{
         return urls.get(type);
     }
     
-    @Override
-    public String getContentsToWrite() {
-        StringBuilder sb = new StringBuilder("Data, URL");
-        urls.entrySet().forEach((entry) -> {
-            sb
-                .append(NEWLINE)
-                .append(entry.getKey().getTitle())
-                .append(", ")
-                .append(entry.getValue());
-        });
-        return sb.toString();
-    }
-
-    @Override
-    public void importData(Graph g) {
-        urls.forEach((type, url)->{
-            try {
-                importFileFor(type, g).getExcecutingThread().join();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-        });
-    }
-
     
-    @Override
     public void exportData(Graph g) {
         attachedFiles.clear();
         urls.clear();
         
-        NodeCoordFile coords = new NodeCoordFile(title);
-        coords.exportData(g);
+        NodeCoordFileHelper coords = new NodeCoordFileHelper(title);
         attachedFiles.put(FileType.NODE_COORD, coords);
         
-        NodeConnFile conn = new NodeConnFile(title);
-        conn.exportData(g);
+        NodeConnFileHelper conn = new NodeConnFileHelper(title);
         attachedFiles.put(FileType.NODE_CONN, conn);
         
-        NodeLabelFile labels = new NodeLabelFile(title);
-        labels.exportData(g);
+        NodeLabelFileHelper labels = new NodeLabelFileHelper(title);
         attachedFiles.put(FileType.LABEL, labels);
         
-        MapFile map = new MapFile(title);
-        map.exportData(g);
+        MapFileHelper map = new MapFileHelper(title);
         attachedFiles.put(FileType.MAP_IMAGE, map);
     }
     
@@ -164,7 +135,7 @@ public class WayfindingManifest extends AbstractCsvFile{
             public Boolean perform() throws Exception {
                 attachedFiles.forEach((type, file)->{
                     try {
-                        GoogleDriveUploader.uploadFile(file, driveFolderId).addOnSucceed((f)->{
+                        GoogleDriveUploader.uploadFile(g, file, driveFolderId).addOnSucceed((f)->{
                             urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
                         }).getExcecutingThread().join();
                     } catch (InterruptedException ex) {
@@ -197,11 +168,25 @@ public class WayfindingManifest extends AbstractCsvFile{
         }
         
         // download the files
-        importData(g);
+        urls.forEach((fileType, fileUrl)->{
+            try {
+                importFileFor(fileType, g).getExcecutingThread().join();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void writeGraphDataToFile(Graph g, OutputStream out) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        StringBuilder sb = new StringBuilder("Data, URL");
+        urls.entrySet().forEach((entry) -> {
+            sb
+                .append(NEWLINE)
+                .append(entry.getKey().getTitle())
+                .append(", ")
+                .append(entry.getValue());
+        });
+        out.write(sb.toString().getBytes());
     }
 }

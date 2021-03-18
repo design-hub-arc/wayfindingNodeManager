@@ -5,63 +5,20 @@ import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import nodemanager.model.Graph;
 
 /**
  * Used to read/write the node connections file
  * @author Matt Crow
  */
-public class NodeConnFile extends AbstractCsvFile{
+public class NodeConnFileHelper extends AbstractWayfindingFileHelper { 
     
-    private final HashMap<Integer, Integer> connections;
-    
-    public NodeConnFile(String title){
+    public NodeConnFileHelper(String title){
         super(title + "NodeConn", FileType.NODE_CONN);
-        connections = new HashMap<>();
     }
     
-    public NodeConnFile(){
+    public NodeConnFileHelper(){
         this("temp");
-    }
-
-    /**
-     * generates the contents of a csv file containing the node connection data.
-     * The first column is one node id, and the second column is another.
-     * each row represents a connection between nodes.
-     * @return the file's contents
-     */
-    @Override
-    public String getContentsToWrite(){
-        StringBuilder s = new StringBuilder("node1, node2");
-        connections.forEach((from, to)->{
-            s
-                .append(NEWLINE)
-                .append(Integer.toString(from))
-                .append(", ")
-                .append(Integer.toString(to));
-        });
-        return s.toString();
-    }
-
-    @Override
-    public void importData(Graph g) {
-        connections.forEach((from, to)->{
-            g.addConnection(from, to);
-        });
-    }
-
-    @Override
-    public void exportData(Graph g) {
-        connections.clear();
-        g.getAllConnections().forEach((Integer[] pair)->{
-            connections.put(pair[0], pair[1]);
-        });
-    }
-    
-    @Override
-    public String toString(){
-        return getContentsToWrite();
     }
 
     @Override

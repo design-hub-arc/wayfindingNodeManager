@@ -24,7 +24,7 @@ import nodemanager.model.Graph;
  * 
  * @author Matt Crow
  */
-public class VersionLog extends AbstractCsvFile{
+public class VersionLog extends AbstractWayfindingFileHelper {
     public static final String DEFAULT_VERSION_LOG_ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
     
     /**
@@ -141,50 +141,7 @@ public class VersionLog extends AbstractCsvFile{
     
     /*
     Inherited methods
-    */    
-    
-    
-    /**
-     * Gets what to write to the version log.
-     * @return the updated contents of the version log.
-     */
-    @Override
-    public String getContentsToWrite() {
-        StringBuilder sb = new StringBuilder();
-        
-        ArrayList<String> versions = new ArrayList<>(exports.keySet());
-        
-        sb.append(String.join(", ", versions));
-        
-        int maxUrls = 0; //maximum URLs any one version has
-        for(ArrayList<String> al : exports.values()){
-            if(al.size() > maxUrls){
-                maxUrls = al.size();
-            }
-        }
-        
-        String[] newRow;
-        ArrayList<String> vUrls; //version's URLs
-        for(int i = 0; i < maxUrls; i++){
-            sb.append(NEWLINE);
-            newRow = new String[exports.size()]; //number of columns
-            for(int j = 0; j < exports.size(); j++){
-                vUrls = exports.get(versions.get(j));
-                //           prevent out of bounds               blank if that version doesn't have an i'th URL
-                newRow[j] = (vUrls.size() > i) ? vUrls.get(i) : "";
-            }
-            sb.append(String.join(", ", newRow));
-        }
-        return sb.toString();
-    }
-    
-    
-    
-    @Override
-    public void importData(Graph g) {}
-
-    @Override
-    public void exportData(Graph g) {}
+    */
     
     /**
      * Reads the contents of the given InputStream,
@@ -260,7 +217,7 @@ public class VersionLog extends AbstractCsvFile{
         GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
             try {
                 v.readGraphDataFromFile(null, stream);
-                System.out.println(v.getContentsToWrite());
+                v.writeGraphDataToFile(null, System.out);
                 
                 //GoogleDriveUploader.revise(v);
             } catch (IOException ex) {
