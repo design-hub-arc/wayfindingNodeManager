@@ -1,5 +1,6 @@
 package nodemanager.gui.importData;
 
+import nodemanager.files.AbstractWayfindingFile;
 import nodemanager.files.FileType;
 
 /**
@@ -7,7 +8,7 @@ import nodemanager.files.FileType;
  * @author Matt Crow
  */
 public class FileTypeCheckBox extends AbstractFileCheckbox{ 
-    public FileTypeCheckBox(FileType t){
-        super(t);
+    public FileTypeCheckBox(FileType t, AbstractWayfindingFile helper){
+        super(t, helper);
     }
 }

@@ -10,6 +10,10 @@ import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import nodemanager.NodeManager;
+import nodemanager.files.MapFile;
+import nodemanager.files.NodeConnFile;
+import nodemanager.files.NodeCoordFile;
+import nodemanager.files.NodeLabelFile;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
 import nodemanager.gui.ApplicationPage;
@@ -43,24 +47,28 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
         add(selectedFolder);
         
         fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.NODE_COORD
-                )
+            new FileCheckBox(
+                FileType.NODE_COORD,
+                new NodeCoordFile()
+            )
         );
         fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.NODE_CONN
-                )
+            new FileCheckBox(
+                FileType.NODE_CONN,
+                new NodeConnFile()
+            )
         );
         fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.LABEL
-                )
+            new FileCheckBox(
+                FileType.LABEL,
+                new NodeLabelFile()
+            )
         );
         fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.MAP_IMAGE
-                )
+            new FileCheckBox(
+                FileType.MAP_IMAGE,
+                new MapFile()
+            )
         );
         fileCheckBoxes.forEach((box)->add(box));
         JButton importAll = new JButton("Import the selected files");
@@ -93,11 +101,7 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
             Files.list(f.toPath()).forEach((file)->{
                 fileCheckBoxes.forEach((checkBox)->{
                     if(file.getFileName().toString().toUpperCase().contains(checkBox.getFileType().getSuffix().toUpperCase())){
-                        try {
-                            checkBox.selectFile(file.toFile());
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+                        checkBox.selectFile(file.toFile());
                     }
                 });
             });

@@ -15,6 +15,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import nodemanager.NodeManager;
+import nodemanager.files.MapFile;
+import nodemanager.files.NodeConnFile;
+import nodemanager.files.NodeCoordFile;
+import nodemanager.files.NodeLabelFile;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.GoogleDriveUploader;
 import nodemanager.gui.ApplicationPage;
@@ -61,16 +65,22 @@ public class DriveImportPage extends ApplicationPage {
         
         cbs = new ArrayList<>();
         FileTypeCheckBox temp;
-        for(FileType t : new FileType[]{
-            FileType.NODE_COORD,
-            FileType.NODE_CONN,
-            FileType.LABEL,
-            FileType.MAP_IMAGE
-        }){
-            temp = new FileTypeCheckBox(t);
-            cbs.add(temp);
-            add(temp);
-        }
+        
+        temp = new FileTypeCheckBox(FileType.NODE_COORD, new NodeCoordFile());
+        cbs.add(temp);
+        add(temp);
+        
+        temp = new FileTypeCheckBox(FileType.NODE_CONN, new NodeConnFile());
+        cbs.add(temp);
+        add(temp);
+        
+        temp = new FileTypeCheckBox(FileType.LABEL, new NodeLabelFile());
+        cbs.add(temp);
+        add(temp);
+        
+        temp = new FileTypeCheckBox(FileType.MAP_IMAGE, new MapFile());
+        cbs.add(temp);
+        add(temp);
         
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{            

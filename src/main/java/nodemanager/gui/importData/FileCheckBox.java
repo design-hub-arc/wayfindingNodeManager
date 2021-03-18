@@ -18,8 +18,8 @@ public class FileCheckBox extends AbstractFileCheckbox{
     private final JTextField fileName;
     private final JButton select;
     
-    public FileCheckBox(FileType t){
-        super(t);
+    public FileCheckBox(FileType t, AbstractWayfindingFile fileHelper){
+        super(t, fileHelper);
         setLayout(new GridLayout(1, 3));
         
         fileName = new JTextField("no " + getFileType().getTitle() + " file selected");
@@ -32,21 +32,18 @@ public class FileCheckBox extends AbstractFileCheckbox{
                     "Select " + getFileType().getTitle() + " file",
                     new String[]{t.getFileExtention()},
                     (f)->{
-                        try {
-                            selectFile(f);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+                        selectFile(f);
                     }
             ).actionPerformed(e);
         });
         add(select);
     }
     
-    public void selectFile(File f) throws IOException{
-        AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(f.getName(), getFileType());
-        wayfindingFile.setContents(new FileInputStream(f));
-        super.selectFile(wayfindingFile);
+    @Override
+    public void selectFile(File f) {
+        //AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(f.getName(), getFileType());
+        //wayfindingFile.setContents(new FileInputStream(f));
+        super.selectFile(f);
         fileName.setText(f.getAbsolutePath());
     }
 }
