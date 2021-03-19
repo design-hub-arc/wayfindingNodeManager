@@ -1,13 +1,17 @@
 package nodemanager.gui.exportData;
 
+import com.google.api.services.drive.model.File;
 import nodemanager.gui.InputConsole;
 import nodemanager.files.VersionLog;
 import nodemanager.files.WayfindingManifest;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.io.IOException;
+import java.io.InputStream;
 import javax.swing.*;
-import nodemanager.Session;
+import nodemanager.NodeManager;
+import nodemanager.exceptions.NoPermissionException;
+import nodemanager.exceptions.VersionLogAccessException;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.*;
 import nodemanager.gui.ApplicationPage;
@@ -79,23 +83,22 @@ public final class ExportBody extends ApplicationPage {
         add(exportButton);
         
         v = new VersionLog();
-        downloadVersionLog();
+        tryDownloadVersionLog();
     }
     
-    private void downloadVersionLog(){
-        GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            try {
-                v.setContents(stream);
-                for(String option : v.getTypes()){
-                    selectType.addItem(option);
-                }
-                selectType.addItem(NEW_TYPE);
-                selectType.setSelectedIndex(0);
-                msg.setText("Ready to export!");
-            } catch (IOException ex) {
-                ex.printStackTrace();
+    private void tryDownloadVersionLog(){
+        try {
+            InputStream stream = GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID);
+            v.readGraphDataFromFile(null, stream);
+            for(String option : v.getTypes()){
+                selectType.addItem(option);
             }
-        });
+            selectType.addItem(NEW_TYPE);
+            selectType.setSelectedIndex(0);
+            msg.setText("Ready to export!");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
     /**
@@ -105,16 +108,32 @@ public final class ExportBody extends ApplicationPage {
         msg.setText("Beginning upload...");
         revalidate();
         repaint();
-        WayfindingManifest newMan = new WayfindingManifest(name.getText());
-        GoogleDriveUploader.uploadManifest(newMan, folder.getText()).addOnSucceed((f)->{
-            msg.setText("Upload complete!");            
-            Session.purgeActions();
-            v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
-            GoogleDriveUploader.revise(v).addOnFail((err)->{
-                msg.setText(err.getMessage());
-            });
-            this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
-        }).addOnFail((ex)->msg.setText(ex.getMessage()));
+        Thread t = new Thread(){
+            @Override
+            public void run(){
+                try {
+                    WayfindingManifest newMan = new WayfindingManifest(name.getText());
+                    File f = newMan.uploadToDrive(folder.getText(), NodeManager.getInstance().getGraph());
+                    msg.setText("Upload complete!");
+                    NodeManager.getInstance().getLog().clear();
+                    v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
+                    try {
+                        GoogleDriveUploader.revise(v);
+                        getApplicationBody().switchToPage(ApplicationBody.EDIT);
+                    } catch (VersionLogAccessException ex) {
+                        msg.setText(ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                } catch (IOException ex) {
+                    msg.setText(ex.getMessage());
+                    ex.printStackTrace();
+                } catch (NoPermissionException ex) {
+                    msg.setText(ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        };
+        t.start();
     }
     
     private JButton createExportButton(){
@@ -125,19 +144,18 @@ public final class ExportBody extends ApplicationPage {
             revalidate();
             repaint();
             
-            // Second, make sure the user is trying to upload to a folder
-            GoogleDriveUploader.isFolder(folder.getText())
-                .addOnFail((ex)->{
-                    msg.setText("Hmm... looks like that file doesn't exist. Could you double check to make sure you have access?");
-                })
-                .addOnSucceed((bool)->{
-                    if(bool){
-                        msg.setText("Looks like that's a folder! uploading...");
-                        upload(); //uploads here
-                    } else {
-                        msg.setText("Nope, not a folder.");
-                    }
-                });
+            try {
+                // Second, make sure the user is trying to upload to a folder
+                boolean isFolder = GoogleDriveUploader.isFolder(folder.getText());
+                if(isFolder){
+                    msg.setText("Looks like that's a folder! uploading...");
+                    upload(); //uploads here
+                } else {
+                    msg.setText("Nope, not a folder.");
+                }
+            } catch (IOException ex) {
+                msg.setText("Hmm... looks like that file doesn't exist. Could you double check to make sure you have access?");
+            }
         });
         
         return ret;

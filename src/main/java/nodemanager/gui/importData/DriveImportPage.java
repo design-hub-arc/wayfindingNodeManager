@@ -12,11 +12,18 @@ import nodemanager.files.FileType;
 import nodemanager.files.VersionLog;
 import nodemanager.files.WayfindingManifest;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
+import nodemanager.NodeManager;
+import nodemanager.files.MapFileHelper;
+import nodemanager.files.NodeConnFileHelper;
+import nodemanager.files.NodeCoordFileHelper;
+import nodemanager.files.NodeLabelFileHelper;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.GoogleDriveUploader;
 import nodemanager.gui.ApplicationPage;
+import nodemanager.model.Graph;
 
 /**
  * Acts as the body of the import dialog whenever the user clicks the import from drive button.
@@ -59,47 +66,48 @@ public class DriveImportPage extends ApplicationPage {
         
         cbs = new ArrayList<>();
         FileTypeCheckBox temp;
-        for(FileType t : new FileType[]{
-            FileType.NODE_COORD,
-            FileType.NODE_CONN,
-            FileType.LABEL,
-            FileType.MAP_IMAGE
-        }){
-            temp = new FileTypeCheckBox(t);
-            cbs.add(temp);
-            add(temp);
-        }
+        
+        temp = new FileTypeCheckBox(FileType.NODE_COORD, new NodeCoordFileHelper());
+        cbs.add(temp);
+        add(temp);
+        
+        temp = new FileTypeCheckBox(FileType.NODE_CONN, new NodeConnFileHelper());
+        cbs.add(temp);
+        add(temp);
+        
+        temp = new FileTypeCheckBox(FileType.LABEL, new NodeLabelFileHelper());
+        cbs.add(temp);
+        add(temp);
+        
+        temp = new FileTypeCheckBox(FileType.MAP_IMAGE, new MapFileHelper());
+        cbs.add(temp);
+        add(temp);
         
         importButton = new JButton("Import");
         importButton.addActionListener((e)->{            
             msg.setText("Beginning download...");
             WayfindingManifest man = new WayfindingManifest();
-            GoogleDriveUploader.download(nameToUrl.get((String)exportSelector.getSelectedItem()))
-            .addOnSucceed((s)->{
-                try {
-                    man.setContents(s);
-                    importManifest(man);
-                    msg.setText("Done!");
-                } catch (IOException ex) {
-                    msg.setText(ex.getMessage());
-                }
-            }).addOnFail((err)->{
+            try {
+                InputStream s = GoogleDriveUploader.download(nameToUrl.get((String)exportSelector.getSelectedItem()));
+                // problem: doesn't have URLs yet
+                importManifest(man, NodeManager.getInstance().getGraph());
+                msg.setText("Done!");
+            } catch(Exception err){
                 msg.setText(err.getMessage());
-            });
+            }
         });
         add(importButton);
         
         v = new VersionLog();
-        GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            try {
-                v.setContents(stream);
-                importVersionLog(v);
-                msg.setText("Ready to import!");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                msg.setText("an error occurred while downloading the version log");
-            }
-        });
+        try {
+            InputStream stream  = GoogleDriveUploader.download(VersionLog.DEFAULT_VERSION_LOG_ID);
+            v.readGraphDataFromFile(null, stream);
+            importVersionLog(v);
+            msg.setText("Ready to import!");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            msg.setText("an error occurred while downloading the version log");
+        }
         
         updateExportSelector();
     }
@@ -127,14 +135,13 @@ public class DriveImportPage extends ApplicationPage {
         String selectedType = (String)wayfindingTypeSelector.getSelectedItem();
         String[] exportUrls = v.getExportsFor(selectedType);
         final LinkedList<String> exportNames = new LinkedList<>();
-        
+        String fileName;
         for(String url : exportUrls){
             try {
-                GoogleDriveUploader.getFileName(url).addOnSucceed((fileName)->{
-                    nameToUrl.put(fileName, url);
-                    exportNames.addFirst(fileName); //orders from newest to oldest
-                }).getExcecutingThread().join();
-            } catch (InterruptedException ex) {
+                fileName = GoogleDriveUploader.getFileName(url);
+                nameToUrl.put(fileName, url);
+                exportNames.addFirst(fileName); //orders from newest to oldest
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
@@ -147,15 +154,9 @@ public class DriveImportPage extends ApplicationPage {
         repaint();
     }
     
-    private void importManifest(WayfindingManifest man){
+    private void importManifest(WayfindingManifest man, Graph g) {
         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
-            try {
-                man.getFileFor(cb.getFileType()).addOnSucceed((file)->{
-                    file.importData();
-                }).getExcecutingThread().join();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
+            man.importFileFor(cb.getFileType(), g);
         });
         this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
     }

@@ -4,9 +4,12 @@ import nodemanager.io.StreamReaderUtil;
 import static nodemanager.io.StreamReaderUtil.NEWLINE;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import nodemanager.io.GoogleDriveUploader;
+import nodemanager.io.StreamWriterUtil;
+import nodemanager.model.Graph;
 
 /**
  * Used to interact with the versions.csv file in the google drive.
@@ -21,7 +24,7 @@ import nodemanager.io.GoogleDriveUploader;
  * 
  * @author Matt Crow
  */
-public class VersionLog extends AbstractCsvFile{
+public class VersionLog extends AbstractWayfindingFileHelper {
     public static final String DEFAULT_VERSION_LOG_ID = "1Q99ku0cMctu3kTN9OerjFsM9Aj-nW6H5";
     
     /**
@@ -138,15 +141,44 @@ public class VersionLog extends AbstractCsvFile{
     
     /*
     Inherited methods
-    */    
-    
+    */
     
     /**
-     * Gets what to write to the version log.
-     * @return the updated contents of the version log.
+     * Reads the contents of the given InputStream,
+     * and sets the contents of this VersionLog to match.
+     * 
+     * @param in the contents of the version log on Google Drive
+     * @throws java.io.IOException if an error occurs while reading the stream
      */
     @Override
-    public String getContentsToWrite() {
+    public void readGraphDataFromFile(Graph g, InputStream in) throws IOException {
+        exports.clear();
+        
+        String content = StreamReaderUtil.readStream(in);
+        String[] rows = content.split("\\n");
+        
+        //locate columns
+        HashMap<Integer, String> columnToType = new HashMap<>();
+        String[] headers = rows[0].split(",");
+        for(int i = 0; i < headers.length; i++){
+            columnToType.put(i, headers[i].trim());
+        }
+        
+        //populate exports
+        String[] row;
+        for(int rowNum = 1; rowNum < rows.length; rowNum++){
+            row = rows[rowNum].split(",");
+            for(int column = 0; column < row.length; column++){
+                if(!"".equals(row[column].trim())){
+                    //not empty
+                    addExport(columnToType.get(column), row[column].trim());
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void writeGraphDataToFile(Graph g, OutputStream out) throws IOException {
         StringBuilder sb = new StringBuilder();
         
         ArrayList<String> versions = new ArrayList<>(exports.keySet());
@@ -172,49 +204,8 @@ public class VersionLog extends AbstractCsvFile{
             }
             sb.append(String.join(", ", newRow));
         }
-        return sb.toString();
+        StreamWriterUtil.writeStream(out, sb.toString());
     }
-    
-    /**
-     * Reads the contents of the given InputStream,
-     * and sets the contents of this VersionLog to match.
-     * 
-     * @param s the contents of the version log on Google Drive
-     * @throws java.io.IOException if an error occurs while reading the stream
-     */
-    @Override
-    public void setContents(InputStream s) throws IOException {
-        exports.clear();
-        
-        String content = StreamReaderUtil.readStream(s);
-        String[] rows = content.split("\\n");
-        
-        //locate columns
-        HashMap<Integer, String> columnToType = new HashMap<>();
-        String[] headers = rows[0].split(",");
-        for(int i = 0; i < headers.length; i++){
-            columnToType.put(i, headers[i].trim());
-        }
-        
-        //populate exports
-        String[] row;
-        for(int rowNum = 1; rowNum < rows.length; rowNum++){
-            row = rows[rowNum].split(",");
-            for(int column = 0; column < row.length; column++){
-                if(!"".equals(row[column].trim())){
-                    //not empty
-                    addExport(columnToType.get(column), row[column].trim());
-                }
-            }
-        }
-    }
-    
-    @Override
-    public void importData() {}
-
-    @Override
-    public void exportData() {}
-    
     
     /*
     Test methods
@@ -223,15 +214,14 @@ public class VersionLog extends AbstractCsvFile{
     
     public static void main(String[] args) throws IOException{
         VersionLog v = new VersionLog();
-        GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID).addOnSucceed((stream)->{
-            try {
-                v.setContents(stream);
-                System.out.println(v.getContentsToWrite());
-                
-                //GoogleDriveUploader.revise(v);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
+        try {
+            InputStream stream = GoogleDriveUploader.download(DEFAULT_VERSION_LOG_ID);
+            v.readGraphDataFromFile(null, stream);
+            v.writeGraphDataToFile(null, System.out);
+
+            //GoogleDriveUploader.revise(v);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

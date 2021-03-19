@@ -1,7 +1,7 @@
 package nodemanager.io;
 
 import nodemanager.files.VersionLog;
-import nodemanager.files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFileHelper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import nodemanager.NodeManager;
 import nodemanager.exceptions.NoPermissionException;
 import nodemanager.exceptions.VersionLogAccessException;
+import nodemanager.model.Graph;
 
 /**
  * Used to upload files to the google drive.
@@ -75,133 +77,90 @@ public class GoogleDriveUploader{
     /**
      * Gets the contents of a file in the Google Drive with the given ID
      * @param id either the id of a file, or a url to that file
-     * @return a DriveIOOp containing an inputstream containing the data of the file
+     * @return an inputstream containing the data of the file
      */
-    public static DriveIOOp<InputStream> download(String id){
-        
+    public static final InputStream download(String id) throws IOException{
         if(id.contains("id=")){
-            //need to do this, as anonnymous class requires that id is final
-            return download(id.split("id=")[1]);
+            id = id.split("id=")[1];
         }
-        //########################### Ends here and recurs if id was invalid
-        
-        return new DriveIOOp<InputStream>(){
-            @Override
-            public InputStream perform() throws Exception {
-                ID_TO_NAME.put(id, drive.files().get(id).execute().getName());
-                return drive.files().get(id).executeMediaAsInputStream();
-            }  
-        };
+        //ID_TO_NAME.put(id, drive.files().get(id).execute().getName());
+        return drive.files().get(id).executeMediaAsInputStream();
     }
     
     /**
-     * Asynchronously uploads a file to the google drive
+     * Synchronously uploads a file to the google drive
      * @param f the wayfinding file to upload to the drive
      * @param folderId the id of the folder to upload to
-     * @return a DriveIOOp. See DriveIOOp for how to use this
+     * @return the newly uploaded file
      */
-    public static DriveIOOp<File> uploadFile(AbstractWayfindingFile f, String folderId){
-        DriveIOOp<File> upload = new DriveIOOp<File>(){
-            @Override
-            public File perform() throws Exception {
-                File googleFile = null;
-                try{
-                    java.io.File localFileToUpload = f.createTempFile();
-                    
-                    googleFile = new File();
-                    FileContent content = new FileContent(f.getType().getMimeType(), localFileToUpload);
+    public static File uploadFile(Graph g, AbstractWayfindingFileHelper f, String folderId) throws IOException, NoPermissionException{
+        File googleFile = null;
+        try{
+            java.io.File localFileToUpload = f.writeToTempFile(g);
 
-                    ArrayList<String> parents = new ArrayList<>();
-                    parents.add(folderId);
-                    googleFile.setParents(parents);
+            googleFile = new File();
+            FileContent content = new FileContent(f.getType().getMimeType(), localFileToUpload);
 
-                    Drive.Files.Create insert = drive.files().create(googleFile, content);
+            ArrayList<String> parents = new ArrayList<>();
+            parents.add(folderId);
+            googleFile.setParents(parents);
 
-                    googleFile.setName(f.getFileName());
+            Drive.Files.Create insert = drive.files().create(googleFile, content);
 
-                    //since all of this google stuff is blocking code (O...K...)
-                    //it will execute in whatever order we put it in.
-                    //no need to worry about them executing out of order
-                    googleFile = insert.execute();
-                    publishToWeb(googleFile);
-                } catch(GoogleJsonResponseException gex){
-                    int code = gex.getDetails().getCode();
-                    if(code == 403 || code == 404){
-                        deleteFileStore();
-                        throw new NoPermissionException(DEFAULT_FOLDER_ID);
-                    } else {
-                        throw gex;
-                    }
-                }
-                return googleFile;
+            googleFile.setName(f.getFileName());
+
+            //since all of this google stuff is blocking code (O...K...)
+            //it will execute in whatever order we put it in.
+            //no need to worry about them executing out of order
+            googleFile = insert.execute();
+            publishToWeb(googleFile);
+        } catch(GoogleJsonResponseException gex){
+            int code = gex.getDetails().getCode();
+            if(code == 403 || code == 404){
+                deleteFileStore();
+                throw new NoPermissionException(DEFAULT_FOLDER_ID);
+            } else {
+                throw gex;
             }
-        };
-        
-        return upload;
+        }
+        return googleFile;
     }
     
-    public static final DriveIOOp<File> uploadManifest(WayfindingManifest man, String folderId){
-        try {
-            createSubfolder(folderId, man.getTitle()).addOnSucceed((folder)->{
-                man.setDriveFolderId(folder.getId());
-            }).getExcecutingThread().join();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
+    public static final File revise(VersionLog vl) throws IOException, VersionLogAccessException{
+        File ret = null;
+        try{
+            ret = drive.files().get(VersionLog.DEFAULT_VERSION_LOG_ID).execute();
+            java.io.File localFileToUpdate = vl.writeToTempFile(null);
+            drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
+        } catch(IOException e){
+            if(e instanceof GoogleJsonResponseException){
+                int code = ((GoogleJsonResponseException) e).getDetails().getCode();
+                if(code == 403 || code == 404){
+                    throw new VersionLogAccessException();
+                } else {
+                    throw e;
+                }
+            }
         }
 
-        man.exportData();
-        try {
-            man.uploadContents().getExcecutingThread().join();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-        
-        return uploadFile(man, man.getDriveFolderId());
-    }
-    
-    public static final DriveIOOp<File> revise(VersionLog vl){
-        return new DriveIOOp<File>(){
-            @Override
-            public File perform() throws Exception {
-                File ret = null;
-                try{
-                    ret = drive.files().get(VersionLog.DEFAULT_VERSION_LOG_ID).execute();
-                    java.io.File localFileToUpdate = vl.createTempFile();
-                    drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
-                } catch(IOException e){
-                    if(e instanceof GoogleJsonResponseException){
-                        int code = ((GoogleJsonResponseException) e).getDetails().getCode();
-                        if(code == 403 || code == 404){
-                            throw new VersionLogAccessException();
-                        }
-                    }
-                }
-                
-                return ret;
-            }
-        };
+        return ret;
     }
     
     /**
      * Creates a new folder on the google drive
      * @param id the id of the folder containing this new folder
      * @param name the name of this new folder
-     * @return the DriveIOOp creating the new folder, then returns the folder afterwards
+     * @return the folder
      */
-    public static DriveIOOp<File> createSubfolder(String id, String name){
-        return new DriveIOOp<File>(){
-            @Override
-            public File perform() throws Exception {
-                File folder = new File();
-                folder.setName(name);
-                folder.setMimeType("application/vnd.google-apps.folder");
-                ArrayList<String> parents = new ArrayList<>();
-                parents.add(id);
-                folder.setParents(parents);
-                folder = drive.files().create(folder).setFields("id").execute();
-                return folder;
-            }
-        };
+    public static final File createSubfolder(String id, String name) throws IOException{
+        File folder = new File();
+        folder.setName(name);
+        folder.setMimeType("application/vnd.google-apps.folder");
+        ArrayList<String> parents = new ArrayList<>();
+        parents.add(id);
+        folder.setParents(parents);
+        folder = drive.files().create(folder).setFields("id").execute();
+        return folder;
     }
     
     private static void publishToWeb(File f) throws IOException{
@@ -212,84 +171,54 @@ public class GoogleDriveUploader{
         drive.permissions().create(f.getId(), p).execute();
     }
     
-    public static com.google.api.services.drive.model.File getFile(String id){
+    public static final com.google.api.services.drive.model.File getFile(String id) throws IOException{
         com.google.api.services.drive.model.File ret = null;
         if(id.contains("id=")){
             id = id.split("id=")[1];
         }
-        try{
-            ret = drive.files().get(id).execute();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        ret = drive.files().get(id).execute();
         
         return ret;
-    }
-    
-    /**
-     * Verifies that a file exists.
-     * @param id the id of the file to check. This can be either a URL or just the file ID
-     * @return a DriveIOOp which will return true if it succeeds, or throw an error if it fails
-     */
-    public static DriveIOOp<Boolean> checkExists(String id){
-        if(id.contains("id=")){
-            return checkExists(id.split("id=")[1]);
-        }
-        
-        return new DriveIOOp<Boolean>(){
-            @Override
-            public Boolean perform() throws Exception {
-                File f = drive.files().get(id).execute();
-                ID_TO_NAME.put(id, f.getName());
-                return true;
-            }
-        };
     }
     
     /**
      * Checks if a file is a folder
      * @param id the id of the file to check
-     * @return a DriveIOOp, which, when successful, returns whether or not the file is a folder
+     * @return a whether or not the file is a folder
+     * @throws java.io.IOException of this fails to retrieve the folder
      */
-    public static DriveIOOp<Boolean> isFolder(String id){
+    public static final boolean isFolder(String id) throws IOException{
         if(id.contains("id=")){
-            return isFolder(id.split("id=")[1]);
+            id = id.split("id=")[1];
         }
         
-        return new DriveIOOp<Boolean>(){
-            @Override
-            public Boolean perform() throws Exception {
-                File f = drive.files().get(id).execute();
-                ID_TO_NAME.put(id, f.getName());
-                return f.getMimeType().equals("application/vnd.google-apps.folder");
-            }
-        };
+        File f = getFile(id);
+        ID_TO_NAME.put(id, f.getName());
+        return f.getMimeType().equals("application/vnd.google-apps.folder");
     }
     
-    public static DriveIOOp<String> getFileName(String id){
-        DriveIOOp<String> ret = null;
+    /**
+     * Synchronously retrieves the name of the Google Drive file with the given
+     * ID. Note: this method is blocking.
+     * 
+     * @param id
+     * @return 
+     * @throws java.io.IOException if this fails to retrieve the file
+     */
+    public static final String getFileName(String id) throws IOException{
+        String fileName;
         
         if(id.contains("id=")){
-            ret = getFileName(id.split("id=")[1]);
-        } else if(ID_TO_NAME.containsKey(id)){
-            ret = new DriveIOOp<String>() {
-                @Override
-                public String perform() throws Exception {
-                    return ID_TO_NAME.get(id);
-                }
-            };
+            id = id.split("id=")[1];
+        }
+        if(ID_TO_NAME.containsKey(id)){
+            fileName = ID_TO_NAME.get(id);
         } else {
-            ret = new DriveIOOp<String>() {
-                @Override
-                public String perform() throws Exception {
-                    String name = drive.files().get(id).execute().getName();
-                    ID_TO_NAME.put(id, name);
-                    return name;
-                }
-            };
+            fileName = getFile(id).getName();
+            ID_TO_NAME.put(id, fileName);
         }
         
-        return ret;
+        return fileName;
     }
     
     /**
@@ -314,12 +243,10 @@ public class GoogleDriveUploader{
     private static Credential authorize() throws Exception{
         //load a json file containing the user's login data
         GoogleClientSecrets clientInfo = GoogleClientSecrets.load(
-                JSON, 
-                new InputStreamReader(
-                        GoogleDriveUploader
-                                .class
-                                .getResourceAsStream("/client_id.json")
-                )
+            JSON, 
+            new InputStreamReader(
+                GoogleDriveUploader.class.getResourceAsStream("/client_id.json")
+            )
         );
         if(
             clientInfo.getDetails().getClientId().startsWith("NULL") ||

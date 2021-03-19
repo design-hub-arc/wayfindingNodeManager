@@ -1,6 +1,10 @@
 package nodemanager.events;
 
-import nodemanager.node.Node;
+import nodemanager.NodeManager;
+import nodemanager.gui.editPage.mapComponents.MapImage;
+import nodemanager.gui.editPage.mapComponents.NodeIcon;
+import nodemanager.model.Graph;
+import nodemanager.model.Node;
 
 /**
  * Records when a node is moved via the "move this node" button
@@ -13,7 +17,8 @@ public class NodeMovedEvent extends EditEvent{
     private int newX;
     private int newY;
     
-    public NodeMovedEvent(Node n, int x, int y){
+    public NodeMovedEvent(Graph g, Node n, int x, int y){
+        super(g);
         moved = n;
         initialX = x;
         initialY = y;
@@ -22,19 +27,24 @@ public class NodeMovedEvent extends EditEvent{
     }
     
     @Override
-    public void undo() {
-        newX = moved.getIcon().getX();
-        newY = moved.getIcon().getY();
-        moved.getIcon().setPos(initialX, initialY);
-        moved.getIcon().respositionNode(); //need to do this, or scaleTo will override the undo
-        moved.getIcon().getHost().repaint();
+    public void undoImpl(Graph g) {
+        MapImage map = NodeManager.getInstance().getMap();
+        NodeIcon icon = map.getIcon(moved.getId());
+        newX = icon.getX();
+        newY = icon.getY();
+        icon.setPos(initialX, initialY);
+        moved.setX((int)icon.getScale().mapXToNodeX(icon.getX()));
+        moved.setY((int)icon.getScale().mapYToNodeY(icon.getY()));
+        icon.getHost().repaint();
     }
 
     @Override
-    public void redo() {
-        moved.getIcon().setPos(newX, newY);
-        moved.getIcon().respositionNode();
-        moved.getIcon().getHost().repaint();
+    public void redoImpl(Graph g) {
+        NodeIcon icon = NodeManager.getInstance().getMap().getIcon(moved.getId());
+        icon.setPos(newX, newY);
+        moved.setX((int)icon.getScale().mapXToNodeX(icon.getX()));
+        moved.setY((int)icon.getScale().mapYToNodeY(icon.getY()));
+        icon.getHost().repaint();
     }
     
 }

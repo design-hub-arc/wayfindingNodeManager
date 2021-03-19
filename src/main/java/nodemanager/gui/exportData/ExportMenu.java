@@ -1,17 +1,19 @@
 package nodemanager.gui.exportData;
 
-import nodemanager.files.NodeConnFile;
-import nodemanager.files.NodeLabelFile;
-import nodemanager.files.NodeCoordFile;
+import nodemanager.files.NodeConnFileHelper;
+import nodemanager.files.NodeLabelFileHelper;
+import nodemanager.files.NodeCoordFileHelper;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
-import nodemanager.files.MapFile;
+import nodemanager.files.MapFileHelper;
 import java.io.IOException;
+import nodemanager.NodeManager;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.ApplicationMenuBar;
 import nodemanager.gui.InputConsole;
+import nodemanager.model.Graph;
 
 
 /**
@@ -51,37 +53,36 @@ public class ExportMenu extends JMenu{
     }
     
     private void saveCurrentDataset(String exportName, String parentDir){
-        NodeCoordFile coords = new NodeCoordFile(exportName);
-        coords.exportData();
+        Graph g = NodeManager.getInstance().getGraph();
+        NodeCoordFileHelper coords = new NodeCoordFileHelper(exportName);
         try {
-            coords.createFile(parentDir);
+            coords.writeToFileUnderParent(g, parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         
-        NodeConnFile conns = new NodeConnFile(exportName);
-        conns.exportData();
+        NodeConnFileHelper conns = new NodeConnFileHelper(exportName);
         try {
-            conns.createFile(parentDir);
+            conns.writeToFileUnderParent(g, parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         
-        NodeLabelFile labels = new NodeLabelFile(exportName);
-        labels.exportData();
+        NodeLabelFileHelper labels = new NodeLabelFileHelper(exportName);
         try {
-            labels.createFile(parentDir);
+            labels.writeToFileUnderParent(g, parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         
-        MapFile map = new MapFile(exportName);
-        map.exportData();
+        MapFileHelper map = new MapFileHelper(exportName);
         try {
-            map.createFile(parentDir);
+            map.writeToFileUnderParent(g, parentDir);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        
+        NodeManager.getInstance().getLog().clear();
     }
     
     private JMenuItem exportManifest(){

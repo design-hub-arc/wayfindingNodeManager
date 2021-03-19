@@ -1,7 +1,6 @@
 package nodemanager.gui.importData;
 
 import nodemanager.files.FileType;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,9 +8,15 @@ import java.io.IOException;
 import javax.swing.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import nodemanager.NodeManager;
+import nodemanager.files.MapFileHelper;
+import nodemanager.files.NodeConnFileHelper;
+import nodemanager.files.NodeCoordFileHelper;
+import nodemanager.files.NodeLabelFileHelper;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.gui.FileSelector;
 import nodemanager.gui.ApplicationPage;
+import nodemanager.model.Graph;
 
 /**
  * The LocalImportPage is used to 
@@ -27,50 +32,54 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
     
     public LocalImportPage(ApplicationBody parent){
         super(parent);
-        setLayout(new GridLayout(7, 1));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
+        JPanel inner = new JPanel();
+        
+        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         
         fileCheckBoxes = new ArrayList<>();
         
         selectFolder = new JButton("Select folder containing data");
         selectFolder.addActionListener(this);
-        add(selectFolder);
+        inner.add(selectFolder);
         
         selectedFolder = new JTextField("no folder selected");
         selectedFolder.setEditable(false);
-        add(selectedFolder);
+        inner.add(selectedFolder);
         
-        fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.NODE_COORD
-                )
+        fileCheckBoxes.add(new FileCheckBox(
+                FileType.NODE_COORD,
+                new NodeCoordFileHelper()
+            )
         );
-        fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.NODE_CONN
-                )
+        fileCheckBoxes.add(new FileCheckBox(
+                FileType.NODE_CONN,
+                new NodeConnFileHelper()
+            )
         );
-        fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.LABEL
-                )
+        fileCheckBoxes.add(new FileCheckBox(
+                FileType.LABEL,
+                new NodeLabelFileHelper()
+            )
         );
-        fileCheckBoxes.add( 
-                new FileCheckBox(
-                        FileType.MAP_IMAGE
-                )
+        fileCheckBoxes.add(new FileCheckBox(
+                FileType.MAP_IMAGE,
+                new MapFileHelper()
+            )
         );
-        fileCheckBoxes.forEach((box)->add(box));
-        
+        fileCheckBoxes.forEach((box)->inner.add(box));
         JButton importAll = new JButton("Import the selected files");
         importAll.addActionListener((e)->{
+            Graph g = NodeManager.getInstance().getGraph();
             for(FileCheckBox b : fileCheckBoxes){
                 //don't do lambda. Needs to do in order.
-                b.importIfSelected();
+                b.importIfSelected(g);
             }
             this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
         });
-        add(importAll);
+        inner.add(importAll);
+        
+        this.add(inner);
     }
 
     @Override
@@ -91,11 +100,7 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
             Files.list(f.toPath()).forEach((file)->{
                 fileCheckBoxes.forEach((checkBox)->{
                     if(file.getFileName().toString().toUpperCase().contains(checkBox.getFileType().getSuffix().toUpperCase())){
-                        try {
-                            checkBox.selectFile(file.toFile());
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+                        checkBox.selectFile(file.toFile());
                     }
                 });
             });
