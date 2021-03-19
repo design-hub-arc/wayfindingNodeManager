@@ -1,8 +1,13 @@
 package nodemanager.gui;
 
+import java.awt.Color;
+import java.awt.GridLayout;
 import nodemanager.gui.editPage.mapComponents.NodeIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -24,44 +29,47 @@ public class ApplicationMenuBar extends JMenuBar {
     public ApplicationMenuBar(NodeManagerWindow parent){
         super();
         this.parent = parent;
-        add(createHomeButton());
-        add(new ImportMenu(this));
-        add(new ExportMenu(this));
-        add(createSelectMenu());
-        add(createOptionMenu());
+        add(addHoverBehavior(createHomeButton()));
+        add(addHoverBehavior(new ImportMenu(this)));
+        add(addHoverBehavior(new ExportMenu(this)));
+        add(addHoverBehavior(createSelectMenu()));
+        add(addHoverBehavior(createOptionMenu()));
         
         JMenuItem addNodeButton = new JMenuItem("Add a new Node");
         addNodeButton.addActionListener((ActionEvent e) -> {
             NodeManager.getInstance().setMode(new ModeNewNode());
         });
-        add(addNodeButton);
+        add(addHoverBehavior(addNodeButton));
         
         JMenuItem resetData = new JMenuItem("Clear all data");
         resetData.addActionListener((ActionEvent e) -> {
             resetData();
         });
-        add(resetData);
+        add(addHoverBehavior(resetData));
         
         JMenuItem undo = new JMenuItem("Undo");
         undo.addActionListener((ActionEvent e) -> {
             NodeManager.getInstance().getLog().undo();
         });
         undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK));
-        add(undo);
+        add(addHoverBehavior(undo));
         
         JMenuItem redo = new JMenuItem("Redo");
         redo.addActionListener((ActionEvent e) -> {
             NodeManager.getInstance().getLog().redo();
         });
         redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK));
-        add(redo);
+        add(addHoverBehavior(redo));
         
+        /*
         JMenuItem test = new JMenuItem("Test");
         test.addActionListener((e)->{
             System.out.println(NodeManager.getInstance().getGraph());
         });
-        add(test);
+        add(addHoverBehavior(test));
+        */
         
+        setLayout(new GridLayout(1, this.getComponentCount()));
         resetData();
     }
     
@@ -76,6 +84,24 @@ public class ApplicationMenuBar extends JMenuBar {
         });
         return ret;
     }
+    
+    private JMenuItem addHoverBehavior(JMenuItem jmi){
+        jmi.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                jmi.setForeground(Color.blue);
+                jmi.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                jmi.setForeground(Color.black);
+                jmi.repaint();
+            }
+        });
+        return jmi;
+    }
+    
     private void resetData(){
         Graph g = Graph.createDefault();
         NodeManager.getInstance().setGraph(g);

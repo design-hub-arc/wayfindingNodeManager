@@ -1,7 +1,6 @@
 package nodemanager.gui.importData;
 
 import nodemanager.files.FileType;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -33,18 +32,20 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
     
     public LocalImportPage(ApplicationBody parent){
         super(parent);
-        setLayout(new GridLayout(7, 1));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
+        JPanel inner = new JPanel();
+        
+        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         
         fileCheckBoxes = new ArrayList<>();
         
         selectFolder = new JButton("Select folder containing data");
         selectFolder.addActionListener(this);
-        add(selectFolder);
+        inner.add(selectFolder);
         
         selectedFolder = new JTextField("no folder selected");
         selectedFolder.setEditable(false);
-        add(selectedFolder);
+        inner.add(selectedFolder);
         
         fileCheckBoxes.add(new FileCheckBox(
                 FileType.NODE_COORD,
@@ -66,7 +67,7 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
                 new MapFileHelper()
             )
         );
-        fileCheckBoxes.forEach((box)->add(box));
+        fileCheckBoxes.forEach((box)->inner.add(box));
         JButton importAll = new JButton("Import the selected files");
         importAll.addActionListener((e)->{
             Graph g = NodeManager.getInstance().getGraph();
@@ -76,7 +77,9 @@ public class LocalImportPage extends ApplicationPage implements ActionListener{
             }
             this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
         });
-        add(importAll);
+        inner.add(importAll);
+        
+        this.add(inner);
     }
 
     @Override
