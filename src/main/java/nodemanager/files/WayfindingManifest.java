@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import nodemanager.exceptions.NoPermissionException;
-import nodemanager.io.DriveIOOp;
 import nodemanager.io.GoogleDriveUploader;
 import static nodemanager.io.GoogleDriveUploader.DOWNLOAD_URL_PREFIX;
 import nodemanager.model.Graph;
@@ -60,16 +59,11 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
         return urls.containsKey(fileType);
     }
     
-    public final DriveIOOp<AbstractWayfindingFileHelper> importFileFor(FileType fileType, Graph g){
-        DriveIOOp<AbstractWayfindingFileHelper> ret;
+    public final AbstractWayfindingFileHelper importFileFor(FileType fileType, Graph g){
+        AbstractWayfindingFileHelper ret;
         
         if(attachedFiles.containsKey(fileType)){
-            ret = new DriveIOOp<AbstractWayfindingFileHelper>(){
-                @Override
-                public AbstractWayfindingFileHelper perform() throws Exception {
-                    return attachedFiles.get(fileType);
-                }
-            };
+            ret = attachedFiles.get(fileType);
         } else {
             //load the file
             if(!containsUrlFor(fileType)){
@@ -77,34 +71,30 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
                 throw new NullPointerException(String.format("No file set for type '%s'", fileType.getTitle()));
             }
             //download the file
-            ret = new DriveIOOp<AbstractWayfindingFileHelper>() {
-                @Override
-                public AbstractWayfindingFileHelper perform() throws Exception {
-                    AbstractWayfindingFileHelper file = AbstractWayfindingFileHelper.fromType("manifestFile", fileType);
-                    String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
+            AbstractWayfindingFileHelper file = AbstractWayfindingFileHelper.fromType("manifestFile", fileType);
+            String id = urls.get(fileType).replace(DOWNLOAD_URL_PREFIX, "");
 
-                    try {
-                        InputStream in = GoogleDriveUploader.download(id);
-                        file.readGraphDataFromFile(g, in);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    attachedFiles.put(fileType, file); //cache the file
+            try {
+                InputStream in = GoogleDriveUploader.download(id);
+                file.readGraphDataFromFile(g, in);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            attachedFiles.put(fileType, file); //cache the file
 
-                    return file;
-                }
-            };
+            ret = file;
         }
         
         return ret;
     }
     
-    public final String getUrlFor(FileType type){
-        return urls.get(type);
-    }
-    
-    
-    public void exportData(Graph g) {
+    /**
+     * Uploads the contents of the program to the drive,
+     * then populates this with the urls of those new files.
+     * @param g the Graph to upload
+     * @return 
+     */
+    public boolean uploadContents(Graph g){
         attachedFiles.clear();
         urls.clear();
         
@@ -119,35 +109,19 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
         
         MapFileHelper map = new MapFileHelper(title);
         attachedFiles.put(FileType.MAP_IMAGE, map);
-    }
-    
-    /**
-     * Uploads the contents of the program to the drive,
-     * then populates this with the urls of those new files.
-     * @param g the Graph to upload
-     * @return 
-     */
-    public DriveIOOp<Boolean> uploadContents(Graph g){
-        if(attachedFiles.isEmpty()){
-            exportData(g);
-        }
-        return new DriveIOOp<Boolean>(){
-            @Override
-            public Boolean perform() throws Exception {
-                attachedFiles.forEach((type, file)->{
-                    try {
-                        File f = GoogleDriveUploader.uploadFile(g, file, driveFolderId);
-                        urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    } catch (NoPermissionException ex) {
-                        ex.printStackTrace();
-                    } 
-                });
-                
-                return true;
-            }
-        };
+        
+        attachedFiles.forEach((type, file)->{
+            try {
+                File f = GoogleDriveUploader.uploadFile(g, file, driveFolderId);
+                urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (NoPermissionException ex) {
+                ex.printStackTrace();
+            } 
+        });
+
+        return true;
     }
 
     @Override
@@ -171,11 +145,7 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
         
         // download the files
         urls.forEach((fileType, fileUrl)->{
-            try {
-                importFileFor(fileType, g).getExcecutingThread().join();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
+            importFileFor(fileType, g);
         });
     }
 

@@ -132,37 +132,29 @@ public class GoogleDriveUploader{
         File newFolder = createSubfolder(folderId, man.getTitle());
         man.setDriveFolderId(newFolder.getId());
         
-
-        try {
-            man.uploadContents(g).getExcecutingThread().join();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+        man.uploadContents(g);
         
         return uploadFile(g, man, man.getDriveFolderId());
     }
     
-    public static final DriveIOOp<File> revise(VersionLog vl){
-        return new DriveIOOp<File>(){
-            @Override
-            public File perform() throws Exception {
-                File ret = null;
-                try{
-                    ret = drive.files().get(VersionLog.DEFAULT_VERSION_LOG_ID).execute();
-                    java.io.File localFileToUpdate = vl.writeToTempFile(null);
-                    drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
-                } catch(IOException e){
-                    if(e instanceof GoogleJsonResponseException){
-                        int code = ((GoogleJsonResponseException) e).getDetails().getCode();
-                        if(code == 403 || code == 404){
-                            throw new VersionLogAccessException();
-                        }
-                    }
+    public static final File revise(VersionLog vl) throws IOException, VersionLogAccessException{
+        File ret = null;
+        try{
+            ret = drive.files().get(VersionLog.DEFAULT_VERSION_LOG_ID).execute();
+            java.io.File localFileToUpdate = vl.writeToTempFile(null);
+            drive.files().update(ret.getId(), new File(), new FileContent("text/csv", localFileToUpdate)).execute();
+        } catch(IOException e){
+            if(e instanceof GoogleJsonResponseException){
+                int code = ((GoogleJsonResponseException) e).getDetails().getCode();
+                if(code == 403 || code == 404){
+                    throw new VersionLogAccessException();
+                } else {
+                    throw e;
                 }
-                
-                return ret;
             }
-        };
+        }
+
+        return ret;
     }
     
     /**

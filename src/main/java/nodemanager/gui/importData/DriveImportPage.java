@@ -156,11 +156,7 @@ public class DriveImportPage extends ApplicationPage {
     
     private void importManifest(WayfindingManifest man, Graph g) {
         cbs.stream().filter((cb)->cb.isSelected()).filter((cb)->man.containsUrlFor(cb.getFileType())).forEach((cb)->{
-            try {
-                man.importFileFor(cb.getFileType(), g).getExcecutingThread().join();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
+            man.importFileFor(cb.getFileType(), g);
         });
         this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
     }

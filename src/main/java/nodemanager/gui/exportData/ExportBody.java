@@ -11,6 +11,7 @@ import java.io.InputStream;
 import javax.swing.*;
 import nodemanager.NodeManager;
 import nodemanager.exceptions.NoPermissionException;
+import nodemanager.exceptions.VersionLogAccessException;
 import nodemanager.gui.ApplicationBody;
 import nodemanager.io.*;
 import nodemanager.gui.ApplicationPage;
@@ -113,10 +114,13 @@ public final class ExportBody extends ApplicationPage {
             msg.setText("Upload complete!");
             NodeManager.getInstance().getLog().clear();
             v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
-            GoogleDriveUploader.revise(v).addOnFail((err)->{
-                msg.setText(err.getMessage());
-            });
-            this.getApplicationBody().switchToPage(ApplicationBody.EDIT);
+            try {
+                GoogleDriveUploader.revise(v);
+                getApplicationBody().switchToPage(ApplicationBody.EDIT);
+            } catch (VersionLogAccessException ex) {
+                msg.setText(ex.getMessage());
+                ex.printStackTrace();
+            }
         } catch (IOException ex) {
             msg.setText(ex.getMessage());
             ex.printStackTrace();
