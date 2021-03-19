@@ -1,6 +1,7 @@
 package nodemanager.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 import javax.swing.JPanel;
@@ -72,6 +73,8 @@ public class InputConsole extends JPanel {
     private void enqueueCommand(InputRequest req){
         if(waitingCommands.isEmpty()){
             writeMessage(req.getMessage());
+            inputField.setBackground(Color.yellow);
+            inputField.requestFocus();
         }
         waitingCommands.addLast(req);
     }
@@ -89,6 +92,10 @@ public class InputConsole extends JPanel {
             waitingCommands.poll().accept(inputField.getText());
             if(!waitingCommands.isEmpty()){
                 writeMessage(waitingCommands.peek().getMessage());
+                inputField.setBackground(Color.yellow);
+                inputField.requestFocus();
+            } else {
+                inputField.setBackground(Color.white);
             }
         }
         inputField.setText("");
