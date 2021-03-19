@@ -1,8 +1,8 @@
 package nodemanager.events;
 
 import java.awt.image.BufferedImage;
-import nodemanager.Session;
-import nodemanager.gui.mapComponents.MapImage;
+import nodemanager.gui.editPage.mapComponents.MapImage;
+import nodemanager.model.Graph;
 
 /**
  *
@@ -15,27 +15,27 @@ public class MapResizeEvent extends EditEvent{
     
     /**
      * Created by MapImage whenever the user changes the map.
+     * @param g the graph the map represents
      * @param m the MapImage that was changed
      * @param from the original image
      * @param to the image it was changed to
      */
-    public MapResizeEvent(MapImage m, BufferedImage from, BufferedImage to){
+    public MapResizeEvent(Graph g, MapImage m, BufferedImage from, BufferedImage to){
+        super(g);
         resized = m;
         origImage = from;
         newImage = to;
     }
 
     @Override
-    public void undo() {
+    public void undoImpl(Graph g) {
         resized.setImage(origImage);
-        Session.newMapX = 0;
-        Session.newMapY = 0;
+        g.setMapImage(origImage);
     }
     
     @Override
-    public void redo(){
+    public void redoImpl(Graph g){
         resized.setImage(newImage);
-        Session.newMapX = 0;
-        Session.newMapY = 0;
+        g.setMapImage(newImage);
     }
 }

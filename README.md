@@ -3,6 +3,9 @@
 A data management program for the Wayfinding project.
 The Google Drive API credentials used by this program have been invalidated, so any Drive API functionality will fail.
 
+## TODO
+* Do we still want to see the node move as we are moving the mouse, choosing a new place for it?
+
 ## Important Notice
 
 The application will not allow you to download or upload data if you log in using a Google account without access to the Wayfinding folder on the ARCDH Google Drive.
@@ -26,6 +29,8 @@ You can pan the map image by clicking and dragging it around.
 You can also zoom in and out using the mouse scroll wheel.
 
 Exit the current mode by using the ESC key
+
+Be sure to look in the text console after you choose where to save your data set
 
 ## Editting the application
 

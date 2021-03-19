@@ -1,9 +1,12 @@
 package nodemanager.gui.importData;
 
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.FileInputStream;
 import javax.swing.*;
-import nodemanager.files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFileHelper;
 import nodemanager.files.FileType;
+import nodemanager.model.Graph;
 
 /**
  * This will serve as the base for local- and drive import file choosers.
@@ -15,19 +18,22 @@ import nodemanager.files.FileType;
 public abstract class AbstractFileCheckbox extends JComponent{
     private final FileType fileType;
     private final JCheckBox include;
-    private AbstractWayfindingFile selectedFile;
+    private final AbstractWayfindingFileHelper fileHelper;
+    private File selectedFile;
 
     /**
      *
      * @param t What type of file this allows the user to select
+     * @param fileHelper the Object to help this import or export files
      */
-    public AbstractFileCheckbox(FileType t){
+    public AbstractFileCheckbox(FileType t, AbstractWayfindingFileHelper fileHelper){
         super();
         setLayout(new GridLayout(1, 1));
         fileType = t;
         include = new JCheckBox("Include " + t.getTitle() + " file", true);
         selectedFile = null;
         add(include);
+        this.fileHelper = fileHelper;
     }
     
     /**
@@ -44,7 +50,7 @@ public abstract class AbstractFileCheckbox extends JComponent{
      * What happens when it is imported is determined based on what this' file type is.
      * @param f 
      */
-    public void selectFile(AbstractWayfindingFile f){
+    public void selectFile(File f){
         selectedFile = f;
     }
     
@@ -52,10 +58,10 @@ public abstract class AbstractFileCheckbox extends JComponent{
         return include.isSelected();
     }
     
-    public final void importIfSelected(){
+    public final void importIfSelected(Graph g){
         if(selectedFile != null && include.isSelected()){
             try {
-                selectedFile.importData();
+                this.fileHelper.readGraphDataFromFile(g, new FileInputStream(selectedFile));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

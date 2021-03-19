@@ -1,13 +1,11 @@
 package nodemanager.gui.importData;
 
-import nodemanager.files.AbstractWayfindingFile;
+import nodemanager.files.AbstractWayfindingFileHelper;
 import java.awt.GridLayout;
 import java.io.File;
 import javax.swing.*;
 import nodemanager.gui.FileSelector;
 import nodemanager.files.FileType;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  * Used by LocalImportBody to allow the user to choose what wayfinding files to import.
@@ -18,8 +16,8 @@ public class FileCheckBox extends AbstractFileCheckbox{
     private final JTextField fileName;
     private final JButton select;
     
-    public FileCheckBox(FileType t){
-        super(t);
+    public FileCheckBox(FileType t, AbstractWayfindingFileHelper fileHelper){
+        super(t, fileHelper);
         setLayout(new GridLayout(1, 3));
         
         fileName = new JTextField("no " + getFileType().getTitle() + " file selected");
@@ -32,21 +30,16 @@ public class FileCheckBox extends AbstractFileCheckbox{
                     "Select " + getFileType().getTitle() + " file",
                     new String[]{t.getFileExtention()},
                     (f)->{
-                        try {
-                            selectFile(f);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+                        selectFile(f);
                     }
             ).actionPerformed(e);
         });
         add(select);
     }
     
-    public void selectFile(File f) throws IOException{
-        AbstractWayfindingFile wayfindingFile = AbstractWayfindingFile.fromType(f.getName(), getFileType());
-        wayfindingFile.setContents(new FileInputStream(f));
-        super.selectFile(wayfindingFile);
+    @Override
+    public void selectFile(File f) {
+        super.selectFile(f);
         fileName.setText(f.getAbsolutePath());
     }
 }

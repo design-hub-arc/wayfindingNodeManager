@@ -1,6 +1,7 @@
 package nodemanager.events;
 
-import nodemanager.node.Node;
+import nodemanager.model.Graph;
+import nodemanager.model.Node;
 
 /**
  * Created whenever a label is added to a node
@@ -10,18 +11,19 @@ public class LabelAddedEvent extends EditEvent{
     private final Node addedTo;
     private final String label;
     
-    public LabelAddedEvent(Node n, String s){
+    public LabelAddedEvent(Graph g, Node n, String s){
+        super(g);
         addedTo = n;
         label = s;
     }
 
     @Override
-    public void undo() {
-        addedTo.removeLabel(label);
+    public void undoImpl(Graph g) {
+        g.removeLabel(label);
     }
 
     @Override
-    public void redo() {
-        addedTo.addLabel(label);
+    public void redoImpl(Graph g) {
+        g.addLabel(label, addedTo.getId());
     }
 }
