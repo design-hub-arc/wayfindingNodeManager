@@ -25,7 +25,6 @@ import nodemanager.model.Graph;
  */
 public class WayfindingManifest extends AbstractWayfindingFileHelper {
     private final String title;
-    private String driveFolderId;
     private final HashMap<FileType, AbstractWayfindingFileHelper> attachedFiles;
     private final HashMap<FileType, String> urls;
     
@@ -34,7 +33,6 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
     public WayfindingManifest(String folderName){
         super(folderName + "Manifest", FileType.MANIFEST);
         title = folderName;
-        driveFolderId = null;
         attachedFiles = new HashMap<>();
         urls = new HashMap<>();
     }
@@ -45,14 +43,6 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
     
     public String getTitle(){
         return title;
-    }
-    
-    public void setDriveFolderId(String folderId){
-        driveFolderId = folderId;
-    }
-    
-    public String getDriveFolderId(){
-        return driveFolderId;
     }
     
     public final boolean containsUrlFor(FileType fileType) {
@@ -86,42 +76,6 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
         }
         
         return ret;
-    }
-    
-    /**
-     * Uploads the contents of the program to the drive,
-     * then populates this with the urls of those new files.
-     * @param g the Graph to upload
-     * @return 
-     */
-    public boolean uploadContents(Graph g){
-        attachedFiles.clear();
-        urls.clear();
-        
-        NodeCoordFileHelper coords = new NodeCoordFileHelper(title);
-        attachedFiles.put(FileType.NODE_COORD, coords);
-        
-        NodeConnFileHelper conn = new NodeConnFileHelper(title);
-        attachedFiles.put(FileType.NODE_CONN, conn);
-        
-        NodeLabelFileHelper labels = new NodeLabelFileHelper(title);
-        attachedFiles.put(FileType.LABEL, labels);
-        
-        MapFileHelper map = new MapFileHelper(title);
-        attachedFiles.put(FileType.MAP_IMAGE, map);
-        
-        attachedFiles.forEach((type, file)->{
-            try {
-                File f = GoogleDriveUploader.uploadFile(g, file, driveFolderId);
-                urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (NoPermissionException ex) {
-                ex.printStackTrace();
-            } 
-        });
-
-        return true;
     }
 
     @Override
@@ -160,5 +114,40 @@ public class WayfindingManifest extends AbstractWayfindingFileHelper {
                 .append(entry.getValue());
         });
         out.write(sb.toString().getBytes());
+    }
+    
+    public final com.google.api.services.drive.model.File uploadToDrive(String folderId, Graph g) throws IOException, NoPermissionException{
+        // create a subfolder for this
+        File newFolder = GoogleDriveUploader.createSubfolder(folderId, title);
+        
+        // try and upload the different files for the Graph
+        attachedFiles.clear();
+        urls.clear();
+        
+        NodeCoordFileHelper coords = new NodeCoordFileHelper(title);
+        attachedFiles.put(FileType.NODE_COORD, coords);
+        
+        NodeConnFileHelper conn = new NodeConnFileHelper(title);
+        attachedFiles.put(FileType.NODE_CONN, conn);
+        
+        NodeLabelFileHelper labels = new NodeLabelFileHelper(title);
+        attachedFiles.put(FileType.LABEL, labels);
+        
+        MapFileHelper map = new MapFileHelper(title);
+        attachedFiles.put(FileType.MAP_IMAGE, map);
+        
+        attachedFiles.forEach((type, file)->{
+            try {
+                File f = GoogleDriveUploader.uploadFile(g, file, newFolder.getId());
+                urls.put(type, DOWNLOAD_URL_PREFIX + f.getId());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (NoPermissionException ex) {
+                ex.printStackTrace();
+            } 
+        });
+        
+        // lastly, upload this to the Drive.
+        return GoogleDriveUploader.uploadFile(g, this, newFolder.getId());
     }
 }

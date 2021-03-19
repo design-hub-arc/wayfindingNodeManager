@@ -108,26 +108,32 @@ public final class ExportBody extends ApplicationPage {
         msg.setText("Beginning upload...");
         revalidate();
         repaint();
-        WayfindingManifest newMan = new WayfindingManifest(name.getText());
-        try {
-            File f = GoogleDriveUploader.uploadManifest(newMan, folder.getText());
-            msg.setText("Upload complete!");
-            NodeManager.getInstance().getLog().clear();
-            v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
-            try {
-                GoogleDriveUploader.revise(v);
-                getApplicationBody().switchToPage(ApplicationBody.EDIT);
-            } catch (VersionLogAccessException ex) {
-                msg.setText(ex.getMessage());
-                ex.printStackTrace();
+        Thread t = new Thread(){
+            @Override
+            public void run(){
+                try {
+                    WayfindingManifest newMan = new WayfindingManifest(name.getText());
+                    File f = newMan.uploadToDrive(folder.getText(), NodeManager.getInstance().getGraph());
+                    msg.setText("Upload complete!");
+                    NodeManager.getInstance().getLog().clear();
+                    v.addExport((String)selectType.getSelectedItem(), DOWNLOAD_URL_PREFIX + f.getId());
+                    try {
+                        GoogleDriveUploader.revise(v);
+                        getApplicationBody().switchToPage(ApplicationBody.EDIT);
+                    } catch (VersionLogAccessException ex) {
+                        msg.setText(ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                } catch (IOException ex) {
+                    msg.setText(ex.getMessage());
+                    ex.printStackTrace();
+                } catch (NoPermissionException ex) {
+                    msg.setText(ex.getMessage());
+                    ex.printStackTrace();
+                }
             }
-        } catch (IOException ex) {
-            msg.setText(ex.getMessage());
-            ex.printStackTrace();
-        } catch (NoPermissionException ex) {
-            msg.setText(ex.getMessage());
-            ex.printStackTrace();
-        }
+        };
+        t.start();
     }
     
     private JButton createExportButton(){

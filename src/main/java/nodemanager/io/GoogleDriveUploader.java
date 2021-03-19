@@ -126,17 +126,6 @@ public class GoogleDriveUploader{
         return googleFile;
     }
     
-    public static final File uploadManifest(WayfindingManifest man, String folderId) throws IOException, NoPermissionException{
-        Graph g = NodeManager.getInstance().getGraph();
-        
-        File newFolder = createSubfolder(folderId, man.getTitle());
-        man.setDriveFolderId(newFolder.getId());
-        
-        man.uploadContents(g);
-        
-        return uploadFile(g, man, man.getDriveFolderId());
-    }
-    
     public static final File revise(VersionLog vl) throws IOException, VersionLogAccessException{
         File ret = null;
         try{
