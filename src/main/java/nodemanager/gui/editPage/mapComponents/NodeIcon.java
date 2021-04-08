@@ -177,22 +177,23 @@ public class NodeIcon{
     public void drawAllLinks(Graphics g){
         if(drawLinks || onImage.getDrawAllConnections()){
             Graph graph = onImage.getGraph();
-            Arrays.stream(graph.getConnectionsById(id)).mapToObj((int id)-> {
-                return graph.getNodeById(id);
-            }).forEach((Node n) -> drawLink(g, n));
+            Arrays.stream(graph.getConnectionsById(id)).forEach((int id) -> drawLink(g, id));
         }
     }
     
     
     /**
      * Draw a link between this NodeIcon and another Node's icon
-     * @param n the Node to draw a connection to
      */
-    private void drawLink(Graphics g, Node n){
+    private void drawLink(Graphics g, int otherId){
         Graphics2D g2d = (Graphics2D)g;
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(size / 2));
-        NodeIcon other = this.getHost().getIcon(n.id);
-        g2d.drawLine(getX(), getY(), other.getX(), other.getY());
+        NodeIcon other = this.getHost().getIcon(otherId);
+        if(other == null){
+            System.err.printf("Couldn't find node icon for Node#%d in NodeIcon::drawLink", otherId);
+        } else {
+            g2d.drawLine(getX(), getY(), other.getX(), other.getY());
+        }
     }
 }
